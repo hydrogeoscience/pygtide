@@ -9,6 +9,6 @@ This image shows Earth tides calculated for the city Karlsruhe (Germany) in the 
 
 ## References
 
-* Wenzel, H.-G. (1996), The nanogal software: Earth tide data processing package ETERNA 3.30, Bull. Inf. Marées Terrestres, 124, 9425–9439.
-* Hartmann, T., and H.-G. Wenzel (1995), The HW95 tidal potential catalogue, Geophysical Research Letters, 22(24), 3553–3556, doi:10.1029/95GL03324.
-* Kudryavtsev, S. M. (2004), Improved harmonic development of the Earth tide-generating potential, Journal of Geodesy, Springer.
+* Wenzel, H.-G. (1996), The nanogal software: Earth tide data processing package ETERNA 3.30, Bulletin d’Informations des Marées Terrestres, 124, 9425–9439.
+* Hartmann, T., and H.-G. Wenzel (1995), The HW95 tidal potential catalogue, Geophysical Research Letters, 22(24), 3553–3556, https://doi.org/10.1029/95GL03324.
+* Kudryavtsev, S. M. (2004), Improved harmonic development of the Earth tide-generating potential, Journal of Geodesy, 17(12), 829-838, https://doi.org/10.1007/s00190-003-0361-2.
