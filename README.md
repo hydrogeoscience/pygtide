@@ -5,7 +5,7 @@ The original ETERNA PREDICT 3.3 was written by the late Prof. H.-G. Wenzel (Wenz
 
 ## How to install and run
 * Download and install [Anaconda 5.2+ for Python 3.6](https://www.anaconda.com/download/) (Windows 7/10 64bit)
-* Use the *Anaconda Navigator* to ensure that the packages [libpython}(https://anaconda.org/anaconda/libpython) (as a minimum v2.1) and [mingw](https://anaconda.org/anaconda/mingw) (as a minimum v4.7) are installed. You will also need the following standard libraries: *numpy*, *pandas* and *datetime*.
+* Use the *Anaconda Navigator* to ensure that the packages [libpython](https://anaconda.org/anaconda/libpython) (as a minimum v2.1) and [mingw](https://anaconda.org/anaconda/mingw) (as a minimum v4.7) are installed. You will also need the following standard libraries: *numpy*, *pandas* and *datetime*.
 * Download [PyGTide](https://github.com/hydrogeoscience/pygtide/archive/master.zip), unzip into a local directory and run *test.py*
 
 ## Example
