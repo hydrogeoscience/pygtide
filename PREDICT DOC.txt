@@ -1,0 +1,329 @@
+      Section 11: Description of program PREDICT                              
+      ------------------------------------------                              
+                                                                               
+      The Fortran 90 program PREDICT can  be  used  for  the  computation of
+      earth tide signals with constant time  interval  for  one  station  in 
+      order to generate a table of synthetic model tides  (tidal  potential, 
+      gravity  tides,  tilt  tides,  vertical  or  horizontal  displacement,
+      vertical strain, horizontal strain, areal strain, shear strain, volume   
+      strain, and oceanic tides). There can be  used seven  different  tidal   
+      potential  catalogs   (Doodson  1921,  Cartwright-Tayler-Edden   1973,   
+      Buellesfeld 1985, Tamura 1987, Xi 1989, Roosbeek  1996,  Hartmann  and
+      Wenzel 1995) together with observed  tidal  parameters.  Additionally,
+      gravity pole tides (gravity variation due to polar motion,  see  encl.
+      007) and gravity LOD tides (gravity  variation  due  to  variation  of 
+      length of day, see encl. 008) can be computed for those periods, where
+      the necessary data are given in file "etpolc.dat".    
+ 
+      Section 11.1: Description of the project file "project"
+      ------------------------------------------------------
+ 
+      The ASCII project name file "project"  for  program  PREDICT  contains
+      one single variable only, the project name  which  is  abbreviated  as
+      "pn" in this manual. The project  name  is  an  alphanumerical  string 
+      consisting of 8 characters at maximum. The project name is  read  from 
+      the first 8 characters of  the  first  record  of  project  name  file 
+      "project". The project name is used to define  the  control  parameter 
+      file name "pn".ini for program PREDICT.  
+ 
+      Section 11.2: Description of control parameter file "pn".ini    
+      -----------------------------------------------------------    
+                                                                               
+      The control parameter file "pn".ini (where "pn" stands for the project  
+      name defined in file "project")  defines  several  control  parameters 
+      necessary for the operation of program PREDICT. This control parameter
+      file has an identical structure to the control parameter files used by
+      programs RECTIDE, DETIDE, DESPIKE, DECIMATE, PREGRED and ANALYZE. Some
+      of the variables are identical to  those  used  by  programs  RECTIDE, 
+      DETIDE, DESPIKE,  DECIMATE,  PREGRED  and  ANALYZE.  Thus  it  may  be 
+      possible to use the same control parameter file  for  data  recording, 
+      data preprocessing and data analysis.                      
+                                                                               
+      All control parameter statements must begin with the control parameter   
+      name (column 1...10) which ends with an equal sign. The control parame-  
+      ter names must be spelled exactly with uppercase  letters  as  defined   
+      below. Control parameters  with  unknown  names  will  be  ignored  by   
+      program RECTIDE. The control parameter variables must be  input  after   
+      the equal sign following the control parameter name, with  appropriate   
+      format. The control parameter statements  must  not  have  a  specific   
+      sequence. A record starting with # in column 1 will be ignored and may   
+      be used to comment the control parameters.  All  characters  following   
+      # in a record will be ignored and may be used to comment  the  control   
+      parameters.                                                              
+                                                                               
+      STATIONAME= station name, 10 characters (col. 12...21)  following  the   
+                  equal sign. The station name  will  be  displayed  on  the   
+                  graphics screen during data recording.                       
+      STATLATITU= ellipsoidal latitude of the station in degree referring to   
+                  WGS84 reference system (col.12...26).                        
+      STATLONITU= ellipsoidal longitude of the station in  degree  referring   
+                  to WGS84 reference system (col.12...26).                     
+      STATELEVAT= ellipsoidal height of the station in meter referring to      
+                  WGS84 reference system (col.12...26).                        
+      STATGRAVIT= gravity of the station in m/s**2, necessary for tidal tilt   
+                  only (col. 12...26,  real  with  decimal  point).  If  the   
+                  gravity is unknown, use a value of less than 1.0  and  the   
+                  program will  compute  and  subsequently  use  the  normal   
+                  gravity value referring to GRS80 reference system.           
+      STATAZIMUT= azimuth of the  instrument  in  degree  decimal,  reckoned   
+                  clockwise from north (col. 12 ... 26,  real  with  decimal   
+                  point). This parameter is used for tidal tilt,  horizontal   
+                  displacement and horizontal strain only.                     
+      TIDALPOTEN= parameter for the tidal potential catalog to be used.        
+                  1 = Doodson (1921) tidal potential catalog,                  
+                  2 = Cartwright-Tayler-Edden (1973) tidal potential catalog   
+                  3 = Buellesfeld (1985) tidal potential catalog,            
+                  4 = Tamura (1987) tidal potential catalog,
+                  5 = Xi (1989) tidal potential catalog,
+                  6 = Roosbeek (1996) tidal potential catalog,
+                  7 = Hartmann and Wenzel (1995) tidal potential catalog.
+                  As default, TIDALPOTEN= 7 is used.                   
+      SAMPLERATE= Data sample interval in s (col. 12 ... 26, integer).         
+      INITIALEPO= Initial epoch, used to compute the Fourier development  of   
+                  the specific earth tide component. The initial epoch  con-   
+                  sists  of  the  integer  year (col. 12 ... 16, e.g. 1992),   
+                  integer month (col. 17 ... 21), and integer day (col.        
+                  22 ... 26).                                                  
+      PREDICSPAN= Time span for the  prediction  in  hours  (col. 12 ... 26,   
+                  integer). The model tide series will start at the  initial   
+                  epoch INITIALEPO and the  time  span  will  be  PREDICSPAN   
+                  hours.                                                       
+      TIDALCOMPO= Earth tide component (col. 12 ... 26, integer).              
+                  = -1 for tidal potential in m**2/s**2.                       
+                  =  0 for tidal gravity in nm/s**2.                           
+                  =  1 for tidal tilt in mas, at azimuth STATAZIMUT.           
+                  =  2 for tidal vertical displacement in mm.                  
+                  =  3 for tidal horizontal displacement in mm at              
+                       azimuth STATAZIMUT.                                     
+                  =  4 for tidal vertical   strain in 10**-9 = nstr.           
+                  =  5 for tidal horizontal strain in 10**-9 = nstr,           
+                       at azimuth STATAZIMUT.                                  
+                  =  6 for tidal areal  strain in 10**-9 = nstr.               
+                  =  7 for tidal shear  strain in 10**-9 = nstr.               
+                  =  8 for tidal volume strain in 10**-9 = nstr.               
+                  =  9 for ocean tides in mm.                                  
+                  The computed model  tides  will  be  given  in  the  units   
+                  defined above.                                               
+      AMTRUNCATE= Amplitude threshold for the tidal potential  catalogue  in
+                  m**2/s**2. Only tidal waves with amplitudes exceeding  the
+                  amplitude threshold are used  for  the  computation.  This 
+                  reduces the execution time, but also the accuracy  of  the
+                  computed tidal signales. For mean latitudes, the  relation
+                  between amplitude threshold and gravity tide accuracy   is
+                  for the Hartmann and Wenzel (1995) tidal potential catalog
+ 
+                           threshold              rms error             
+                                                 [nm/s**2]          
+ 
+                             1.D-01                88.40              
+                             1.D-02                14.40              
+                             1.D-03                 2.25              
+                             1.D-04                 0.44              
+                             1.D-05                 0.068             
+                             1.D-06                 0.011             
+                             1.D-07                 0.002             
+                             1.D-08                 0.001             
+                             1.D-09                 0.001              
+                             1.D-10                 0.001
+             
+      POLTIDECOR= Amplitude factor for gravity pole  tide. If  the amplitude
+                  factor is greater zero, gravity pole tides will be  compu-
+                  ted using the IERS daily pole  coordinates  and  stored as 
+                  additional channel of the ouput file "pn".prd.
+      LODTIDECOR= Amplitude factor for gravity LOD tide.  If  the  amplitude
+                  factor is greater zero, gravity LOD tides will be computed
+                  using  the IERS  daily  pole  coordinates  and  stored  as 
+                  additional channeld of the output file "pn".prd.    
+      TIDALPARAM= wave group selection for a priori model tide  computation.   
+                  The number of wavegroups is restricted to  85.  The  tidal   
+                  parameters may be taken from an  earth  tide  analysis  of   
+                  another data set in the same station,  or  from  a  neigh-   
+                  bouring station, or from synthetic gravity tide parameters   
+                  (Timmen and Wenzel 1994, 1995), or from a guess only.        
+                  Col.12..21: DFRA#=  start frequency of the wave  group  in   
+                                      cpd (real).                              
+                  Col.22..31: DFRE#=  end   frequency of the wave  group  in   
+                                      cpd (real).                              
+                  Col.32..41: DGAM0#= amplitude factor  of  the  wave  group   
+                                      (real).                                  
+                  Col.42..51: DPHI0#= phase lead of the wave  group  in  deg   
+                                      (real).                                  
+                                                                               
+      The wave group selection for model tide  computation  should  be  made   
+      according to the wave group selection for the analysis of  Earth  tide   
+      data; the list given below is a  proposal  only. The  frequencies  are 
+      given in cycles per day (cpd).            
+                                                                               
+      group        > 1 month            > 6 months          > 1 year           
+                   from      to         from      to        from      to       
+                  [cpd]   [cpd]        [cpd]   [cpd]       [cpd]   [cpd]       
+                                                                               
+      SA             -       -            -       -       0.001379  0.004107   
+      SSA            -       -      0.004108  0.020884    0.004108  0.020884   
+      MM      0.020885  0.054747    0.020885  0.054747    0.020885  0.054747
+      MF      0.054748  0.091348    0.054748  0.091348    0.054748  0.091348
+      MTM     0.091349  0.501369    0.091349  0.501369    0.091349  0.501369   
+      Q1      0.501370  0.911390    0.501370  0.911390    0.501370  0.911390   
+      O1      0.911391  0.947991    0.911391  0.947991    0.911391  0.947991   
+      M1      0.947992  0.981854    0.947992  0.981854    0.947992  0.981854
+      P1             -       -      0.981855  0.998631    0.981855  0.998631   
+      S1             -       -            -       -       0.998632  1.001369   
+      K1      0.981855  1.023622    0.998632  1.023622    1.001370  1.004107   
+      PSI1           -       -            -       -       1.004108  1.006845   
+      PHI1           -       -            -       -       1.006846  1.023622   
+      J1      1.023623  1.057485    1.023623  1.057485    1.023623  1.057485   
+      OO1     1.057486  1.470243    1.057486  1.470243    1.057486  1.470243   
+      2N2     1.470244  1.880264    1.470244  1.880264    1.470244  1.880264   
+      N2      1.880265  1.914128    1.880265  1.914128    1.880265  1.914128   
+      M2      1.914129  1.950419    1.914129  1.950419    1.914129  1.950419   
+      L2      1.950420  1.984282    1.950420  1.984282    1.950420  1.984282   
+      S2      1.984283  2.451943    1.984283  2.002736    1.984283  2.002736  
+      K2             -       -      2.002737  2.451943    2.002737  2.451943   
+      M3M6    2.451944  7.000000    2.451944  7.000000    2.451944  7.000000
+                                                                               
+  
+      As an example for the control parameter file for program  PREDICT,  we 
+      list below file "bfhw9501.ini", which is provided on the CD-rom:
+ 
+      # This file BFHW9501.INI status 1996.08.15 containing control parameters
+      # for program package ETERNA 3.40
+ 
+      # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      # ! NOTE: The datalines have to start with their names.       !
+      # !       An additional comment may follow after the values,  !
+      # !       delimited by a whitespace                           !
+      # ! Values of 0 or less causes PREGRED to calculate the       !
+      # ! range(s) automatically resp. to use default values        !
+      # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+ 
+      # a commentline starts with an '#', it may appear at any position
+      # in this file. Empty lines may appear too
+ 
+      TEXTHEADER=  1.15000   0.0000 long   1.14673   -0.2474 Q1    
+      TEXTHEADER=  1.14882   0.0804 O1     1.13070   0.2132 M1   
+      TEXTHEADER=  1.13899   0.2062 P1     1.13000   0.0000 S1      
+      TEXTHEADER=  1.13600   0.2070 K1     1.25000   0.5000 PSI1    
+      TEXTHEADER=  1.18000   0.3000 PHI1   1.15354   0.0801 J1   
+      TEXTHEADER=  1.14851  -0.0251 OO1    1.15205   2.4463 2N2  
+      TEXTHEADER=  1.17054   2.5425 N2     1.18705   2.0327 M2   
+      TEXTHEADER=  1.22450   4.1630 L2     1.18963   0.6271 S2
+      TEXTHEADER=  1.18947   0.8226 K2     1.06234   0.3783 M3
+      TEXTHEADER=  1.02000   0.0000 M4     1.01500   0.0000 M5M6   
+ 
+      SENSORNAME=PREDICT         # earth tide sensor name
+      SAMPLERATE=   3600         # sampling interval in seconds 
+      STATLATITU=     48.3306    # stations latitude  in degree
+      STATLONITU=      8.3300    # stations longitude in degree
+      STATELEVAT=    589.000     # stations elevation in meter
+      STATGRAVIT=      0.        # stations gravity in m/s**2
+      STATAZIMUT=      0.        # stations azimuth in degree from north
+      INITIALEPO= 1987    1    1 # start epoch for PREDICT
+      PREDICSPAN=  65544         # time span in hours for PREDICT
+      TIDALCOMPO=      0         # tidal component, see manual
+      TIDALPOTEN=      7         # HW95 tidal potential development
+      AMTRUNCATE=  1.D-10        # amplitude threshold 
+      POLTIDECOR=   1.16         # poletide amplitude factor
+      LODTIDECOR=   1.17         # LOD tide amplitude factor   
+      POLTIDEREG=      1         # ANALYZE pole tide regression adjustment
+ 
+      TIDALPARAM=  0.000000  0.501369   1.15000    0.0000 long   #tidal param. 
+      TIDALPARAM=  0.501370  0.911390   1.14673   -0.2474 Q1     #tidal param.
+      TIDALPARAM=  0.911391  0.947991   1.14882    0.0804 O1     #tidal param.
+      TIDALPARAM=  0.947992  0.981854   1.13070    0.2132 M1     #tidal param.
+      TIDALPARAM=  0.981855  0.998631   1.13899    0.2062 P1     #tidal param.
+      TIDALPARAM=  0.998632  1.001369   1.13000    0.0000 S1     #tidal param. 
+      TIDALPARAM=  1.001370  1.004107   1.13600    0.2070 K1     #tidal param.
+      TIDALPARAM=  1.004108  1.006845   1.25000    0.5000 PSI1   #tidal param. 
+      TIDALPARAM=  1.006846  1.023622   1.18000    0.3000 PHI1   #tidal param. 
+      TIDALPARAM=  1.023623  1.057485   1.15354    0.0801 J1     #tidal param.
+      TIDALPARAM=  1.057486  1.470243   1.14851   -0.0251 OO1    #tidal param.
+      TIDALPARAM=  1.470244  1.880264   1.15205    2.4463 2N2    #tidal param.
+      TIDALPARAM=  1.880265  1.914128   1.17054    2.5425 N2     #tidal param.
+      TIDALPARAM=  1.914129  1.950419   1.18705    2.0327 M2     #tidal param.
+      TIDALPARAM=  1.950420  1.984282   1.22450    4.1630 L2     #tidal param.
+      TIDALPARAM=  1.984283  2.002736   1.18963    0.6271 S2     #tidal param.
+      TIDALPARAM=  2.002737  2.451943   1.18947    0.8226 K2     #tidal param.
+      TIDALPARAM=  2.451944  3.381478   1.06234    0.3783 M3     #tidal param.
+      TIDALPARAM=  3.381379  4.347615   1.02000    0.0000 M4     #tidal param.
+      TIDALPARAM=  4.347616  7.000000   1.01500    0.0000 M5M6   #tidal param.
+ 
+      # End of file BFHW9501.INI
+ 
+      Section 11.3: Description of output file "pn".prd
+      -------------------------------------------------
+ 
+      The data output file of  program  PREDICT  uses  the  ETERNA  standard
+      format for exchange of  high  resolution  and  high  rate  tidal  data   
+      (Wenzel 1995). The output file is divided into a file header giving
+      an alphanumeric description of the file (provided with control 
+      parameters TEXTHEADER of the "pn".ini file) and the file body
+      containing the computed tidal signal. The format of the file body is
+                                                                               
+      Col.01...08: date in year, month, day; e.g. 19900328  means year 1990,   
+                   month 03 = March, day 28th.                                 
+      Col.10...15: time in hour, minute, second,  given  in  Universal  Time   
+                   Coordinated (UTC); e.g. 231200 means 23 hours 12  minutes   
+                   00 seconds. The seconds  are assumed to be exact, e.g. 00   
+                   seconds means 0.000 seconds.                                
+      Col.16...25: Channel 1 in units of the tidal component. This channel
+                   contains the sum of the tidal signal and the gravity
+                   pole tide and LOD tide signals.  
+      Col.26...35: Channel 2 in units of the tidal component. This channel
+                   usually conatins the gravity tide.                  
+      Col.36...45: Channel 3 in units of the tidal component. This channel
+                   contains the gravity pole tide, if computed.
+      Col.46...55: Channel 4 in units of the tidal component. This channel
+                   contains the gravity LOD tide, if computed.
+ 
+      The file ends with 99999999 as date.
+ 
+      As an example, a part of the output file "bfhw9501.prd" computed with
+      program PREDICT using the control parameter file "bfhw9501.ini" is 
+      given below. This files contains gravity tides, gravity pole tides and
+      gravity LOD tides. 
+                                                                               
+      77777777            0.000     0.000     0.000     0.000
+      19870101      0 -1630.338 -1649.708    18.906     0.464
+      19870101  10000 -1544.612 -1563.988    18.909     0.467
+      19870101  20000 -1253.944 -1273.327    18.913     0.469
+      19870101  30000  -811.681  -831.070    18.917     0.472
+      19870101  40000  -295.698  -315.093    18.921     0.474
+      19870101  50000   208.593   189.191    18.925     0.477
+      19870101  60000   626.498   607.090    18.929     0.479
+      19870101  70000   909.354   889.939    18.933     0.482
+      19870101  80000  1043.335  1023.914    18.937     0.485
+      19870101  90000  1049.655  1030.227    18.941     0.487
+      19870101 100000   976.094   956.660    18.944     0.490
+      19870101 110000   881.969   862.529    18.948     0.492
+      19870101 120000   820.439   800.992    18.952     0.495
+ 
+      The data stored in the output file of program PREDICT can be plotted
+      using program PLOTDATA (see encl. 006...008).
+ 
+      Section 11.4: Execution time of program PREDICT
+      -----------------------------------------------
+  
+      The execution time of program PREDICT depends mainly on the number of
+      waves of the chosen tidal potential catalogue, on the amplitude
+      threshold of the tidal potential, and on the number of samples to be
+      computed. The execution time given below has been measured on a 100 
+      MHz PENTIUM pc with operating system MS-DOS 6.22 for 8760 hourly
+      gravity signals including pole tide and LOD tide. The rms error has
+      been determined by comparison with gravity tide benchmark series
+      BFDE403F.DAT.
+ 
+      catalogue           threshold     nwave    rms error    exec.time
+                                                 [nm/s**2]       [s]
+ 
+      Tamura (1987)          1.D-06       1200      0.070        11.86
+      Hartmann+Wenzel (1995) 1.D-01          9     88.40          3.90
+      Hartmann+Wenzel (1995) 1.D-02         42     14.40          4.06
+      Hartmann+Wenzel (1995) 1.D-03        155      2.25          4.94
+      Hartmann+Wenzel (1995) 1.D-04        434      0.44          7.20
+      Hartmann+Wenzel (1995) 1.D-05       1248      0.068        13.51
+      Hartmann+Wenzel (1995) 1.D-06       3268      0.011        33.01
+      Hartmann+Wenzel (1995) 1.D-07       7761      0.002        83.82
+      Hartmann+Wenzel (1995) 1.D-08      11462      0.001       132.86
+      Hartmann+Wenzel (1995) 1.D-09      12000      0.001       139.95
+      Hartmann+Wenzel (1995) 1.D-10      12011      0.001       140.11
+  
