@@ -6,7 +6,7 @@ This was updated to include the latest tidal catalogue (Kudryavtsev, 2004)
 The original Fortran code can be found at: http://igets.u-strasbg.fr/soft_and_tool.php
 
 ## Example
-![Image of Yaktocat](https://octodex.github.com/images/yaktocat.png)
+![Earth tides for Karlsruhe](https://raw.githubusercontent.com/hydrogeoscience/pygtide/master/earth_tide_example.png)
 
 ## References
 
