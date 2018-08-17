@@ -1,7 +1,7 @@
 # PyGTide
 ## A Python module and wrapper for ETERNA PREDICT to compute gravitational tides on Earth
 
-The original ETERNA PREDICT 3.3 was written by the late Prof. H.-G. Wenzel (Wenzel, 1996). This was updated to include the latest tidal catalogue (Kudryavtsev, 2004). The original Fortran code can be found at: http://igets.u-strasbg.fr/soft_and_tool.php
+The original ETERNA PREDICT 3.3 was written by the late Prof. H.-G. Wenzel (Wenzel, 1996). This was updated by Kudryavtsev (2004) to include the latest tidal catalogue. The original Fortran code can be found at: http://igets.u-strasbg.fr/soft_and_tool.php
 
 ## How to install and run
 * Download and install [Anaconda 5.2+ for Python 3.6](https://www.anaconda.com/download/) (Windows 7/10 64bit)
