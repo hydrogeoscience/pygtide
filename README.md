@@ -18,4 +18,4 @@ This image shows Earth tides calculated for the city Karlsruhe (Germany) in the 
 * Kudryavtsev, S. M. (2004), Improved harmonic development of the Earth tide-generating potential, Journal of Geodesy, 17(12), 829-838, https://doi.org/10.1007/s00190-003-0361-2.
 
 ## License
-PyGTide is released under the [Mozilla Public License 2.0](https://www.mozilla.org/en-US/MPL/2.0/)
+PyGTide is released by [Gabriel C. Rau](https://hydrogeo.science) under the [Mozilla Public License 2.0](https://www.mozilla.org/en-US/MPL/2.0/)
