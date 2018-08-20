@@ -6,7 +6,8 @@ PyGTide is a Python class that wraps around ETERNA PREDICT 3.4 which was compile
 Earth Tide Service (IGETS)](http://igets.u-strasbg.fr/soft_and_tool.php).
 
 ## How to install and run
-The PyGTide user guide is available as [PDF download](https://github.com/hydrogeoscience/pygtide/raw/master/PyGTide_user-guide.pdf).
+A user guide is available as [PDF download](https://github.com/hydrogeoscience/pygtide/raw/master/PyGTide_user-guide.pdf).
+
 Instructions:
 * Download and install [Anaconda 5.2+ for Python 3.6](https://www.anaconda.com/download/) (Windows 7/10 64bit)
 * Use the *Anaconda Navigator* to ensure that the packages [libpython](https://anaconda.org/anaconda/libpython) (as a minimum v2.1) and [mingw](https://anaconda.org/anaconda/mingw) (as a minimum v4.7) are installed. You will also need the following standard libraries: *numpy*, *pandas* and *datetime*.
