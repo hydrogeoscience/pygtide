@@ -72,12 +72,12 @@ This Python module was created based on the Fortran code PREDICT as part of
 ETERNA 3.4, originally written by Prof. Hans George Wenzel in 1996. PREDICT is used to
 calculate Earth tide gravity time series. The original PREDICT Fortran code was
 updated to implement the new tidal catalogue by Kudryatvtsev (2004). The code
-was then modernised (Fortran 90) for compilation as Python 3 module. This interface 
+was then modernised (Fortran 90) for compilation as Python 3 module. This interface
 provides a convenient way to utilise ETERNA PREDICT within Python.
 
 The module relies on external files in the directory "commdat". The folowing files require
 regular updating:
-    
+
 - etddt.dat - contains the difference between ephemeris time and UTC (include any leap seconds)
 - etpolut.dat - contains the earth's pole rotation
 
@@ -93,7 +93,7 @@ The original Fortran code was also modified for use with f2py:
 import numpy as np
 import pandas as pd
 import datetime as dt
-import etpred
+from etpred import etpred
 import os
 from sys import path
 
@@ -114,7 +114,7 @@ class pygtide(object):
         #print(str(etpred.params.comdir, 'UTF-8').strip())
         self.data_dir = str(etpred.params.comdir, 'UTF-8').strip() + str(etpred.params.pathsep, 'UTF-8').strip()
         self.args = []
-        
+
         #%% capture end date of file "etddt.dat" from module
         self.etddt_file = str(etpred.params.etddtdat, 'UTF-8').strip()
         year = int(etpred.inout.etd_start)
@@ -137,7 +137,7 @@ class pygtide(object):
         # self.units = ['(m/s)**2','nm/s**2','mas','mm','mm','nstr','nstr','nstr','nstr','nstr','mm']
         self.is_init = True
         self.exec = False
-        
+
         #%% remote data files
         # IERS leap seconds history file
         self.leapsec_rfile = 'https://hpiers.obspm.fr/iers/bul/bulc/Leap_Second_History.dat'
@@ -386,7 +386,7 @@ class pygtide(object):
             raise ValueError("Samprate exceeds duration!")
             return False
         # ####################################################
-        # BUGFIX: fix a weird bug where the program stops before 
+        # BUGFIX: fix a weird bug where the program stops before
         # the etpdata table is filled completely
         argsin[6] = duration + 1
         #%% run prediction routine
@@ -486,7 +486,7 @@ class pygtide(object):
         etpolut1(self.data_dir, self.etpolut1_dat_file, self.leapsec_rfile, self.iauhist_rfile, self.iaucurr_rfile)
         # refresh bin file also
         self.etpolut1_dat2bin()
-        
+
     #%% update the etpolut1 binary file from the text file
     def etpolut1_dat2bin(self):
         etpolut1_dat = self.data_dir + '\\' + self.etpolut1_dat_file
@@ -497,14 +497,14 @@ class pygtide(object):
             for num, line in enumerate(f, 1):
                 header.append(line)
                 if "C*******" in header[-1]: break
-        
+
         # read into dataframe
         cols = ['Date', 'Time', 'MJD', 'x', 'y', 'UT1-UTC', 'TAI-UT1']
         etpolut = pd.read_csv(etpolut1_dat, names=cols, skiprows=num, header=None, delimiter=r"\s+")
         # drop the last row with EOL ('99999999')
         etpolut = etpolut[:-1]
         print("File '{:s}' has {:d} rows.".format(etpolut1_dat, etpolut.shape[0]))
-        #%% 
+        #%%
         # write as binary for use in fortran
         # in fortran, each record has 4 * 8 bytes = 32
         # header contains start date in MJD and number of rows + 1
@@ -520,7 +520,7 @@ class pygtide(object):
             f.write(data.flatten().tobytes())
         f.close()
         print("File '{:s}' has been updated (Header: {:.0f}, {:d}).".format(etpolut1_bin, etpolut.iloc[0, 2], etpolut.shape[0]+1))
-        
+
 # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 # FUNCTIONS BELOW THIS LINE ARE UNDER DEVELOPMENT AND THEREFORE EXPERIMENTAL
 # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
