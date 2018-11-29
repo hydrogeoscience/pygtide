@@ -7,7 +7,7 @@ setup(
     name='pygtide',
     version='0.2',
     packages=['pygtide', 'etpred'],
-    package_data={'etpred': ['*.pyd', 'commdat/*']},
+    package_data={'etpred': ['*.pyd', '*.so', 'commdat/*']},
     install_requires=['numpy', 'pandas'],
     author='Gabriel C. Rau',
     author_email='gabriel@hydrogeo.science',
