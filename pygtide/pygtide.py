@@ -97,6 +97,9 @@ from etpred import etpred
 import os
 from sys import path
 
+WORKING_DIR = os.getcwd()
+ETPRED_DIR = os.path.dirname(etpred.__file__)
+
 class pygtide(object):
     """
     The PyGTide class will initialise internal variables
@@ -106,6 +109,10 @@ class pygtide(object):
         pygtide.init() initialises the etpred (Fortran) module and sets global variables
         """
         self.msg = msg
+
+        # Move to etpred directory
+        os.chdir(ETPRED_DIR)
+
         # set some common variables for external access
         etpred.init()
         self.version = 'PyGTide v0.1'
@@ -143,6 +150,9 @@ class pygtide(object):
         self.leapsec_rfile = 'https://hpiers.obspm.fr/iers/bul/bulc/Leap_Second_History.dat'
         self.iauhist_rfile = 'http://hpiers.obspm.fr/iers/eop/eopc04/eopc04_IAU2000.62-now'
         self.iaucurr_rfile = 'http://maia.usno.navy.mil/ser7/finals2000A.data'
+
+        # Move back to original working directory
+        os.chdir(WORKING_DIR)
 
     def update(self):
         """
@@ -394,8 +404,16 @@ class pygtide(object):
         # print(argsin)
         self.args = argsin
         if (self.msg): print('%s is calculating, please wait ...' % (self.fortran_version))
+
+        # Move to etpred directory
+        os.chdir(ETPRED_DIR)
+
         # run predict
         etpred.predict(argsin)
+
+        # Move back to original working directory
+        os.chdir(WORKING_DIR)
+
         self.exec = True
         self.exectime = etpred.inout.exectime
         if (self.msg): print('Done after %.3f s.' % (self.exectime))
