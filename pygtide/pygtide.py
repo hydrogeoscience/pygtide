@@ -508,8 +508,8 @@ class pygtide(object):
     #%% update the etpolut1 binary file from the text file
     def etpolut1_dat2bin(self):
         data_dir = os.path.join(ETPRED_DIR, self.data_dir)
-        etpolut1_dat = data_dir + '\\' + self.etpolut1_dat_file
-        etpolut1_bin = data_dir + '\\' + self.etpolut1_bin_file
+        etpolut1_dat = os.path.join(data_dir, self.etpolut1_dat_file)
+        etpolut1_bin = os.path.join(data_dir, self.etpolut1_bin_file)
         header = []
         # find the end of the header
         with open(etpolut1_dat, "r") as f:
@@ -544,7 +544,8 @@ class pygtide(object):
 # FUNCTIONS BELOW THIS LINE ARE UNDER DEVELOPMENT AND THEREFORE EXPERIMENTAL
 # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     def read_etpolut1_bin(self):
-        with open('commdat\etpolut1.bin','rb') as f:
+        fname = os.path.join(ETPRED_DIR, self.data_dir, 'etpolut1.bin')
+        with open(fname,'rb') as f:
             header = np.fromfile(f, dtype=np.int, count=2)
             f.seek(32)
             data = np.fromfile(f, dtype=np.float64)
@@ -557,7 +558,8 @@ class pygtide(object):
         print(data.shape)
 
     def read_etpolut1_dat(self):
-        with open('commdat\etpolut1.dat', "rb") as f:
+        fname = os.path.join(ETPRED_DIR, self.data_dir, 'etpolut1.dat')
+        with open(fname, "rb") as f:
             first = f.readline()
             #print(first[0:10])
             while first[0:10] != b"C*********":
@@ -576,7 +578,8 @@ class pygtide(object):
         self.etpolut1_end = dt.datetime.strptime(last[0:8].decode("utf-8"), "%Y%m%d")
 
     def read_etddt_dat(self):
-        with open('commdat\etddt.dat', "rb") as f:
+        fname = os.path.join(ETPRED_DIR, self.data_dir, 'etddt.dat')
+        with open(fname, "rb") as f:
             first = f.readline()
             while first[0:10] != b"C*********":
                 first = f.readline()
