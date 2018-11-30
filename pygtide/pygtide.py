@@ -96,7 +96,7 @@ import datetime as dt
 from etpred import etpred
 import os
 from sys import path
-from pygtide_update_data import etddt, etpolut1
+from pygtide.pygtide_update_data import etddt, etpolut1
 
 WORKING_DIR = os.getcwd()
 ETPRED_DIR = os.path.dirname(etpred.__file__)
@@ -500,14 +500,16 @@ class pygtide(object):
     #%% update the pole coordinates and UT1 to TAI times
     def update_etpolut1(self):
         # import update routines
-        etpolut1(self.data_dir, self.etpolut1_dat_file, self.leapsec_rfile, self.iauhist_rfile, self.iaucurr_rfile)
+        data_dir = os.path.join(ETPRED_DIR, self.data_dir)
+        etpolut1(data_dir, self.etpolut1_dat_file, self.leapsec_rfile, self.iauhist_rfile, self.iaucurr_rfile)
         # refresh bin file also
         self.etpolut1_dat2bin()
 
     #%% update the etpolut1 binary file from the text file
     def etpolut1_dat2bin(self):
-        etpolut1_dat = self.data_dir + '\\' + self.etpolut1_dat_file
-        etpolut1_bin = self.data_dir + '\\' + self.etpolut1_bin_file
+        data_dir = os.path.join(ETPRED_DIR, self.data_dir)
+        etpolut1_dat = data_dir + '\\' + self.etpolut1_dat_file
+        etpolut1_bin = data_dir + '\\' + self.etpolut1_bin_file
         header = []
         # find the end of the header
         with open(etpolut1_dat, "r") as f:
