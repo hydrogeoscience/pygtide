@@ -96,6 +96,7 @@ import datetime as dt
 from etpred import etpred
 import os
 from sys import path
+from pygtide_update_data import etddt, etpolut1
 
 WORKING_DIR = os.getcwd()
 ETPRED_DIR = os.path.dirname(etpred.__file__)
@@ -494,13 +495,11 @@ class pygtide(object):
     #%% update the time conversion database (leap seconds)
     def update_etddt(self):
         # import update routines
-        from pygtide_update_data import etddt
         etddt(self.data_dir, self.etddt_file, self.leapsec_rfile)
 
     #%% update the pole coordinates and UT1 to TAI times
     def update_etpolut1(self):
         # import update routines
-        from pygtide_update_data import etpolut1
         etpolut1(self.data_dir, self.etpolut1_dat_file, self.leapsec_rfile, self.iauhist_rfile, self.iaucurr_rfile)
         # refresh bin file also
         self.etpolut1_dat2bin()
