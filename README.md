@@ -15,6 +15,7 @@ Instructions:
 
 ## Cite
 If you use PyGTide, please cite the work as:
+
 *Rau, Gabriel C. (2018) hydrogeoscience/pygtide: PyGTide v0.2 (Version v0.2). Zenodo. [http://doi.org/10.5281/zenodo.1346664](http://doi.org/10.5281/zenodo.1346664).*
 
 ## Example
