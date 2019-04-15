@@ -72,12 +72,12 @@ This Python module was created based on the Fortran code PREDICT as part of
 ETERNA 3.4, originally written by Prof. Hans George Wenzel in 1996. PREDICT is used to
 calculate Earth tide gravity time series. The original PREDICT Fortran code was
 updated to implement the new tidal catalogue by Kudryatvtsev (2004). The code
-was then modernised (Fortran 90) for compilation as Python 3 module. This interface 
+was then modernised (Fortran 90) for compilation as Python 3 module. This interface
 provides a convenient way to utilise ETERNA PREDICT within Python.
 
 The module relies on external files in the directory "commdat". The folowing files require
 regular updating:
-    
+
 - etddt.dat - contains the difference between ephemeris time and UTC (include any leap seconds)
 - etpolut.dat - contains the earth's pole rotation
 
@@ -93,9 +93,13 @@ The original Fortran code was also modified for use with f2py:
 import numpy as np
 import pandas as pd
 import datetime as dt
-import etpred
+from etpred import etpred
 import os
 from sys import path
+from pygtide.pygtide_update_data import etddt, etpolut1
+
+WORKING_DIR = os.getcwd()
+ETPRED_DIR = os.path.dirname(etpred.__file__)
 
 class pygtide(object):
     """
@@ -106,6 +110,10 @@ class pygtide(object):
         pygtide.init() initialises the etpred (Fortran) module and sets global variables
         """
         self.msg = msg
+
+        # Move to etpred directory
+        os.chdir(ETPRED_DIR)
+
         # set some common variables for external access
         etpred.init()
         self.version = 'PyGTide v0.1'
@@ -114,7 +122,7 @@ class pygtide(object):
         #print(str(etpred.params.comdir, 'UTF-8').strip())
         self.data_dir = str(etpred.params.comdir, 'UTF-8').strip() + str(etpred.params.pathsep, 'UTF-8').strip()
         self.args = []
-        
+
         #%% capture end date of file "etddt.dat" from module
         self.etddt_file = str(etpred.params.etddtdat, 'UTF-8').strip()
         year = int(etpred.inout.etd_start)
@@ -137,12 +145,15 @@ class pygtide(object):
         # self.units = ['(m/s)**2','nm/s**2','mas','mm','mm','nstr','nstr','nstr','nstr','nstr','mm']
         self.is_init = True
         self.exec = False
-        
+
         #%% remote data files
         # IERS leap seconds history file
         self.leapsec_rfile = 'https://hpiers.obspm.fr/iers/bul/bulc/Leap_Second_History.dat'
         self.iauhist_rfile = 'http://hpiers.obspm.fr/iers/eop/eopc04/eopc04_IAU2000.62-now'
         self.iaucurr_rfile = 'http://maia.usno.navy.mil/ser7/finals2000A.data'
+
+        # Move back to original working directory
+        os.chdir(WORKING_DIR)
 
     def update(self):
         """
@@ -386,7 +397,7 @@ class pygtide(object):
             raise ValueError("Samprate exceeds duration!")
             return False
         # ####################################################
-        # BUGFIX: fix a weird bug where the program stops before 
+        # BUGFIX: fix a weird bug where the program stops before
         # the etpdata table is filled completely
         argsin[6] = duration + 1
         #%% run prediction routine
@@ -394,8 +405,16 @@ class pygtide(object):
         # print(argsin)
         self.args = argsin
         if (self.msg): print('%s is calculating, please wait ...' % (self.fortran_version))
+
+        # Move to etpred directory
+        os.chdir(ETPRED_DIR)
+
         # run predict
         etpred.predict(argsin)
+
+        # Move back to original working directory
+        os.chdir(WORKING_DIR)
+
         self.exec = True
         self.exectime = etpred.inout.exectime
         if (self.msg): print('Done after %.3f s.' % (self.exectime))
@@ -476,35 +495,35 @@ class pygtide(object):
     #%% update the time conversion database (leap seconds)
     def update_etddt(self):
         # import update routines
-        from pygtide_update_data import etddt
         etddt(self.data_dir, self.etddt_file, self.leapsec_rfile)
 
     #%% update the pole coordinates and UT1 to TAI times
     def update_etpolut1(self):
         # import update routines
-        from pygtide_update_data import etpolut1
-        etpolut1(self.data_dir, self.etpolut1_dat_file, self.leapsec_rfile, self.iauhist_rfile, self.iaucurr_rfile)
+        data_dir = os.path.join(ETPRED_DIR, self.data_dir)
+        etpolut1(data_dir, self.etpolut1_dat_file, self.leapsec_rfile, self.iauhist_rfile, self.iaucurr_rfile)
         # refresh bin file also
         self.etpolut1_dat2bin()
-        
+
     #%% update the etpolut1 binary file from the text file
     def etpolut1_dat2bin(self):
-        etpolut1_dat = self.data_dir + '\\' + self.etpolut1_dat_file
-        etpolut1_bin = self.data_dir + '\\' + self.etpolut1_bin_file
+        data_dir = os.path.join(ETPRED_DIR, self.data_dir)
+        etpolut1_dat = os.path.join(data_dir, self.etpolut1_dat_file)
+        etpolut1_bin = os.path.join(data_dir, self.etpolut1_bin_file)
         header = []
         # find the end of the header
         with open(etpolut1_dat, "r") as f:
             for num, line in enumerate(f, 1):
                 header.append(line)
                 if "C*******" in header[-1]: break
-        
+
         # read into dataframe
         cols = ['Date', 'Time', 'MJD', 'x', 'y', 'UT1-UTC', 'TAI-UT1']
         etpolut = pd.read_csv(etpolut1_dat, names=cols, skiprows=num, header=None, delimiter=r"\s+")
         # drop the last row with EOL ('99999999')
         etpolut = etpolut[:-1]
         print("File '{:s}' has {:d} rows.".format(etpolut1_dat, etpolut.shape[0]))
-        #%% 
+        #%%
         # write as binary for use in fortran
         # in fortran, each record has 4 * 8 bytes = 32
         # header contains start date in MJD and number of rows + 1
@@ -520,12 +539,13 @@ class pygtide(object):
             f.write(data.flatten().tobytes())
         f.close()
         print("File '{:s}' has been updated (Header: {:.0f}, {:d}).".format(etpolut1_bin, etpolut.iloc[0, 2], etpolut.shape[0]+1))
-        
+
 # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 # FUNCTIONS BELOW THIS LINE ARE UNDER DEVELOPMENT AND THEREFORE EXPERIMENTAL
 # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     def read_etpolut1_bin(self):
-        with open('commdat\etpolut1.bin','rb') as f:
+        fname = os.path.join(ETPRED_DIR, self.data_dir, 'etpolut1.bin')
+        with open(fname,'rb') as f:
             header = np.fromfile(f, dtype=np.int, count=2)
             f.seek(32)
             data = np.fromfile(f, dtype=np.float64)
@@ -538,7 +558,8 @@ class pygtide(object):
         print(data.shape)
 
     def read_etpolut1_dat(self):
-        with open('commdat\etpolut1.dat', "rb") as f:
+        fname = os.path.join(ETPRED_DIR, self.data_dir, 'etpolut1.dat')
+        with open(fname, "rb") as f:
             first = f.readline()
             #print(first[0:10])
             while first[0:10] != b"C*********":
@@ -557,7 +578,8 @@ class pygtide(object):
         self.etpolut1_end = dt.datetime.strptime(last[0:8].decode("utf-8"), "%Y%m%d")
 
     def read_etddt_dat(self):
-        with open('commdat\etddt.dat', "rb") as f:
+        fname = os.path.join(ETPRED_DIR, self.data_dir, 'etddt.dat')
+        with open(fname, "rb") as f:
             first = f.readline()
             while first[0:10] != b"C*********":
                 first = f.readline()
