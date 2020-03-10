@@ -1,1 +1,1 @@
-from .pygtide import pygtide
+from pygtide.core import pygtide
