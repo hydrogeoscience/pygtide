@@ -93,13 +93,10 @@ The original Fortran code was also modified for use with f2py:
 import numpy as np
 import pandas as pd
 import datetime as dt
-from etpred import etpred
 import os
-from sys import path
-from pygtide.pygtide_update_data import etddt, etpolut1
-
-WORKING_DIR = os.getcwd()
-ETPRED_DIR = os.path.dirname(etpred.__file__)
+from pkg_resources import resource_filename
+from pygtide import etpred
+#from pygtide.pygtide_update_data import etddt, etpolut1
 
 class pygtide(object):
     """
@@ -111,20 +108,18 @@ class pygtide(object):
         """
         self.msg = msg
 
-        # Move to etpred directory
-        os.chdir(ETPRED_DIR)
 
-        # set some common variables for external access
-        etpred.init()
-        self.version = 'PyGTide v0.1'
+        self.version = 'PyGTide v0.3'
         self.exectime = 0
         self.fortran_version = etpred.inout.vers.astype(str)
         #print(str(etpred.params.comdir, 'UTF-8').strip())
-        self.data_dir = str(etpred.params.comdir, 'UTF-8').strip() + str(etpred.params.pathsep, 'UTF-8').strip()
+        self.data_dir = resource_filename('pygtide', 'commdat/')
+        etpred.params.comdir = self.data_dir + ' ' * (256 - len(self.data_dir))
         self.args = []
-
-        #%% capture end date of file "etddt.dat" from module
-        self.etddt_file = str(etpred.params.etddtdat, 'UTF-8').strip()
+        # set some common variables for external access
+        etpred.init()
+        # capture end date of file "etddt.dat" from module
+        self.etddt_file = etpred.params.etddtdat
         year = int(etpred.inout.etd_start)
         # leap year is missing
         d = dt.timedelta(days=(etpred.inout.etd_start - year)*365)
@@ -134,26 +129,24 @@ class pygtide(object):
         d = dt.timedelta(days=(etpred.inout.etd_end - year)*365)
         self.etddt_end = d + dt.datetime(year,1,1)
 
-        #%% capture end date of file "etpolut1.dat" from module
+        # capture end date of file "etpolut1.dat" from module
         self.etpolut1_dat_file = str(etpred.params.etpolutdat, 'UTF-8').strip()
         self.etpolut1_bin_file = str(etpred.params.etpolutbin, 'UTF-8').strip()
         self.etpolut1_start = dt.datetime.strptime(str(etpred.inout.etpol_start), "%Y%m%d")
         self.etpolut1_end = dt.datetime.strptime(str(etpred.inout.etpol_end), "%Y%m%d")
+#        self.etpolut1_end = dt.datetime.strptime('20190817', "%Y%m%d")
 
-        # print(end_date)
         self.headers = np.char.strip(etpred.inout.header.astype('str'))
         # self.units = ['(m/s)**2','nm/s**2','mas','mm','mm','nstr','nstr','nstr','nstr','nstr','mm']
         self.is_init = True
         self.exec = False
 
-        #%% remote data files
+        # remote data files
         # IERS leap seconds history file
         self.leapsec_rfile = 'https://hpiers.obspm.fr/iers/bul/bulc/Leap_Second_History.dat'
         self.iauhist_rfile = 'http://hpiers.obspm.fr/iers/eop/eopc04/eopc04_IAU2000.62-now'
         self.iaucurr_rfile = 'http://maia.usno.navy.mil/ser7/finals2000A.data'
 
-        # Move back to original working directory
-        os.chdir(WORKING_DIR)
 
     def update(self):
         """
@@ -164,7 +157,7 @@ class pygtide(object):
         self.args = etpred.inout.argsin
         self.unit = etpred.inout.etpunit.astype('str')
 
-    #%% run module etpred and return numbers
+    # run module etpred and return numbers
     def predict(self, latitude, longitude, height, startdate, duration, samprate, **control):
         """
         self.predict(latitude, longitude, height, startdate, duration, samprate, **control):
@@ -262,7 +255,7 @@ class pygtide(object):
         argsin[13] = 1.16
         argsin[14] = 1.16
 
-        #%% iterate through optional arguments passed
+        # iterate through optional arguments passed
         # print(control)
         # check statgravit validity
         if 'statgravit' in control:
@@ -313,7 +306,7 @@ class pygtide(object):
                 return False
             else:
                 argsin[14] = control['lodtidecor']
-        #%% additional control parameters
+        # additional control parameters
         # check fileout validity
         if 'fileprd' in control:
             if control['fileprd'] not in range(0,2):
@@ -400,20 +393,20 @@ class pygtide(object):
         # BUGFIX: fix a weird bug where the program stops before
         # the etpdata table is filled completely
         argsin[6] = duration + 1
-        #%% run prediction routine
+        # run prediction routine
         # ######################################################
         # print(argsin)
         self.args = argsin
         if (self.msg): print('%s is calculating, please wait ...' % (self.fortran_version))
 
         # Move to etpred directory
-        os.chdir(ETPRED_DIR)
+#        os.chdir(ETPRED_DIR)
 
         # run predict
         etpred.predict(argsin)
 
         # Move back to original working directory
-        os.chdir(WORKING_DIR)
+#        os.chdir(WORKING_DIR)
 
         self.exec = True
         self.exectime = etpred.inout.exectime
@@ -421,7 +414,7 @@ class pygtide(object):
         self.update()
         return True
 
-    #%% easy access to the raw data calculated by the Fortran module
+    # easy access to the raw data calculated by the Fortran module
     def results(self, round=6):
         """
         self.results(round=6)
@@ -448,7 +441,7 @@ class pygtide(object):
         else:
             return False
 
-    #%% easy access to the raw data calculated by Fortran
+    # easy access to the raw data calculated by Fortran
     def raw(self):
         """
         self.raw()
@@ -461,7 +454,7 @@ class pygtide(object):
         else:
             return False
 
-    #%% easy access to the formatted data calculated by Fortran
+    # easy access to the formatted data calculated by Fortran
     def data(self, round=6):
         """
         self.data(round=6):
@@ -475,7 +468,7 @@ class pygtide(object):
         else:
             return False
 
-    #%% easy access to the raw datetime calculated by Fortran
+    # easy access to the raw datetime calculated by Fortran
     def datetime(self):
         """
         self.datetime():
@@ -492,12 +485,12 @@ class pygtide(object):
         else:
             return False
 
-    #%% update the time conversion database (leap seconds)
+    # update the time conversion database (leap seconds)
     def update_etddt(self):
         # import update routines
         etddt(self.data_dir, self.etddt_file, self.leapsec_rfile)
 
-    #%% update the pole coordinates and UT1 to TAI times
+    # update the pole coordinates and UT1 to TAI times
     def update_etpolut1(self):
         # import update routines
         data_dir = os.path.join(ETPRED_DIR, self.data_dir)
@@ -505,7 +498,7 @@ class pygtide(object):
         # refresh bin file also
         self.etpolut1_dat2bin()
 
-    #%% update the etpolut1 binary file from the text file
+    # update the etpolut1 binary file from the text file
     def etpolut1_dat2bin(self):
         data_dir = os.path.join(ETPRED_DIR, self.data_dir)
         etpolut1_dat = os.path.join(data_dir, self.etpolut1_dat_file)
@@ -523,7 +516,6 @@ class pygtide(object):
         # drop the last row with EOL ('99999999')
         etpolut = etpolut[:-1]
         print("File '{:s}' has {:d} rows.".format(etpolut1_dat, etpolut.shape[0]))
-        #%%
         # write as binary for use in fortran
         # in fortran, each record has 4 * 8 bytes = 32
         # header contains start date in MJD and number of rows + 1
