@@ -96,7 +96,6 @@ import datetime as dt
 import os
 from pkg_resources import resource_filename
 from pygtide import etpred
-#from pygtide.pygtide_update_data import etddt, etpolut1
 
 class pygtide(object):
     """
@@ -328,7 +327,7 @@ class pygtide(object):
                 return False
             else:
                 argsin[17] = control['screenout']
-        #%% process required parameters here
+        # process required parameters here
         # test latitude validity
         if not (-90 <= latitude <= 90):
             raise ValueError('Latitude exceeds permissible range!')
@@ -485,113 +484,9 @@ class pygtide(object):
         else:
             return False
 
-    # update the time conversion database (leap seconds)
-    def update_etddt(self):
-        # import update routines
-        etddt(self.data_dir, self.etddt_file, self.leapsec_rfile)
-
-    # update the pole coordinates and UT1 to TAI times
-    def update_etpolut1(self):
-        # import update routines
-        data_dir = os.path.join(ETPRED_DIR, self.data_dir)
-        etpolut1(data_dir, self.etpolut1_dat_file, self.leapsec_rfile, self.iauhist_rfile, self.iaucurr_rfile)
-        # refresh bin file also
-        self.etpolut1_dat2bin()
-
-    # update the etpolut1 binary file from the text file
-    def etpolut1_dat2bin(self):
-        data_dir = os.path.join(ETPRED_DIR, self.data_dir)
-        etpolut1_dat = os.path.join(data_dir, self.etpolut1_dat_file)
-        etpolut1_bin = os.path.join(data_dir, self.etpolut1_bin_file)
-        header = []
-        # find the end of the header
-        with open(etpolut1_dat, "r") as f:
-            for num, line in enumerate(f, 1):
-                header.append(line)
-                if "C*******" in header[-1]: break
-
-        # read into dataframe
-        cols = ['Date', 'Time', 'MJD', 'x', 'y', 'UT1-UTC', 'TAI-UT1']
-        etpolut = pd.read_csv(etpolut1_dat, names=cols, skiprows=num, header=None, delimiter=r"\s+")
-        # drop the last row with EOL ('99999999')
-        etpolut = etpolut[:-1]
-        print("File '{:s}' has {:d} rows.".format(etpolut1_dat, etpolut.shape[0]))
-        # write as binary for use in fortran
-        # in fortran, each record has 4 * 8 bytes = 32
-        # header contains start date in MJD and number of rows + 1
-        head = np.array([int(etpolut.iloc[0, 2]), int(etpolut.shape[0]+1)])
-        data = etpolut.values[:, 3:]
-        #print(data)
-        with open(etpolut1_bin,'wb+') as f:
-            # write header integers
-            f.write(head.tobytes())
-            # advance to next record (32 bytes)
-            f.seek(32)
-            # write the flattened matrix
-            f.write(data.flatten().tobytes())
-        f.close()
-        print("File '{:s}' has been updated (Header: {:.0f}, {:d}).".format(etpolut1_bin, etpolut.iloc[0, 2], etpolut.shape[0]+1))
-
-# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-# FUNCTIONS BELOW THIS LINE ARE UNDER DEVELOPMENT AND THEREFORE EXPERIMENTAL
-# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    def read_etpolut1_bin(self):
-        fname = os.path.join(ETPRED_DIR, self.data_dir, 'etpolut1.bin')
-        with open(fname,'rb') as f:
-            header = np.fromfile(f, dtype=np.int, count=2)
-            f.seek(32)
-            data = np.fromfile(f, dtype=np.float64)
-
-        print(header)
-        print(data)
-        print(data.shape)
-        data = np.reshape(data, (-1, 4))
-        print(data)
-        print(data.shape)
-
-    def read_etpolut1_dat(self):
-        fname = os.path.join(ETPRED_DIR, self.data_dir, 'etpolut1.dat')
-        with open(fname, "rb") as f:
-            first = f.readline()
-            #print(first[0:10])
-            while first[0:10] != b"C*********":
-                first = f.readline()
-                #print(first[0:10])
-            first = f.readline()
-            # Jump to the second last byte.
-            f.seek(-12, os.SEEK_END)
-            # Until EOL is found...
-            while f.read(1) != b"\n":
-                # ...jump back the read byte plus one more.
-                f.seek(-2, os.SEEK_CUR)
-            last = f.readline()
-        # store dates
-        self.etpolut1_start = dt.datetime.strptime(first[0:8].decode("utf-8"), "%Y%m%d")
-        self.etpolut1_end = dt.datetime.strptime(last[0:8].decode("utf-8"), "%Y%m%d")
-
-    def read_etddt_dat(self):
-        fname = os.path.join(ETPRED_DIR, self.data_dir, 'etddt.dat')
-        with open(fname, "rb") as f:
-            first = f.readline()
-            while first[0:10] != b"C*********":
-                first = f.readline()
-            first = f.readline()
-            # Jump to the second last byte.
-            f.seek(-12, os.SEEK_END)
-            # Until EOL is found...
-            while f.read(1) != b"\n":
-                # ...jump back the read byte plus one more.
-                f.seek(-2, os.SEEK_CUR)
-            last = f.readline()
-        # store dates
-        self.etddt_start = self.from_floatyear(float(first[0:10]))
-        self.etddt_end = self.from_floatyear(float(last[0:10]))
 
     def from_floatyear(self,year):
         intyear = int(year)
         # leap year is missing
         d = dt.timedelta(days=(etpred.inout.etd_date - intyear)*365)
         return d + dt.datetime(intyear,1,1)
-
-# end class pygtide
-# pt = pygtide()
