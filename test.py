@@ -1,4 +1,4 @@
-#%% PyGTide class test
+# PyGTide tests
 import pygtide
 
 # create a PyGTide object
@@ -63,13 +63,3 @@ pt.predict(-20.82071, -70.15288, 830.0, '2020-01-01', 6, 600, statazimut=90,
            tidalcompo=8)
 
 assert str(data) == output
-
-# update the pole coordinates and UT1 time database
-#pt.update_etpolut1()
-
-#pt.update_etddt()
-
-#pt.etpolut1_dat2bin()
-
-# update the time database
-#pt.update_etddt()
