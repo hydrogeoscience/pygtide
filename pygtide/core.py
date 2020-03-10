@@ -90,10 +90,9 @@ The original Fortran code was also modified for use with f2py:
     sampling rate was lower than 60 seconds. This was successfully fixed.
 ===============================================================================
 """
+import datetime as dt
 import numpy as np
 import pandas as pd
-import datetime as dt
-import os
 from pkg_resources import resource_filename
 from pygtide import etpred
 
