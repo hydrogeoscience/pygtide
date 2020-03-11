@@ -426,3 +426,49 @@ class pygtide(object):
             date = np.char.mod("%08.0f", etpred.inout.etpdata[:,0])
             time = np.char.mod("%06.0f", etpred.inout.etpdata[:,1])
             return np.stack((date, time), axis=1)
+
+
+def predict_table(*args, msg=False, **kwargs):
+    kwargs.setdefault('screenout', int(msg))
+    pt = pygtide(msg=msg)
+    pt.predict(*args, **kwargs)
+    return pt.results()
+
+
+def predict_series(*args, msg=False, index=0, **kwargs):
+    kwargs.setdefault('screenout', int(msg))
+    pt = pygtide(msg=msg)
+    pt.predict(*args, **kwargs)
+    return pt.data()[:, index]
+
+
+def predict_spectrum(*args, nfft=None, **kwargs):
+    from numpy.fft import rfft, rfftfreq
+    sr = args[-1]
+    data = predict_series(*args, **kwargs)
+    if nfft is None:
+        nfft = len(data)
+    freq = rfftfreq(nfft, sr)
+    spec = rfft(data, nfft) * 2 / len(data)
+    return freq, spec
+
+
+def plot_series(*args, indices=(0, 1), show=True, **kwargs):
+    table = predict_table(*args, **kwargs)
+    table.plot(*indices)
+    if show:
+        import matplotlib.pyplot as plt
+        plt.show()
+
+def plot_spectrum(*args, ax=None, show=True, **kwargs):
+    import matplotlib.pyplot as plt
+    freq, spec = predict_spectrum(*args, **kwargs)
+    if ax is None:
+        ax = plt.subplot(111)
+    ax.plot(freq * 24 * 3600, np.abs(spec))
+    ax.set_xlabel('freq (cycles per day)')
+    ax.set_ylabel('amplitude')
+    if show:
+        plt.show()
+
+
