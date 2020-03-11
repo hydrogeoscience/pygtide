@@ -4,8 +4,8 @@ from pygtide import predict_series, predict_spectrum, predict_table
 from pygtide import plot_series, plot_spectrum
 from pygtide import pygtide
 
-def test():
-    pt = pygtide(False)
+def test(msg=False):
+    pt = pygtide(msg)
     args = (-20.82071, -70.15288, 830.0, '2017-01-01', 6, 600)
     pt.predict(*args, statazimut=90, tidalcompo=8)
     pt.results()
@@ -23,7 +23,7 @@ def test():
     np.testing.assert_almost_equal(series, expected, 5)
 
     args = (-20.82071, -70.15288, 830.0, '2020-01-01', 29.5 * 24, 600)
-    predict_table(*args, statazimut=90, tidalcompo=8)
+    predict_table(*args, statazimut=90, tidalcompo=8, msg=msg)
     freq, spec = predict_spectrum(*args, statazimut=90, tidalcompo=8)
     index = np.argmax(np.abs(spec))
     freqM2 = freq[index] * 3600
@@ -31,10 +31,12 @@ def test():
     assert abs(freqM2 - freqM2expected) / freqM2expected < 2e-3
 
     try:
-        import matplotlib
+        import matplotlib.pyplot as plt
     except ImportError:
         pass
     else:
         plot_spectrum(*args, statazimut=90, tidalcompo=8, show=False)
         plot_series(*args, statazimut=90, tidalcompo=8, show=False)
+        if msg:
+            plt.show()
     print('finished pygtide tests')
