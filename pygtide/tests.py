@@ -5,7 +5,7 @@ from pygtide import plot_series, plot_spectrum
 from pygtide import pygtide
 
 def test():
-    pt = pygtide()
+    pt = pygtide(False)
     args = (-20.82071, -70.15288, 830.0, '2017-01-01', 6, 600)
     pt.predict(*args, statazimut=90, tidalcompo=8)
     pt.results()
