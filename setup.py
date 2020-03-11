@@ -19,4 +19,5 @@ setup(
     description=('A Python module and wrapper for ETERNA PREDICT to compute '
                  'gravitational tides on Earth'),
     long_description=long_description,
-    long_description_content_type='text/markdown')
+    long_description_content_type='text/markdown'
+    )
