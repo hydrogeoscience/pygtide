@@ -109,7 +109,6 @@ class pygtide(object):
         self.version = 'PyGTide v0.3'
         self.exectime = 0
         self.fortran_version = etpred.inout.vers.astype(str)
-        #print(str(etpred.params.comdir, 'UTF-8').strip())
         self.data_dir = resource_filename('pygtide', 'commdat/')
         etpred.params.comdir = self.data_dir + ' ' * (256 - len(self.data_dir))
         self.args = []
@@ -121,8 +120,6 @@ class pygtide(object):
         year = etpred.inout.etd_end
         self.etddt_end = (datetime(int(year), 1, 1) +
                           timedelta(days=(year - int(year)) * 365))
-        print(self.etddt_start, self.etddt_end)
-
         # capture end date of file "etpolut1.dat" from module
         self.etpolut1_start = datetime.strptime(str(etpred.inout.etpol_start), "%Y%m%d")
         self.etpolut1_end = datetime.strptime(str(etpred.inout.etpol_end), "%Y%m%d")
@@ -322,19 +319,20 @@ class pygtide(object):
         enddate = startdate + timedelta(hours=duration)
         # check if requested prediction series exceeds permissible time
         if (startdate < self.etddt_start):
-            file = np.char.strip(etpred.params.etddtdat.astype('str'))
-            if (self.msg): print("Prediction timeframe is earlier than the available time database (%s). " \
-                  "For details refer to the file '%s'." % (self.etddt_start, file))
+            from warnings import warn
+            fname = str(etpred.params.etddtdat)
+            warn("Prediction timeframe is earlier than the available time database (%s). "
+                 "For details refer to the file '%s'." % (self.etddt_start, fname))
         if (enddate > (self.etddt_end + timedelta(days=365))):
-            file = np.char.strip(etpred.params.etddtdat.astype('str'))
-            if (self.msg): print("Prediction timeframe exceeds the end of the available time database (%s) plus 1 year. " \
-                  "For best accuracy, please consider updating '%s'." % (self.etddt_end, file))
+            from warnings import warn
+            fname = str(etpred.params.etddtdat)
+            warn("Prediction timeframe exceeds the end of the available time database (%s) plus 1 year. "
+                 "For best accuracy, please consider updating '%s'." % (self.etddt_end, fname))
         # if not (-50*365 < (startdate - dt.datetime.now()).days < 365):
         if ( ((argsin[13] > 0) or (argsin[14] > 0)) and ((startdate < self.etpolut1_start) or (enddate > self.etpolut1_end)) ):
-            file = np.char.strip(etpred.params.etpolutdat.astype('str'))
+            fname = str(etpred.params.etddtdat)
             raise ValueError("Dates exceed permissible range for pole/LOD tide correction (interval %s to %s). "\
-                "Please update file '%s'." % (self.etpolut1_start, self.etpolut1_end, file))
-            return False
+                "Please update file '%s'." % (self.etpolut1_start, self.etpolut1_end, fname))
         # set the start date and time
         argsin[3:6] = [startdate.year,startdate.month,startdate.day]
         # test sammprate validity
@@ -353,14 +351,14 @@ class pygtide(object):
         # ######################################################
         # print(argsin)
         self.args = argsin
-        if (self.msg):
+        if self.msg:
             print('%s is calculating, please wait ...' % (self.fortran_version))
 
         etpred.predict(argsin)
 
         self.exec = True
         self.exectime = etpred.inout.exectime
-        if (self.msg):
+        if self.msg:
             print('Done after %.3f s.' % (self.exectime))
         self.update()
         return True
@@ -390,8 +388,6 @@ class pygtide(object):
             # obtain header strings from routine and convert
             etdata[cols[2:]] = np.around(etpred.inout.etpdata[:, 2:],round)
             return etdata
-        else:
-            return False
 
     # easy access to the raw data calculated by Fortran
     def raw(self):
@@ -403,8 +399,6 @@ class pygtide(object):
         """
         if self.exec:
             return etpred.inout.etpdata
-        else:
-            return False
 
     # easy access to the formatted data calculated by Fortran
     def data(self, round=6):
@@ -417,8 +411,6 @@ class pygtide(object):
         """
         if self.exec:
             return np.around(etpred.inout.etpdata[:, 2:], round)
-        else:
-            return False
 
     # easy access to the raw datetime calculated by Fortran
     def datetime(self):
@@ -434,5 +426,3 @@ class pygtide(object):
             date = np.char.mod("%08.0f", etpred.inout.etpdata[:,0])
             time = np.char.mod("%06.0f", etpred.inout.etpdata[:,1])
             return np.stack((date, time), axis=1)
-        else:
-            return False
