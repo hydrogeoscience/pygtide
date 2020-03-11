@@ -90,9 +90,8 @@ The original Fortran code was also modified for use with f2py:
     sampling rate was lower than 60 seconds. This was successfully fixed.
 ===============================================================================
 """
-import datetime as dt
+from datetime import datetime, timedelta, date
 import numpy as np
-import pandas as pd
 from pkg_resources import resource_filename
 from pygtide import etpred
 
@@ -117,26 +116,19 @@ class pygtide(object):
         # set some common variables for external access
         etpred.init()
         # capture end date of file "etddt.dat" from module
-        self.etddt_file = etpred.params.etddtdat
         year = int(etpred.inout.etd_start)
-        # leap year is missing
-        d = dt.timedelta(days=(etpred.inout.etd_start - year)*365)
-        self.etddt_start = d + dt.datetime(year,1,1)
-        year = int(etpred.inout.etd_end)
-        # leap year is missing
-        d = dt.timedelta(days=(etpred.inout.etd_end - year)*365)
-        self.etddt_end = d + dt.datetime(year,1,1)
+        self.etddt_start = datetime(year, 1, 1)
+        year = etpred.inout.etd_end
+        self.etddt_end = (datetime(int(year), 1, 1) +
+                          timedelta(days=(year - int(year)) * 365))
+        print(self.etddt_start, self.etddt_end)
 
         # capture end date of file "etpolut1.dat" from module
-        self.etpolut1_dat_file = str(etpred.params.etpolutdat, 'UTF-8').strip()
-        self.etpolut1_bin_file = str(etpred.params.etpolutbin, 'UTF-8').strip()
-        self.etpolut1_start = dt.datetime.strptime(str(etpred.inout.etpol_start), "%Y%m%d")
-        self.etpolut1_end = dt.datetime.strptime(str(etpred.inout.etpol_end), "%Y%m%d")
-#        self.etpolut1_end = dt.datetime.strptime('20190817', "%Y%m%d")
+        self.etpolut1_start = datetime.strptime(str(etpred.inout.etpol_start), "%Y%m%d")
+        self.etpolut1_end = datetime.strptime(str(etpred.inout.etpol_end), "%Y%m%d")
 
         self.headers = np.char.strip(etpred.inout.header.astype('str'))
         # self.units = ['(m/s)**2','nm/s**2','mas','mm','mm','nstr','nstr','nstr','nstr','nstr','mm']
-        self.is_init = True
         self.exec = False
 
         # remote data files
@@ -240,8 +232,6 @@ class pygtide(object):
                       writes output to the screen (but not the Python terminal).
         -------------------------------------------------------------------------------
         """
-        # initialise the module to make variables accessible
-        if not self.is_init: self.__init__()
         # prepare full input argument array
         argsin = np.zeros(18)
         # define default values as given by the Fortran code
@@ -254,118 +244,88 @@ class pygtide(object):
         argsin[14] = 1.16
 
         # iterate through optional arguments passed
-        # print(control)
-        # check statgravit validity
         if 'statgravit' in control:
             if not (0 <= control['statgravit'] <= 20):
                 raise ValueError('Station gravity exceeds permissible range!')
-                return False
             else:
                 argsin[8] = control['statgravit']
-        # check statgravit validity
         if 'statazimut' in control:
             if not (0 <= control['statazimut'] <= 180):
                 raise ValueError('Statazimut exceeds permissible range!')
-                return False
             else:
                 argsin[9] = control['statazimut']
-        # check tidalpoten validity
         if 'tidalpoten' in control:
             if control['tidalpoten'] not in range(1,9):
                 raise ValueError('Tidalpoten must be an integer between 1 and 8!')
-                return False
             else:
                 argsin[10] = control['tidalpoten']
-        # check tidalcompo validity
         if 'tidalcompo' in control:
             if control['tidalcompo'] not in range(-1,10):
                 raise ValueError('Tidalcompo must be an integer between -1 and 9!')
-                return False
             else:
                 argsin[11] = control['tidalcompo']
-        # check amtruncate validity
         if 'amtruncate' in control:
             if not (0 <= control['amtruncate']):
                 raise ValueError('Amtruncate must be greater than 0!')
-                return False
             else:
                 argsin[12] = control['amtruncate']
-        # check poltidecor validity
         if 'poltidecor' in control:
             if not (control['poltidecor'] >= 0):
                 raise ValueError('Poltidecor must be >= 0!')
-                return False
             else:
                 argsin[13] = control['poltidecor']
-        # check lodtidecor validity
         if 'lodtidecor' in control:
             if not (control['lodtidecor'] >= 0):
                 raise ValueError('Lodtidecor must be >= 0!')
-                return False
             else:
                 argsin[14] = control['lodtidecor']
         # additional control parameters
-        # check fileout validity
         if 'fileprd' in control:
             if control['fileprd'] not in range(0,2):
                 raise ValueError('Fileprd flag must be 0 or 1!')
-                return False
             else:
                 argsin[15] = control['fileprd']
-        # check fileout validity
         if 'fileprn' in control:
             if control['fileprn'] not in range(0,2):
                 raise ValueError('Fileprn flag must be 0 or 1!')
-                return False
             else:
                 argsin[16] = control['fileprn']
-        # check fileout validity
         if 'screenout' in control:
             if control['screenout'] not in range(0,2):
                 raise ValueError('Screenout flag must be 0 or 1!')
-                return False
             else:
                 argsin[17] = control['screenout']
         # process required parameters here
-        # test latitude validity
         if not (-90 <= latitude <= 90):
             raise ValueError('Latitude exceeds permissible range!')
-            return False
         else:
             argsin[0] = latitude
-        # test longitude validity
         if not (-180 <= longitude <= 180):
             raise ValueError('Longitude exceeds permissible range!')
-            return False
         else:
             argsin[1] = longitude
-        # test height validity
         if not (-500 <= height <= 5000):
             raise ValueError('Height exceeds permissible range!')
-            return False
         else:
             argsin[2] = height
-        # test duration validity
         if not (0 <  duration <= 10*24*365):
             raise ValueError("Duration exceeds permissible range!")
-            return False
         else:
             argsin[6] = int(duration)
 
         # test startdate format and validity
-        if not (isinstance(startdate, dt.date)):
+        if not (isinstance(startdate, date)):
             try:
-                startdate = dt.datetime.strptime(startdate, "%Y-%m-%d")
+                startdate = datetime.strptime(startdate, "%Y-%m-%d")
             except ValueError:
                 raise ValueError("Startdate has incorrect format (YYYY-MM-DD)!" )
-                return False
-        enddate = startdate + dt.timedelta(hours=duration)
+        enddate = startdate + timedelta(hours=duration)
         # check if requested prediction series exceeds permissible time
         if (startdate < self.etddt_start):
             file = np.char.strip(etpred.params.etddtdat.astype('str'))
             if (self.msg): print("Prediction timeframe is earlier than the available time database (%s). " \
                   "For details refer to the file '%s'." % (self.etddt_start, file))
-        if (enddate > (self.etddt_end + dt.timedelta(days=365))):
+        if (enddate > (self.etddt_end + timedelta(days=365))):
             file = np.char.strip(etpred.params.etddtdat.astype('str'))
             if (self.msg): print("Prediction timeframe exceeds the end of the available time database (%s) plus 1 year. " \
                   "For best accuracy, please consider updating '%s'." % (self.etddt_end, file))
@@ -380,13 +340,11 @@ class pygtide(object):
         # test sammprate validity
         if not (0 < samprate <= 24*3600):
             raise ValueError("Samprate exceeds permissible range!")
-            return False
         else:
             argsin[7] = int(samprate)
         # test that samprate is not larger than duration
         if (samprate/3600 >  duration):
             raise ValueError("Samprate exceeds duration!")
-            return False
         # ####################################################
         # BUGFIX: fix a weird bug where the program stops before
         # the etpdata table is filled completely
@@ -395,20 +353,15 @@ class pygtide(object):
         # ######################################################
         # print(argsin)
         self.args = argsin
-        if (self.msg): print('%s is calculating, please wait ...' % (self.fortran_version))
+        if (self.msg):
+            print('%s is calculating, please wait ...' % (self.fortran_version))
 
-        # Move to etpred directory
-#        os.chdir(ETPRED_DIR)
-
-        # run predict
         etpred.predict(argsin)
-
-        # Move back to original working directory
-#        os.chdir(WORKING_DIR)
 
         self.exec = True
         self.exectime = etpred.inout.exectime
-        if (self.msg): print('Done after %.3f s.' % (self.exectime))
+        if (self.msg):
+            print('Done after %.3f s.' % (self.exectime))
         self.update()
         return True
 
@@ -422,6 +375,7 @@ class pygtide(object):
         keyword 'round' sets the number of digits returned.
         """
         if self.exec:
+            import pandas as pd
             # format date and time into padded number strings
 #            print(etpred.inout.etpdata[:,1])
             date = np.char.mod("%08.0f ", etpred.inout.etpdata[:,0])
@@ -482,10 +436,3 @@ class pygtide(object):
             return np.stack((date, time), axis=1)
         else:
             return False
-
-
-    def from_floatyear(self,year):
-        intyear = int(year)
-        # leap year is missing
-        d = dt.timedelta(days=(etpred.inout.etd_date - intyear)*365)
-        return d + dt.datetime(intyear,1,1)
