@@ -6,19 +6,19 @@ PyGTide is a Python class that wraps around ETERNA PREDICT 3.4 which was compile
 Earth Tide Service (IGETS)](http://igets.u-strasbg.fr/soft_and_tool.php).
 
 ## How to install and run
-A user guide is available as [PDF download](https://github.com/hydrogeoscience/pygtide/raw/master/PyGTide_user-guide.pdf).
+A user guide is available as [PDF download](https://github.com/hydrogeoscience/pygtide/raw/master/PyGTide_v0_5.pdf).
 
 Instructions:
 * Download and install [Anaconda for Python 3+](https://www.anaconda.com) (Windows 7/10 64bit or Linux (Ubuntu) 64bit)
 * Use the *Anaconda Navigator* to ensure that the following standard libraries are installed: *numpy*, *pandas*, *datetime* and *astropy*.
 * Download [PyGTide](https://github.com/hydrogeoscience/pygtide/), unzip into a local directory and run *test_pygtide_waves-all.py*
 
-The class should work for the Python versions 3.5, 3.6, 3.7 and 3.8.
+The module was compiled for Windows 7/10 and Linux (Ubuntu) and the Python versions 3.5, 3.6, 3.7 and 3.8 (64bit).
 
 ## How to cite
 If you use PyGTide, please cite the work as:
 
-*Rau, Gabriel C. (2020) hydrogeoscience/pygtide: PyGTide (Version v0.5). Zenodo. [http://doi.org/10.5281/zenodo.1346664](http://doi.org/10.5281/zenodo.1346664).*
+*Rau, Gabriel C. (2020) hydrogeoscience/pygtide: PyGTide v0.5 (Version v0.5). Zenodo. [http://doi.org/10.5281/zenodo.4290320](http://doi.org/10.5281/zenodo.4290320)*
 
 ## Example
 <img src="https://raw.githubusercontent.com/hydrogeoscience/pygtide/master/earth_tide_example.png" width="500">
