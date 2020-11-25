@@ -1,18 +1,22 @@
-from setuptools import setup
+from numpy.distutils.core import Extension, setup
 
-with open('README.md', 'r') as f:
-    long_description = f.read()
-
-setup(
-    name='pygtide',
-    version='0.2',
-    packages=['pygtide', 'etpred'],
-    package_data={'etpred': ['*.pyd', '*.so', 'commdat/*']},
-    install_requires=['numpy', 'pandas'],
-    author='Gabriel C. Rau',
-    author_email='gabriel@hydrogeo.science',
-    url='http://doi.org/10.5281/zenodo.1346664',
-    description=('A Python module and wrapper for ETERNA PREDICT to compute '
-                 'gravitational tides on Earth'),
-    long_description=long_description,
-    long_description_content_type='text/markdown')
+if __name__ == "__main__":
+    setup(
+        name = "pygtide",
+		version = '0.5',
+		description = 'PyGTide: A Python module and wrapper for ETERNA PREDICT to compute gravitational tides on Earth',
+		author = 'Gabriel C. Rau',
+		author_email = 'gabriel@hydrogeo.science',
+		url = 'https://github.com/hydrogeoscience/pygtide',
+		project_urls = {
+			'Author': 'https://hydrogeo.science',
+		},
+		py_modules = ["pygtide", "test_pygtide", "update_commdat"],
+        ext_modules = [Extension(
+			"etpred", ["etpred/etpred.f90"], 
+			extra_link_args = ["-static", "-static-libgfortran", "-static-libgcc", "-Wno-tabs", "-floop-nest-optimize"],
+			include_dirs = ['commdat/']
+		)],
+		packages = ["pygtide"],
+		include_package_data = True
+    )
