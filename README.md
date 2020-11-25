@@ -13,10 +13,12 @@ Instructions:
 * Use the *Anaconda Navigator* to ensure that the following standard libraries are installed: *numpy*, *pandas*, *datetime* and *astropy*.
 * Download [PyGTide](https://github.com/hydrogeoscience/pygtide/), unzip into a local directory and run *test_pygtide_waves-all.py*
 
+The class should work for the Python versions 3.5, 3.6, 3.7 and 3.8.
+
 ## How to cite
 If you use PyGTide, please cite the work as:
 
-*Rau, Gabriel C. (2018) hydrogeoscience/pygtide: PyGTide v0.2 (Version v0.2). Zenodo. [http://doi.org/10.5281/zenodo.1346664](http://doi.org/10.5281/zenodo.1346664).*
+*Rau, Gabriel C. (2020) hydrogeoscience/pygtide: PyGTide (Version v0.5). Zenodo. [http://doi.org/10.5281/zenodo.1346664](http://doi.org/10.5281/zenodo.1346664).*
 
 ## Example
 <img src="https://raw.githubusercontent.com/hydrogeoscience/pygtide/master/earth_tide_example.png" width="500">
