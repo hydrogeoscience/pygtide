@@ -13,7 +13,7 @@ Instructions:
 * Use the *Anaconda Navigator* to ensure that the following standard libraries are installed: *numpy*, *pandas*, *datetime* and *astropy*.
 * Download [PyGTide](https://github.com/hydrogeoscience/pygtide/), unzip into a local directory and run *test_pygtide_waves-all.py*
 
-The class should work for the Python versions 3.5, 3.6, 3.7 and 3.8.
+The module was compiled for Windows 7/10 and Linux (Ubuntu) and the Python versions 3.5, 3.6, 3.7 and 3.8 (64bit).
 
 ## How to cite
 If you use PyGTide, please cite the work as:
