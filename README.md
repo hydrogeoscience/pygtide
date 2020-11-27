@@ -9,7 +9,7 @@ Earth Tide Service (IGETS)](http://igets.u-strasbg.fr/soft_and_tool.php).
 A user guide is available as [PDF download](https://github.com/hydrogeoscience/pygtide/raw/master/PyGTide_v0_5.pdf).
 
 Instructions:
-* Download and install [Anaconda for Python 3+](https://www.anaconda.com) (Windows 7/10 64bit or Linux (Ubuntu) 64bit)
+* Download and install [Anaconda for Python 3+](https://www.anaconda.com) on Windows 7/10 or Linux (Ubuntu) 64bit
 * Use the *Anaconda Navigator* to ensure that the following standard libraries are installed: *numpy*, *pandas*, *datetime* and *astropy*.
 * Download [PyGTide](https://github.com/hydrogeoscience/pygtide/), unzip into a local directory and run *test_pygtide_waves-all.py*
 
