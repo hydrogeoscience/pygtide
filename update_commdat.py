@@ -15,8 +15,6 @@ import datetime as dt
 import urllib
 import re
 
-global data
-
 class update_etpred_data(object):
     """
     The pygtide_update class will initialise internal variables
@@ -40,6 +38,7 @@ class update_etpred_data(object):
         
     #%% update the pole coordinates and UT1 to TAI times
     def update_etpolut1(self):
+        global etpolut
         status = True
         etpolut1_file = Path(self.data_dir + '/' + self.etpolut1_dat_file)
         leapsec_file = Path(self.data_dir + '/' + '[raw]_Leap_Second_History.dat')
@@ -199,19 +198,18 @@ C****************************************************************\n"""
             header = header.replace("$5$", self.leapsec_rfile)
             
             pd.options.display.max_colwidth = 200
-            etpolut['combined']=etpolut['Date'].astype(str)+' '+etpolut['Time'].astype(str)+' '+etpolut['MJD'].astype(str)\
-                +' '+etpolut['x'].astype(str)+' '+etpolut['y'].astype(str)+' '+etpolut['UT1-UTC'].astype(str)\
-                +' '+etpolut['TAI-UT1'].astype(str)
-                
-            with open(etpolut1_file, "w") as myfile:
+            etpolut['combined'] = etpolut['Date'].astype(str) + ' ' + etpolut['Time'].astype(str) + ' ' + etpolut['MJD'].astype(str)\
+                + ' ' + etpolut['x'].astype(str) + ' ' + etpolut['y'].astype(str) + ' ' + etpolut['UT1-UTC'].astype(str)\
+                + ' ' + etpolut['TAI-UT1'].astype(str)
+            # IMPORTANT: newline needs to comply with windows platform!
+            with open(etpolut1_file, "w", newline='\r\n') as myfile:
                 myfile.write(header)
                 # myfile.write(etpolut['combined'].to_string(index=False, header=False).replace('\n ', '\n'))
                 # etpolut['combined'].to_string(myfile, index=False, header=False)
                 # WEIRD PANDAS BUG: to_string() puts white space at beginning of each line
                 for row in etpolut['combined'].values:
-                    myfile.write(row + '\r\n')
+                    myfile.write(row + '\n')
                 myfile.write("99999999")
-                
             myfile.close()
             end = tt.time()
             # update also bin file
