@@ -311,9 +311,17 @@ C****************************************************************\n"""
         # print(indices)
         
         for i, val in enumerate(indices):
+            # for each record create an time terminating row
+            etddt = etddt.append(etddt.iloc[-1, :])
+            decyear = leapsdf.loc[val, 'year'] - 0.00001
+            jd = leapsdf.loc[val, 'JD'] - 0.00001
+            etddt.iloc[-1, :]['year'] = decyear
+            etddt.iloc[-1, :]['JD'] = jd
             # for each record create a new row
             etddt = etddt.append(etddt.iloc[-1, :])
-            etddt.iloc[-1, :] = {'year': leapsdf.loc[val, 'year'], 'JD': leapsdf.loc[val, 'JD'], 'DDT': leapsdf.loc[val, 'DDT']}
+            decyear = leapsdf.loc[val, 'year']
+            jd = leapsdf.loc[val, 'JD']
+            etddt.iloc[-1, :] = {'year': decyear, 'JD': jd, 'DDT': leapsdf.loc[val, 'DDT']}
 
         # number of new records
         records = sum(mask)
@@ -337,8 +345,9 @@ C****************************************************************\n"""
 pt = update_etpred_data()
 
 pt.update_etddt()
-print(etddt.iloc[-10:, :])
 
-pt.update_etpolut1()
+# pt.update_etpolut1()
+
+print(etddt.iloc[-10:, :])
 
 print("---------------------")
