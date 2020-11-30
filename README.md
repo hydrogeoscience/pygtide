@@ -15,7 +15,7 @@ Instructions:
 
 Attention:
 
-Please only use the data files that are provided in the commdat subfolder in this repository and avoid using files from other sources such as IGETS. This is because the code was adapted to handle leap seconds more appropriately after 1972.
+Please only use the data files that are provided in the commdat subfolder in this repository and avoid using files from other sources such as IGETS. This is because the code was changed to avoid interpolating leap seconds from the year 1972 onwards.
 
 ## How to cite
 If you use PyGTide, please cite the work as:
