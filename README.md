@@ -13,6 +13,9 @@ Instructions:
 * Use the *Anaconda Navigator* to ensure that the packages [libpython](https://anaconda.org/anaconda/libpython) (as a minimum v2.1) and [mingw](https://anaconda.org/anaconda/mingw) (as a minimum v4.7) are installed. You will also need the following standard libraries: *numpy*, *pandas* and *datetime*.
 * Download [PyGTide](https://github.com/hydrogeoscience/pygtide/archive/master.zip), unzip into a local directory and run *test.py*
 
+Attention:
+Please only use the data files that are provided in the commdat subfolder in this repository and avoid using files from other sources such as IGETS. This is because the code was adapted to handle leap seconds more appropriately after 1972.
+
 ## How to cite
 If you use PyGTide, please cite the work as:
 
