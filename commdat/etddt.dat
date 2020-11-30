@@ -1,5 +1,5 @@
 File       : etddt.dat
-Updated    : 27/11/2020
+Updated    : 30/11/2020
 Contents   : Table to interpolate DDT=TT-UTC. For epochs less 
 			 than 1820, DDT is not defined within this table. 
 Source     : ftp://hpiers.obspm.fr/iers/bul/bulc/Leap_Second.dat

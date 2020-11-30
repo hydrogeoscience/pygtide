@@ -330,14 +330,14 @@ C****************************************************************\n"""
                     f.write(string + '\n')
                 f.close()
             end = tt.time()
-            print('{:d} records were added to the template ({:.1f} s).'.format(records, end - start))
+            print('{:d} records were added to the original template ({:.1f} s).'.format(records, end - start))
         print("The leap second File ('{:s}') is now up to date ({:.1f} s).".format(self.etddt_file, end - start))
             
 #%% run the update
 pt = update_etpred_data()
 
 pt.update_etddt()
-print(etddt.iloc[-10:, :])
+# print(etddt.iloc[-10:, :])
 
 pt.update_etpolut1()
 
