@@ -202,7 +202,7 @@ C****************************************************************\n"""
             pd.options.display.max_colwidth = 200
 
             # IMPORTANT: newline needs to comply with windows platform!
-            with open(etpolut1_file, "w", newline='\r\n') as myfile:
+            with open(etpolut1_file, "w", newline='') as myfile:
                 myfile.write(header)
                 # myfile.write(etpolut['combined'].to_string(index=False, header=False).replace('\n ', '\n'))
                 # etpolut['combined'].to_string(myfile, index=False, header=False)
@@ -210,7 +210,7 @@ C****************************************************************\n"""
                 for index, row in etpolut.iterrows():
                     string = "{:s} {:s} {:s} {:s} {:s} {:s} {:s}".format(row['Date'], row['Time'], row['MJD'],\
                             row['x'], row['y'], row['UT1-UTC'], row['TAI-UT1'])
-                    myfile.write(string + '\n')
+                    myfile.write(string + '\r\n')
                 myfile.write("99999999")
             myfile.close()
             end = tt.time()
@@ -330,14 +330,14 @@ C****************************************************************\n"""
                     f.write(string + '\n')
                 f.close()
             end = tt.time()
-            print('{:d} records were added to the original template ({:.1f} s).'.format(records, end - start))
+            print('{:d} records were added to the template ({:.1f} s).'.format(records, end - start))
         print("The leap second File ('{:s}') is now up to date ({:.1f} s).".format(self.etddt_file, end - start))
             
 #%% run the update
 pt = update_etpred_data()
 
 pt.update_etddt()
-# print(etddt.iloc[-10:, :])
+print(etddt.iloc[-10:, :])
 
 pt.update_etpolut1()
 
