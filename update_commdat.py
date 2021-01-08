@@ -12,7 +12,7 @@ import numpy as np
 import time as tt
 import pandas as pd
 import datetime as dt
-import urllib
+import urllib.request
 import re
 
 class update_etpred_data(object):
