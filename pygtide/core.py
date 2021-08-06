@@ -94,7 +94,11 @@ from datetime import datetime, timedelta, date
 import numpy as np
 from pkg_resources import resource_filename
 from pygtide import etpred
-
+import requests
+import os
+import pandas as pd
+import re
+from astropy.time import Time
 class pygtide(object):
     """
     The PyGTide class will initialise internal variables
@@ -128,12 +132,226 @@ class pygtide(object):
         # self.units = ['(m/s)**2','nm/s**2','mas','mm','mm','nstr','nstr','nstr','nstr','nstr','mm']
         self.exec = False
 
-        # remote data files
+
         # IERS leap seconds history file
         self.leapsec_rfile = 'https://hpiers.obspm.fr/iers/bul/bulc/Leap_Second_History.dat'
         self.iauhist_rfile = 'http://hpiers.obspm.fr/iers/eop/eopc04/eopc04_IAU2000.62-now'
-        self.iaucurr_rfile = 'http://maia.usno.navy.mil/ser7/finals2000A.data'
+        self.iaucurr_rfile = 'https://datacenter.iers.org/data/9/finals2000A.all'
 
+        self.leapsec_file = os.path.join(self.data_dir,os.path.basename(self.leapsec_rfile))
+        self.iauhist_file = os.path.join(self.data_dir,os.path.basename(self.iauhist_rfile))
+        self.iaucurr_file = os.path.join(self.data_dir,os.path.basename(self.iaucurr_rfile))
+    
+        self.etpolut1_file = os.path.join(self.data_dir,str(etpred.params.etpolutdat,'utf-8').strip())
+        self.etpolut1_bfile = os.path.join(self.data_dir,str(etpred.params.etpolutbin,'utf-8').strip())
+
+
+        self.etddt_file = os.path.join(self.data_dir,str(etpred.params.etddtdat,'utf-8').strip())
+
+    def refresh_data(self):
+        """Download the newest leap Second data, and Earth Pole data and prediction files and convert them for use of pygtide"""
+        # IERS leap seconds history file
+        for url in [self.leapsec_rfile,self.iauhist_rfile,self.iaucurr_rfile]:
+            fout=os.path.join(self.data_dir,os.path.basename(url))
+            if self.msg:
+                print(f"Downloading {fout}")
+            r=requests.get(url)
+            with open(fout,'wb') as fid:
+                fid.write(r.content) 
+
+        #modify data
+        self.update_etpolut1()
+        self.update_etddt()
+    def update_etpolut1(self):
+        """Update the pole coordinate file with newest data and predictions""" 
+        #%% read leap second history
+        dateparse = lambda x:datetime.strptime(x, '%d %m %Y')
+        leapsdf = pd.read_csv(self.leapsec_file, comment='#', header=None, parse_dates= {'date':[1,2,3]}, \
+                date_parser=dateparse, delimiter=r"\s+")
+        leapsdf.columns = ['date', 'MJD', 'leaps']
+        leapsdf.drop(['MJD'], axis=1, inplace=True)
+        leapsdf.index += 1
+        # insert row at the beginning
+        leapsdf.loc[0] = [datetime(1962,1,1), 10]
+        leapsdf.sort_index(inplace=True)
+        #%% read historic pole coordinates
+        # convert = {3: lambda x: np.around(np.float64(x), 3)}
+        dateparse = lambda x: datetime.strptime(x, '%Y %m %d')
+        iauhist = pd.read_csv(self.iauhist_file, skiprows=13, header=None, parse_dates= {'date':[0,1,2]}, \
+                date_parser=dateparse, delimiter=r"\s+", usecols=[0,1,2,3,4,5,6])
+        iauhist.columns = ['date', 'MJD', 'x', 'y', 'UT1-UTC']
+        #iauhist = iauhist.set_index('date')
+            
+        #%% read current pole coordinates
+        dateparse = lambda x,y,z: datetime.strptime(x.zfill(2)+y.zfill(2)+z.zfill(2), '%y%m%d')
+        fw = [2,2,2,9,3,9,9,10,9,3,10,10]
+        iaucurr = pd.read_fwf(self.iaucurr_file, header=None, widths=fw, parse_dates= {'date':[0,1,2]}, date_parser=dateparse, \
+            usecols=[0,1,2,3,5,7,10])
+        iaucurr.columns = ['date', 'MJD', 'x', 'y', 'UT1-UTC']
+        #iaucurr = iaucurr.set_index('date')
+        #%%
+        mask = (iaucurr['date'] > iauhist['date'].values[-1])
+        etpolut = iauhist.append(iaucurr[mask])
+        etpolut = etpolut[np.isfinite(etpolut['x'])]
+        #iauhist.combine_first(iaucurr)
+        
+        #%%
+        etpolut['Date'] = etpolut['date'].dt.strftime('%Y%m%d')
+        etpolut['Time'] = etpolut['date'].dt.strftime('%H%M%S')
+        etpolut['MJD'] = etpolut['MJD'].map('{:8.3f}'.format)
+        etpolut['x'] = etpolut['x'].map('{:9.5f}'.format)
+        etpolut['y'] = etpolut['y'].map('{:9.5f}'.format)
+        etpolut['TAI-UT1'] = etpolut['UT1-UTC']
+        etpolut['UT1-UTC'] = etpolut['UT1-UTC'].map('{:9.6f}'.format)
+        
+        #%%
+        # prepare the last column
+        for idx, val in leapsdf.iterrows():
+            # print(idx, val[1])
+            # find mask for leap seconds
+            if idx+1 in leapsdf.index:
+                mask = ((etpolut['date'] >= leapsdf['date'].loc[idx]) & (etpolut['date'] < leapsdf['date'].loc[idx+1]))
+                #print(mask)
+                # subtract leap seconds from UTC
+                etpolut.loc[mask, 'TAI-UT1'] = leapsdf['leaps'].loc[idx] - etpolut.loc[mask, 'TAI-UT1']
+            else:
+                mask = (etpolut['date'] >= leapsdf['date'].loc[idx])
+                etpolut.loc[mask, 'TAI-UT1'] = leapsdf['leaps'].loc[idx] - etpolut.loc[mask, 'TAI-UT1']
+        
+        etpolut['TAI-UT1'] = etpolut['TAI-UT1'].map('{:9.6f}'.format)
+        
+        #%%
+        #etpolut[0] = etpolut[0].map('${:,.2f}'.format)
+        header = \
+"""File     : etpolut1.dat
+Updated  : $1$
+Contents : Pole coordinates and earth rotation one day sampling interval,
+   given at 0 hours UTC. Historic data is combined with predictions. 
+   Data are from IERS and USNO.
+Period   : $2$
+Historic : $3$
+Current  : $4$
+Leap sec.: $5$
+
+Date     Time   MJD         x         y       UT1-UTC   TAI-UT1                 
+                       ["]       ["]      [sec]     [sec]                   
+C****************************************************************\n"""
+        header = header.replace("$1$", datetime.utcnow().strftime('%d/%m/%Y'))
+        header = header.replace("$2$", etpolut['date'].iloc[0].strftime('%d/%m/%Y') \
+                + ' to ' + etpolut['date'].iloc[-1].strftime('%d/%m/%Y'))
+        header = header.replace("$3$", self.iauhist_rfile)
+        header = header.replace("$4$", self.iaucurr_rfile)
+        header = header.replace("$5$", self.leapsec_rfile)
+        
+        pd.options.display.max_colwidth = 200
+
+        # IMPORTANT: newline needs to comply with windows platform!
+        with open(self.etpolut1_file, "w", newline='') as myfile:
+            myfile.write(header)
+            # myfile.write(etpolut['combined'].to_string(index=False, header=False).replace('\n ', '\n'))
+            # etpolut['combined'].to_string(myfile, index=False, header=False)
+            # WEIRD PANDAS BUG: to_string() puts white space at beginning of each line
+            for index, row in etpolut.iterrows():
+                string = "{:s} {:s} {:s} {:s} {:s} {:s} {:s}".format(row['Date'], row['Time'], row['MJD'],\
+                        row['x'], row['y'], row['UT1-UTC'], row['TAI-UT1'])
+                myfile.write(string + '\r\n')
+            myfile.write("99999999")
+        myfile.close()
+        # update also bin file
+        self.etpolut1_dat2bin()
+        print(f'Finished updating {self.etpolut1_file}')
+
+    def etpolut1_dat2bin(self):
+        """update the etpolut1 binary file from the equivalent text file"""
+        header = []
+        # find the end of the header
+        with open(self.etpolut1_file, "r") as f:
+            for num, line in enumerate(f, 1):
+                header.append(line)
+                if "C*******" in header[-1]: break
+        
+        # read into dataframe
+        cols = ['Date', 'Time', 'MJD', 'x', 'y', 'UT1-UTC', 'TAI-UT1']
+        etpolut = pd.read_csv(self.etpolut1_file, names=cols, skiprows=num, header=None, delimiter=r"\s+")
+        # drop the last row with EOL ('99999999')
+        etpolut = etpolut[:-1]
+        print("File '{:s}' has {:d} rows.".format(self.etpolut1_file, etpolut.shape[0]))
+        #%% 
+        # write as binary for use in fortran: each record has 4*8 bytes = 32 bytes
+        # header contains start date in MJD and number of rows + 1
+        head = np.array([np.int32(etpolut.iloc[0, 2]), np.int32(etpolut.shape[0]+1)])
+        data = np.float64(etpolut.values[:, 3:])
+        #print(data)
+        with open(self.etpolut1_bfile,'wb+') as f:
+            # write header integers
+            f.write(head.tobytes())
+            # advance to next record (32 bytes)
+            f.seek(32)
+            # write the flattened matrix (this may have 64 bytes)
+            f.write(data.flatten().tobytes())
+        f.close()
+        print("File '{:s}' has been updated (Header: {:.0f}, {:d}).".format(self.etpolut1_bfile, etpolut.iloc[0, 2], etpolut.shape[0]+1))
+        
+    #%% update the time conversion database (leap seconds)  
+    def update_etddt(self):
+        """Updates the leap second file""" 
+        #%%
+        print("--------------------------------------")
+        print("-->> Updating time conversion database '{:s}':".format(self.leapsec_file))
+            
+        #%% READ THE EXISTING FILE
+        # print(etddt_file)
+        # find the end of the header
+        with open(self.etddt_file, "r") as f:
+            print(f"Processing file '{self.etddt_file}..")
+            header = []
+            regex = re.compile(r"^\s*updated\s*\:.*$", re.IGNORECASE)
+            for num, line in enumerate(f, 1):
+                line = regex.sub("Updated    : %s" % datetime.utcnow().strftime('%d/%m/%Y'), line)
+                header.append(line)
+                if "C*******" in header[-1]: break
+        
+        cols = ['year','JD','DDT']
+        etddt = pd.read_csv(self.etddt_file, names=cols, skiprows=num, header=None, delimiter=r"\s+")
+        
+        #%% read leap second history
+        dateparse = lambda x: datetime.strptime(x, '%d %m %Y')
+        leapsdf = pd.read_csv(self.leapsec_file, comment='#', header=None, parse_dates= {'date':[1,2,3]}, date_parser=dateparse, delimiter=r"\s+")
+        leapsdf.columns = ['date', 'MJD', 'leaps']
+        # leapsdf = leapsdf.set_index('date')
+        # DDT = delta-T + delta-UT = leaps + 32.184 s offset
+        leapsdf['DDT'] = leapsdf['leaps'] + 32.184
+        
+        #%%
+        leapsdf['JD'] = Time(leapsdf['date'].values.astype(str), scale='utc').jd
+        leapsdf['year'] = Time(leapsdf['date'].values.astype(str), scale='utc').decimalyear
+        
+        #%%
+        mask = (leapsdf['year'] > etddt['year'].values[-1])
+        indices = leapsdf.index[mask]
+        # print(indices)
+        
+        for i, val in enumerate(indices):
+            # for each record create a new row
+            etddt = etddt.append(etddt.iloc[-1, :])
+            etddt.iloc[-1, :] = {'year': leapsdf.loc[val, 'year'], 'JD': leapsdf.loc[val, 'JD'], 'DDT': leapsdf.loc[val, 'DDT']}
+
+        # number of new records
+        records = sum(mask)
+        if (records > 0):
+            # write header
+            with open(self.etddt_file, "w+", newline='\r\n') as f:
+                f.write("".join(header))
+                #etddt['combined'].to_string(f, index=False, header=False)
+                #f.write("\n")
+                # WEIRD PANDAS BUG: to_string() puts white space at beginning of each line
+                for index, row in etddt.iterrows():
+                    string = "{:.5f} {:.5f} {:8.3f}".format(row['year'], row['JD'], row['DDT'])
+                    # print(string)
+                    f.write(string + '\n')
+                f.close()
+            print(f'{records} records were added to the template.')
+        print(f"The File ('{self.etddt_file}') is now up to date ")
 
     def update(self):
         """
@@ -362,6 +580,8 @@ class pygtide(object):
             print('Done after %.3f s.' % (self.exectime))
         self.update()
         return True
+
+
 
     # easy access to the raw data calculated by the Fortran module
     def results(self, round=6):
