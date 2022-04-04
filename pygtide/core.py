@@ -98,7 +98,16 @@ import requests
 import os
 import pandas as pd
 import re
-from astropy.time import Time
+
+def timestampToDecyear(ts):
+    year=ts.year
+
+    jan1=pd.Timestamp(year,1,1)
+    
+    jan1next=pd.Timestamp(year+1,1,1)
+    yrlen=(jan1next-jan1).total_seconds()
+    return year+(ts-jan1).total_seconds()/yrlen
+
 class pygtide(object):
     """
     The PyGTide class will initialise internal variables
@@ -136,7 +145,7 @@ class pygtide(object):
         # IERS leap seconds history file
         self.leapsec_rfile = 'https://hpiers.obspm.fr/iers/bul/bulc/Leap_Second_History.dat'
         self.iauhist_rfile = 'http://hpiers.obspm.fr/iers/eop/eopc04/eopc04_IAU2000.62-now'
-        self.iaucurr_rfile = 'https://datacenter.iers.org/data/9/finals2000A.all'
+        self.iaucurr_rfile = 'https://maia.usno.navy.mil/ser7/finals2000A.all'
 
         self.leapsec_file = os.path.join(self.data_dir,os.path.basename(self.leapsec_rfile))
         self.iauhist_file = os.path.join(self.data_dir,os.path.basename(self.iauhist_rfile))
@@ -323,8 +332,11 @@ C****************************************************************\n"""
         leapsdf['DDT'] = leapsdf['leaps'] + 32.184
         
         #%%
-        leapsdf['JD'] = Time(leapsdf['date'].values.astype(str), scale='utc').jd
-        leapsdf['year'] = Time(leapsdf['date'].values.astype(str), scale='utc').decimalyear
+        import pdb;pdb.set_trace()
+        leapsdf['JD'] = [dt.to_julian_date() for dt in leapsdf['date']]
+        leapsdf['year'] = [timestampToDecyear(dt) for dt in leapsdf['date']]
+        # leapsdf['JD'] = Time(leapsdf['date'].values.astype(str), scale='utc').jd
+        # leapsdf['year'] = Time(leapsdf['date'].values.astype(str), scale='utc').decimalyear
         
         #%%
         mask = (leapsdf['year'] > etddt['year'].values[-1])

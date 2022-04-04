@@ -40,3 +40,9 @@ def test(msg=False):
         if msg:
             plt.show()
     print('finished pygtide tests')
+
+def test_refresh(msg=False):
+
+    pt = pygtide(msg)
+    pt.refresh_data()
+    print('finished pygtide data refresh test')
