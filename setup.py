@@ -8,7 +8,7 @@ ext = [Extension(name='pygtide.etpred',
 
 setup(
     name='pygtide',
-    version='0.3',
+    version='0.3+trichters.fork',
     packages=['pygtide'],
     package_data={'pygtide': ['commdat/*']},
     ext_modules=ext,
