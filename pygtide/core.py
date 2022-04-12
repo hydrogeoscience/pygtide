@@ -147,9 +147,9 @@ class pygtide(object):
         self.iauhist_rfile = 'http://hpiers.obspm.fr/iers/eop/eopc04/eopc04_IAU2000.62-now'
         self.iaucurr_rfile = 'https://maia.usno.navy.mil/ser7/finals2000A.all'
 
-        self.leapsec_file = os.path.join(self.data_dir,os.path.basename(self.leapsec_rfile))
-        self.iauhist_file = os.path.join(self.data_dir,os.path.basename(self.iauhist_rfile))
-        self.iaucurr_file = os.path.join(self.data_dir,os.path.basename(self.iaucurr_rfile))
+        self.leapsec_file = os.path.join(self.data_dir,"[raw]_Leap_Second_History.dat")
+        self.iauhist_file = os.path.join(self.data_dir,"[raw]_eopc04_IAU2000.dat")
+        self.iaucurr_file = os.path.join(self.data_dir,"[raw]_finals2000A.dat")
     
         self.etpolut1_file = os.path.join(self.data_dir,str(etpred.params.etpolutdat,'utf-8').strip())
         self.etpolut1_bfile = os.path.join(self.data_dir,str(etpred.params.etpolutbin,'utf-8').strip())
@@ -160,8 +160,8 @@ class pygtide(object):
     def refresh_data(self):
         """Download the newest leap Second data, and Earth Pole data and prediction files and convert them for use of pygtide"""
         # IERS leap seconds history file
-        for url in [self.leapsec_rfile,self.iauhist_rfile,self.iaucurr_rfile]:
-            fout=os.path.join(self.data_dir,os.path.basename(url))
+        for url,fout in [(self.leapsec_rfile,self.leapsec_file),(self.iauhist_rfile,self.iauhist_file),(self.iaucurr_rfile,self.iaucurr_file)]:
+            # fout=os.path.join(self.data_dir,os.path.basename(url))\cc
             if self.msg:
                 print(f"Downloading {fout}")
             r=requests.get(url)
@@ -314,29 +314,32 @@ C****************************************************************\n"""
         with open(self.etddt_file, "r") as f:
             print(f"Processing file '{self.etddt_file}..")
             header = []
-            regex = re.compile(r"^\s*updated\s*\:.*$", re.IGNORECASE)
+            regex = re.compile(r"^\s*Status\s*\:.*$", re.IGNORECASE)
             for num, line in enumerate(f, 1):
-                line = regex.sub("Updated    : %s" % datetime.utcnow().strftime('%d/%m/%Y'), line)
+                line = regex.sub("Status    : %s" % datetime.utcnow().strftime('%d/%m/%Y'), line)
                 header.append(line)
                 if "C*******" in header[-1]: break
         
         cols = ['year','JD','DDT']
         etddt = pd.read_csv(self.etddt_file, names=cols, skiprows=num, header=None, delimiter=r"\s+")
-        
-        #%% read leap second history
+        #delete last entry so it gets updated
+        etddt.drop(etddt.tail(1).index,inplace=True)
+            #%% read leap second history
         dateparse = lambda x: datetime.strptime(x, '%d %m %Y')
         leapsdf = pd.read_csv(self.leapsec_file, comment='#', header=None, parse_dates= {'date':[1,2,3]}, date_parser=dateparse, delimiter=r"\s+")
         leapsdf.columns = ['date', 'MJD', 'leaps']
+        #appedn current date
+
+        currentdt=pd.Timestamp.now()
+        leapsdf.loc[len(leapsdf.index)]={"date":currentdt,"MJD":currentdt.to_julian_date() - 2400000.5,"leaps":leapsdf.tail(1).leaps.item()}
         # leapsdf = leapsdf.set_index('date')
         # DDT = delta-T + delta-UT = leaps + 32.184 s offset
         leapsdf['DDT'] = leapsdf['leaps'] + 32.184
         
         #%%
-        import pdb;pdb.set_trace()
         leapsdf['JD'] = [dt.to_julian_date() for dt in leapsdf['date']]
         leapsdf['year'] = [timestampToDecyear(dt) for dt in leapsdf['date']]
-        # leapsdf['JD'] = Time(leapsdf['date'].values.astype(str), scale='utc').jd
-        # leapsdf['year'] = Time(leapsdf['date'].values.astype(str), scale='utc').decimalyear
+
         
         #%%
         mask = (leapsdf['year'] > etddt['year'].values[-1])
@@ -344,10 +347,9 @@ C****************************************************************\n"""
         # print(indices)
         
         for i, val in enumerate(indices):
-            # for each record create a new row
-            etddt = etddt.append(etddt.iloc[-1, :])
-            etddt.iloc[-1, :] = {'year': leapsdf.loc[val, 'year'], 'JD': leapsdf.loc[val, 'JD'], 'DDT': leapsdf.loc[val, 'DDT']}
-
+            # for each record append a new row
+            etddt.loc[len(etddt.index)]={'year': leapsdf.loc[val, 'year'], 'JD': leapsdf.loc[val, 'JD'], 'DDT': leapsdf.loc[val, 'DDT']}
+            
         # number of new records
         records = sum(mask)
         if (records > 0):
@@ -360,7 +362,7 @@ C****************************************************************\n"""
                 for index, row in etddt.iterrows():
                     string = "{:.5f} {:.5f} {:8.3f}".format(row['year'], row['JD'], row['DDT'])
                     # print(string)
-                    f.write(string + '\n')
+                    f.write(string+"\n")
                 f.close()
             print(f'{records} records were added to the template.')
         print(f"The File ('{self.etddt_file}') is now up to date ")
