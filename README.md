@@ -13,6 +13,7 @@ Instructions:
 * Use the *Anaconda Navigator* to ensure that the packages [libpython](https://anaconda.org/anaconda/libpython) (as a minimum v2.1) and [mingw](https://anaconda.org/anaconda/mingw) (as a minimum v4.7) are installed. You will also need the following standard libraries: *numpy*, *pandas* and *datetime*.
 * Download [PyGTide](https://github.com/hydrogeoscience/pygtide/archive/master.zip), unzip into a local directory
 * Install the package and run tests with `python -c 'import pygtide; pygtide.test(msg=True)'`
+* Data files can be updated with `python -c 'import pygtide; pygtide.update_data_files()'`
 
 ## How to cite
 If you use PyGTide, please cite the work as:
