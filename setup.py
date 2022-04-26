@@ -27,7 +27,7 @@ setup(
     packages=['pygtide'],
     package_data={'pygtide': ['commdat/*']},
     ext_modules=ext,
-    install_requires=['numpy', 'pandas'],
+    install_requires=['numpy', 'pandas','requests'],
     author='Gabriel C. Rau, Tom Eulenfeld',
     author_email='gabriel@hydrogeo.science',
     url='http://doi.org/10.5281/zenodo.1346664',
