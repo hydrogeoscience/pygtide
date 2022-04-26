@@ -1,5 +1,5 @@
 File:     ETDDT.DAT
-Status    : 12/04/2022
+Status    : 26/04/2022
 Contents: Table to interpolate DDT = difference ET - UTC  resp.
           TDT - UTC in seconds from 1820.5 until 1994.5. For epochs less
           1820.5,  DDT is not defined within this table.
@@ -269,4 +269,4 @@ C******************************************************************************
 2015.50000 2457204.50000   68.184
 2016.99999 2457754.50000   68.184
 2017.00000 2457754.50000   69.184
-2022.27924 2459682.42161   69.184
+2022.31684 2459696.14833   69.184
