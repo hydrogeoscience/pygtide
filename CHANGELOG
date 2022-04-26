@@ -1,8 +1,9 @@
-v0.2.0:
-  * initial version
+v0.4.0+trichters.fork:
+  * add download routines so data files can easily be kept up to date
 v0.3.0+trichters.fork:
   * build extionsion from sources within setup.py
   * add convenient functions predict_series, predict_spectrum, predict_table
   * add convenient functions plot_series, plot_spectrum
   * add test function
-  
+v0.2.0:
+  * initial version
