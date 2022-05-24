@@ -4,6 +4,9 @@ import pygtide
 import datetime as dt
 import numpy as np
 
+import sys
+sys.path.append("D:\KIT\GitHub\pygtide")
+
 # create a PyGTide object
 pt = pygtide.pygtide()
 
