@@ -6,16 +6,12 @@ PyGTide is a Python class that wraps around ETERNA PREDICT 3.4 which was compile
 Earth Tide Service (IGETS)](http://igets.u-strasbg.fr/soft_and_tool.php).
 
 ## How to install and run
-A user guide is available as [PDF download](https://github.com/hydrogeoscience/pygtide/blob/master/PyGTide_v0_5.pdf).
+A user guide is available as [PDF download](https://github.com/hydrogeoscience/pygtide/raw/master/PyGTide_user-guide.pdf).
 
 Instructions:
-* Download and install [Anaconda3 for Python 3.5+](https://www.anaconda.com) on Windows 7/10 or Ubuntu (64bit)
+* Download and install [Anaconda3 5.2 for Python 3.6](https://repo.continuum.io/archive/Anaconda3-5.2.0-Windows-x86_64.exe) (Windows 7/10 64bit)
 * Use the *Anaconda Navigator* to ensure that the packages [libpython](https://anaconda.org/anaconda/libpython) (as a minimum v2.1) and [mingw](https://anaconda.org/anaconda/mingw) (as a minimum v4.7) are installed. You will also need the following standard libraries: *numpy*, *pandas* and *datetime*.
-* Download [PyGTide](https://github.com/hydrogeoscience/pygtide/archive/master.zip), unzip into a local directory and run *test_pygtide_\*.py*
-
-Attention:
-
-Please only use the data files that are provided in the commdat subfolder in this repository and avoid using files from other sources such as IGETS. This is because the code was changed to avoid interpolating leap seconds from the year 1972 onwards.
+* Download [PyGTide](https://github.com/hydrogeoscience/pygtide/archive/master.zip), unzip into a local directory and run *test.py*
 
 ## How to cite
 If you use PyGTide, please cite the work as:
