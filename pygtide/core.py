@@ -94,7 +94,6 @@ from datetime import datetime, timedelta, date
 import numpy as np
 from pkg_resources import resource_filename
 from pygtide import etpred
-import requests
 import os
 import pandas as pd
 import re
@@ -160,6 +159,7 @@ class pygtide(object):
 
     def update_data_files(self):
         """Download the newest leap Second data, and Earth Pole data and prediction files and convert them for use of pygtide"""
+        import requests
         # IERS leap seconds history file
         for url,fout in [(self.leapsec_rfile,self.leapsec_file),(self.iauhist_rfile,self.iauhist_file),(self.iaucurr_rfile,self.iaucurr_file)]:
             # fout=os.path.join(self.data_dir,os.path.basename(url))\cc
