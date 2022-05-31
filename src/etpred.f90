@@ -210,7 +210,8 @@ module PARAMS
     ! CHARACTER(3), PARAMETER :: NULLFILE='NUL'
     ! end windows specs ######################################
     ! Linux/Mac OS SPECS ######################################
-    CHARACTER(9), PARAMETER :: NULLFILE='/dev/null'
+    ! can be set from inside python
+    CHARACTER(10) :: NULLFILE
     ! END LINUX SPECS ######################################
     ! file i/o streams
     INTEGER, PARAMETER :: STDIN=5,STDOUT=6,STDERR=0,VOID=11
@@ -432,7 +433,7 @@ SUBROUTINE PREDICT(ARGS)
       INTEGER ROWS, ROWI
       LOGICAL OPENSTAT
       ! open a void stream to redirect output (if required)
-      OPEN(UNIT=VOID,FILE=NULLFILE,STATUS='OLD')
+      OPEN(UNIT=VOID,FILE=TRIM(NULLFILE),STATUS='OLD')
 !-GCR calculate row number and allocate new array
       HEADER(1,:)='Date [UTC]'
       HEADER(2,:)='Time [UTC]'

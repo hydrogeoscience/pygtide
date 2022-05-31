@@ -124,6 +124,7 @@ class pygtide(object):
         self.fortran_version = etpred.inout.vers.astype(str)
         self.data_dir = resource_filename('pygtide', 'commdat/')
         etpred.params.comdir = self.data_dir + ' ' * (256 - len(self.data_dir))
+        etpred.params.nullfile = os.devnull + ' ' * (10 - len(os.devnull))
         self.args = []
         # set some common variables for external access
         etpred.init()
