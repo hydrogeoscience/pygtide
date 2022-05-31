@@ -3,7 +3,7 @@
 !--lines modified or added for Kudryavtsev potential contain 'c&'
 !--change all \eterna33... to \eterna34... D. Crossley, Feb 26, 2009
 !--complete overhaul of code for use with F2PY (Gabriel C. Rau, October 2017)
-!--some changes to set commdat directory from python (Tom Eulenfeld, March 2020)
+!-- changes have been marked with GCR throughout the file
 !#######################################################################
 !     Program PREDICT, version 3.31 1997.03.03 Fortran 90.
 !
@@ -122,7 +122,6 @@
 !                   the first execution of program PREDICT, if it does
 !                   not yet exist. The path for this file is
 !                   File: hw95.bin.
-!& (+10 lines)
 !     ksm03.dat:    Formatted file, on which the Kudryavtsev (2004)
 !                   tidal potential catalogue has to be stored before
 !                   the execution of program PREDICT.
@@ -204,46 +203,46 @@
 !     DPI...        3.1415....  DPI2...       2.D0*DPI
 !     DRAD...       DPI/180.D0  DRO...        180.D0/DPI
 !#######################################################################
-      module PARAMS
-          IMPLICIT NONE
-          ! initialise numeric values
-          !IMPLICIT REAL(8) (D)
-          ! file i/o streams
-          INTEGER, PARAMETER :: STDIN=5,STDOUT=6,STDERR=0,VOID=11
-          INTEGER SCR,IC2
-          DATA SCR/STDOUT/
-          CHARACTER(9), PARAMETER :: NULLFILE='/dev/null'
-          ! commdat directory
-          CHARACTER(256) :: COMDIR
-          ! names of the i/o files
-          CHARACTER(17), PARAMETER :: CFINI='pygtide.waves.ini',CFPRN='pygtide.out.prn',CFOUT='pygtide.out.prd',&
-            ETDDTDAT='etddt.dat',ETPOLUTDAT='etpolut1.dat',ETPOLUTBIN='etpolut1.bin'
-          ! numerical parameters
-          REAL(8), PARAMETER :: DPI=3.141592653589793D0
-          REAL(8), PARAMETER :: DPI2=2*DPI,DRAD=DPI/180,DRO=180/DPI
-          ! initialise string values
-          CHARACTER(20) :: CMODEL(8) =(/'Doodson 1921        ', &
-            'CTED 1973           ','Buellesfeld 1985    ', 'Tamura 1987         ',&
-            'Xi 1989             ','Roosbeek 1995       ','Hartmann+Wenzel 1995', &
-            'Kudryavtsev 2004    '/)
-          CHARACTER(12) :: CFFILE(8)=(/ 'doodsehw.dat', 'cted73hw.dat', 'buellehw.dat',&
-            'tamurahw.dat', 'xi1989hw.dat', 'ratgp95.dat ', 'hw95s.dat   ', 'ksm03.dat   '/)
-          CHARACTER(12) :: CUFILE(8)=(/ 'doodsehw.bin', 'cted73hw.bin', 'buellehw.bin', 'tamurahw.bin', &
-            'xi1989hw.bin', 'ratgp95.bin ', 'hw95s.bin   ', 'ksm03.bin   '/)
-          CHARACTER(8) :: CUNIT(11)=(/'(m/s)**2','nm/s**2 ',' mas    ',' mm     ',&
-            ' mm     ',' nstr   ',' nstr   ',' nstr   ',' nstr   ',&
-            ' nstr   ',' mm     '/)
-          CHARACTER(10) :: CHANNEL(4)=(/'Signal    ','Tide      ','Pole tide ','LOD tide  '/)
-          CHARACTER(24) :: COMPON(11)=(/'Potential               ' ,'Gravity                 ',&
-            'Tilt                    ','Vertical displacement   ',&
-            'Horizontal displacement ','Vertical strain         ',&
-            'Horizontal strain       ','Aereal strain           ',&
-            'Shear  strain           ','Volume strain           ',&
-            'Ocean tide              '/)
-          INTEGER, PARAMETER :: C88=88888888,C99=99999999
-          CHARACTER(10), PARAMETER :: CENDT='C*********'
-          save
-      end module PARAMS
+module PARAMS
+    ! initialise numeric values
+    !IMPLICIT REAL(8) (D)
+    ! Windows specs ######################################
+    ! CHARACTER(3), PARAMETER :: NULLFILE='NUL'
+    ! end windows specs ######################################
+    ! Linux/Mac OS SPECS ######################################
+    CHARACTER(9), PARAMETER :: NULLFILE='/dev/null'
+    ! END LINUX SPECS ######################################
+    ! file i/o streams
+    INTEGER, PARAMETER :: STDIN=5,STDOUT=6,STDERR=0,VOID=11
+    INTEGER SCR,IC2
+    DATA SCR/STDOUT/
+    ! commdat directory
+    CHARACTER(256) :: COMDIR
+    ! names of the i/o files
+    CHARACTER(17), PARAMETER :: CFPRN='pygtide.out.prn',CFOUT='pygtide.out.prd',&
+    ETDDTDAT='etddt.dat',ETPOLUTDAT='etpolut1.dat',ETPOLUTBIN='etpolut1.bin'
+    ! numerical parameters
+    REAL(8), PARAMETER :: DPI=3.141592653589793D0
+    REAL(8), PARAMETER :: DPI2=2*DPI,DRAD=DPI/180,DRO=180/DPI
+    ! initialise string values
+    CHARACTER(20) :: CMODEL(8) =(/'Doodson 1921        ','CTED 1973           ','Buellesfeld 1985    ',&
+    'Tamura 1987         ','Xi 1989             ','Roosbeek 1995       ','Hartmann+Wenzel 1995', &
+    'Kudryavtsev 2004    '/)
+    CHARACTER(12) :: CFFILE(8)=(/ 'doodsehw.dat', 'cted73hw.dat', 'buellehw.dat',&
+    'tamurahw.dat', 'xi1989hw.dat', 'ratgp95.dat ', 'hw95s.dat   ', 'ksm03.dat   '/)
+    CHARACTER(12) :: CUFILE(8)=(/ 'doodsehw.bin', 'cted73hw.bin', 'buellehw.bin', 'tamurahw.bin', &
+    'xi1989hw.bin', 'ratgp95.bin ', 'hw95s.bin   ', 'ksm03.bin   '/)
+    CHARACTER(8) :: CUNIT(11)=(/'(m/s)**2','nm/s**2 ',' mas    ',' mm     ',&
+    ' mm     ',' nstr   ',' nstr   ',' nstr   ',' nstr   ',&
+    ' nstr   ',' mm     '/)
+    CHARACTER(10) :: CHANNEL(4)=(/'Signal    ','Tide      ','Pole tide ','LOD tide  '/)
+    CHARACTER(24) :: COMPON(11)=(/'Potential               ', 'Gravity                 ','Tilt                    ',&
+    'Vertical displacement   ','Horizontal displacement ','Vertical strain         ','Horizontal strain       ',&
+    'Aereal strain           ','Shear  strain           ','Volume strain           ','Ocean tide              '/)
+    INTEGER, PARAMETER :: C88=88888888,C99=99999999
+    CHARACTER(10), PARAMETER :: CENDT='C*********'
+    save
+end module PARAMS
 
 !#######################################################################
 !     The following dimension statement is concerning the number of
@@ -256,155 +255,170 @@
 !     waves of the tidal potential catalogue, which is 30 000 in the
 !     current program version (parameter MAXNW).
 !#######################################################################
-      module MAX_PARS
-          INTEGER, PARAMETER :: MAXWG=85, MAXNF=8, MAXNW=30000
-          save
-      end module MAX_PARS
+module MAX_PARS
+    INTEGER, PARAMETER :: MAXWG=85, MAXNW=30000
+    save
+end module MAX_PARS
 
 !#######################################################################
 !     The following DIMENSION statement is concerning the tabel of
 !     differences DDT = TDT - UTC:
 !#######################################################################
-      module DDT_MOD
-          ! DDTTAB needs to be allocatable because it depends on rows in etddt.dat
-          REAL(8) :: DDTTAB(3, 500)
-          INTEGER NDDTAB
-          save
-      end module DDT_MOD
+module DDT_MOD
+    ! DDTTAB needs to be allocatable because it depends on rows in etddt.dat
+    REAL(8), DIMENSION(3, 500) :: DDTTAB
+    INTEGER NDDTAB
+    save
+end module DDT_MOD
 
 !#######################################################################
 !     The following common blocks are used to transfer the control
 !     parameters from routine PREDIN to main program.
 !#######################################################################
-      module CONTROL3
-          use MAX_PARS
-          REAL(8) DFRA(MAXWG),DFRE(MAXWG),NA(MAXWG),NE(MAXWG),&
-            DG0(MAXWG),DPHI0(MAXWG),DAM(MAXWG),DBOD(MAXWG)
-          REAL(8) DLAT,DLON,DH,DGRAV,DAZ,DATLIM,DAMIN,DPOLTC,DLODTC
-          INTEGER IDTSEC
-          SAVE
-      end module CONTROL3
+module CONTROLMOD
+    use MAX_PARS
+    ! number of wave groups
+    INTEGER NGR
+    !     DFRA:        Lowest  frequency within wave group in deg/h.
+    !     DFRE:        Highest frequency within wave group in deg/h.
+    !     DG0:         amplitude factor.
+    !     DPHI0:       phase lead in degree.
+    REAL(8) DFRA(MAXWG),DFRE(MAXWG),DG0(MAXWG),DPHI0(MAXWG)
+    ! GCR could change this to REAL(16) for higher precision wave detection
+    ! but then execution time is longer
+    REAL(8) NA(MAXWG),NE(MAXWG),DAM(MAXWG),DBOD(MAXWG)
+    REAL(8) DLAT,DLON,DH,DGRAV,DAZ,DATLIM,DAMIN,DPOLTC,DLODTC
+    INTEGER IDTSEC
+    CHARACTER CINST*10,CHEAD(10)*64
+    INTEGER IC,IR,ITY,ITM,ITD,ITH,IDA,IMODEL,IPROBS,ISPANH
+    REAL(16) KFILT,IPRLF,IRIGID,IHANN,IQUICK,NF
+    SAVE
+end module CONTROLMOD
 
-!#######################################################################
-!     The following dimension statement is concerning the number of
-!     meteorological parameters, which is 8 in the current program
-!     version.
-!     The following dimension statements are concerning the number of
-!     wavegroups to be used, which is 85 in the current program
-!     version (parameter MAXWG).
-!#######################################################################
-      module CONTROL4
-          use MAX_PARS
-          CHARACTER CINST*10,CHEAD(10)*64
-          INTEGER IREG(MAXNF)
-          CHARACTER CFY1(MAXNF)*10,CFY2(MAXNF)*10
-          CHARACTER CNSY(MAXWG)*4
-          INTEGER IC,IR,NGR,ITY,ITM,ITD,ITH,IDA,IMODEL,IPROBS,ISPANH
-          REAL(16) KFILT,IPRLF,IRIGID,IHANN,IQUICK,NF
-          SAVE
-      end module CONTROL4
+module TIDPHAS
+    REAL(8) DPK(25)
+    save
+end module TIDPHAS
 
-      module TIDPHAS
-          REAL(8) DPK(25)
-          save
-      end module TIDPHAS
-
-      module TIDWAVE1
-          use MAX_PARS
-          INTEGER NW,IWNR(MAXNW),IAARG(MAXNW,12)
-          save
-      end module TIDWAVE1
-
-      module TIDWAVE2
-          use MAX_PARS
-          REAL(8) DX0(MAXNW),DX1(MAXNW),DX2(MAXNW),DY0(MAXNW),&
-            DY1(MAXNW),DY2(MAXNW),DTHPH(MAXNW),DTHFR(MAXNW),DBODY(MAXNW),&
-            DC0(MAXNW),DS0(MAXNW),DDC(MAXNW),DDS(MAXNW)
-          save
-      end module TIDWAVE2
+module TIDWAVE
+    use MAX_PARS
+    INTEGER NW,IWNR(MAXNW),IAARG(MAXNW,12)
+    REAL(8) DX0(MAXNW),DX1(MAXNW),DX2(MAXNW),DY0(MAXNW),&
+    DY1(MAXNW),DY2(MAXNW),DTHPH(MAXNW),DTHFR(MAXNW),DBODY(MAXNW),&
+    DC0(MAXNW),DS0(MAXNW),DDC(MAXNW),DDS(MAXNW)
+    save
+end module TIDWAVE
 
 !#######################################################################
 !     COMMON /LOVE/ contains gravimeter factors, LOVE-numbers, SHIDA-
 !     numbers and tilt factors for degree 2...4 at latitude DLAT:
 !#######################################################################
-      module LOVE
-          REAL(8) DGLAT(12),DHLAT(12),DKLAT(12),DLLAT(12),DTLAT(12)
-          REAL(8) DOM0,DOMR,DGR,DHR,DKR,DLR,DTR
-          save
-      end module LOVE
-
-      module INOUT
-          ! The data storage container read out by Python
-          REAL(8), DIMENSION(:, :), ALLOCATABLE :: ETPDATA
-          ! Python handover arguments controlling the Fortran program
-          REAL(8), DIMENSION(18) :: ARGSIN
-          ! global storage of the execution time
-          REAL(8) :: EXECTIME,ETD_START,ETD_END
-          INTEGER :: FILEPRD,FILEPRN,SCROUT,ETPOL_START,ETPOL_END
-          LOGICAL :: ISINIT
-          ! CHARACTER(255) :: MESSAGE
-          CHARACTER(25), DIMENSION(6,25) :: HEADER
-          CHARACTER(8) :: ETPUNIT
-          !CHARACTER(6), PARAMETER :: CREST='PyGTide'
-          CHARACTER(7), PARAMETER :: CPROJ='pygtide'
-          CHARACTER(3), PARAMETER :: VERSION='0.1'
-          CHARACTER(32), PARAMETER :: VERS='ETERNA PREDICT v3.4 (10/02/2013)'
-          CHARACTER(10), PARAMETER :: FORTVERS='3.4 130210'
-          save
-      end module INOUT
-
+module LOVE
+    REAL(8) DGLAT(12),DHLAT(12),DKLAT(12),DLLAT(12),DTLAT(12)
+    REAL(8) DOM0,DOMR,DGR,DHR,DKR,DLR,DTR
+    save
+end module LOVE
 ! ##################################################################
 
-! GCR  this subroutne sets the variables in module 'INOUT' for access in Python
-      subroutine INIT
-        use INOUT
-        use PARAMS
-        use DDT_MOD
-        INTEGER IUN16,IUN27,IUN30,MYPOS,IOS,IPRINT
-        CHARACTER(100) TXT
-        DATA IUN16/16/,IUN30/30/,IUN27/27/,IPRINT/0/
-        ! find out the date limitations from the files for f2py to prevent calculation
-        ! SUCCESS IN READING THE LAST LINE FROM ETPOLUT1.DAT FORMATTED
-        OPEN(UNIT=IUN30,FILE=TRIM(COMDIR)//TRIM(ETPOLUTDAT),FORM='FORMATTED',&
-            ACTION='READ',STATUS='OLD',ACCESS='STREAM',IOSTAT=IOS)
-        IF (IOS == 0) THEN
-            do
-                read (IUN30,"(A10)",iostat=IOS) TXT
-                if (IOS /= 0) exit
-                if (TXT == CENDT) then ! found search string at beginning of line
-                      READ(IUN30, '(I8,A)') ETPOL_START, TXT
-                      !WRITE(*,*) "etpolut1.dat:",ETPOL_START
-                end if
-            end do
-            ! get file size to estimate where to read dates from
-            INQUIRE(UNIT=IUN30, SIZE=MYPOS)
-            !INQUIRE(IUN30, POS=MYPOS)
-            !WRITE(*,*) MYPOS
-            ! reverse by a specific amount to the beginning of the previous line
-            READ(IUN30, '(I8,A)', POS=MYPOS-74) ETPOL_END, TXT
-            !WRITE(SCR,*) "Last line:" // TXT
-            !WRITE(*,*) "etpolut1.dat:",ETPOL_END
-            CLOSE(IUN30)
-        ENDIF
-        ! read etddt.dat for start end end values
-        CALL ETDDTA(IUN16,IUN27,IPRINT)
-        ETD_START=DDTTAB(1,1)
-        ETD_END=DDTTAB(1,NDDTAB)
-        !WRITE(*,*) ETD_START,NDDTAB,ETD_END
-      END SUBROUTINE
+! ##################################################################
+!-GCR  this subroutne sets the variables in module 'INOUT' for access in Python
+module INOUT
+    use MAX_PARS
+    ! Python handover arguments controlling the Fortran program
+    REAL(8), DIMENSION(18) :: ARGSIN
+    ! The data storage container read out by Python
+    REAL(8), DIMENSION(:, :), ALLOCATABLE :: ETPDATA
+    ! Wave groups parameters
+    INTEGER NUMWG
+    REAL(8), DIMENSION(MAXWG) :: FQMIN, FQMAX, AMPF, PHASEF
+    ! global storage of the execution time
+    REAL(8) :: EXECTIME,ETD_START,ETD_END
+    INTEGER :: FILEPRD,FILEPRN,SCROUT,ETPOL_START,ETPOL_END
+    LOGICAL :: ISINIT
+    ! CHARACTER(255) :: MESSAGE
+    CHARACTER(25), DIMENSION(6,25) :: HEADER
+    CHARACTER(8) :: ETPUNIT
+    !CHARACTER(6), PARAMETER :: CREST='PyGTide'
+    CHARACTER(7), PARAMETER :: CPROJ='pygtide'
+    CHARACTER(3), PARAMETER :: VERSION='0.5'
+    CHARACTER(32), PARAMETER :: VERS='ETERNA PREDICT v3.4 (10/02/2013)'
+    CHARACTER(10), PARAMETER :: FORTVERS='3.4 130210'
+    save
+end module INOUT
+! ##################################################################
 
+! ##################################################################
+!-GCR  this subroutne initialises the module
+subroutine INIT
+    use PARAMS
+    use DDT_MOD
+    use INOUT
+    INTEGER IUN16,IUN27,IUN30,MYPOS,IOS,IPRINT
+    CHARACTER(100) TXT
+    DATA IUN16/16/,IUN30/30/,IUN27/27/,IPRINT/0/
+    ! find out the date limitations from the files for f2py to prevent calculation
+    ! SUCCESS IN READING THE LAST LINE FROM ETPOLUT1.DAT FORMATTED
+    OPEN(UNIT=IUN30,FILE=TRIM(COMDIR)//TRIM(ETPOLUTDAT),FORM='FORMATTED',&
+        ACTION='READ',STATUS='OLD',ACCESS='STREAM',IOSTAT=IOS)
+    IF (IOS == 0) THEN
+        do
+            read (IUN30,"(A10)",iostat=IOS) TXT
+            if (IOS /= 0) exit
+            if (TXT == CENDT) then ! found search string at beginning of line
+                  READ(IUN30, '(I8,A)') ETPOL_START, TXT
+                  !WRITE(*,*) "etpolut1.dat:",ETPOL_START
+            end if
+        end do
+        ! get file size to estimate where to read dates from
+        INQUIRE(UNIT=IUN30, SIZE=MYPOS)
+        !INQUIRE(IUN30, POS=MYPOS)
+        !WRITE(*,*) MYPOS
+        ! go back by a specific number to the beginning of the previous line
+        READ(IUN30, '(I8,A)', POS=MYPOS-74) ETPOL_END, TXT
+        !WRITE(SCR,*) "Last line:" // TXT
+        !WRITE(*,*) "etpolut1.dat:",ETPOL_END
+        CLOSE(IUN30)
+    ENDIF
+    ! read etddt.dat for start end end values
+    NDDTAB = 0
+    CALL ETDDTA(IUN16,IUN27,IPRINT)
+    ETD_START=DDTTAB(1,1)
+    ETD_END=DDTTAB(1,NDDTAB)
+    !WRITE(*,*) ETD_START,NDDTAB,ETD_END
+    !-GCR initiate wave groups to: everything in tidal catalogue
+    NUMWG = 1
+    FQMIN(1) = 0.D0
+    FQMAX(1) = 100.D0
+    AMPF(1) = 1.D0
+    PHASEF(1) = 0.D0
+END SUBROUTINE
+! ##################################################################
+
+! ##################################################################
+!-GCR this is to hand over the wave group parameters
+SUBROUTINE WAVES(FREQFROM, FREQTO, AMPFAC, PHASEFAC, N)
+    use INOUT
+    use MAX_PARS
+    INTEGER, INTENT(IN) :: N
+    REAL(8), INTENT(IN) :: FREQFROM(N), FREQTO(N), AMPFAC(N), PHASEFAC(N)
+    NUMWG = N
+    FQMIN(1:N) = FREQFROM
+    FQMAX(1:N) = FREQTO
+    AMPF(1:N) = AMPFAC
+    PHASEF(1:N) = PHASEFAC
+END SUBROUTINE
+
+! ##################################################################
 !-GCR this is the main interface for f2py
-      SUBROUTINE PREDICT(ARGS)
+SUBROUTINE PREDICT(ARGS)
       use MAX_PARS
       use PARAMS
       use DDT_MOD
-      use CONTROL3
-      use CONTROL4
-      use TIDWAVE1
-      use TIDWAVE2
+      use CONTROLMOD
+      use TIDWAVE
       use INOUT
       IMPLICIT REAL(8) (D)
-      REAL(8), DIMENSION(18) :: ARGS
+      REAL(8), DIMENSION(18), INTENT(IN) :: ARGS
 !-GCR store control arguments
       DIMENSION DGI(6)
 !#######################################################################
@@ -420,14 +434,10 @@
       ! open a void stream to redirect output (if required)
       OPEN(UNIT=VOID,FILE=NULLFILE,STATUS='OLD')
 !-GCR calculate row number and allocate new array
-      ARGSIN = ARGS
       HEADER(1,:)='Date [UTC]'
       HEADER(2,:)='Time [UTC]'
-!#######################################################################
-!-GCR VERY IMPORTANT DIRECTIVE FOR F2PY
-!-----------------------------------------------------------------------
-!Cf2py intent(in) ARGSIN
-!-----------------------------------------------------------------------
+!-GCR VERY IMPORTANT DIRECTIVE FOR F2PY (handover of control inputs from Python)
+      ARGSIN = ARGS
 !#######################################################################
 !     The following dimension statements are concerning the number of
 !     wavegroups to be used, which is restricted to  85 in the current
@@ -461,7 +471,7 @@
 !     22    2.002737    2.451943    2.005476      K2
 !     23    2.451944    7.000000    2.898410      M3M6
 !#######################################################################
-      DATA IUN14/14/,IUN15/15/,IUN16/16/,IUN23/23/,IUN24/24/,IUN27/27/
+      DATA IUN14/14/,IUN16/16/,IUN23/23/,IUN24/24/,IUN27/27/
       DATA IUN30/30/,IUN31/31/
       DATA DZERO/4*0.D0/
 !#######################################################################
@@ -472,7 +482,7 @@
 !-GCR-del      CLOSE(IUN15)
 !-GCR check for screen output option, default: silent (0)
       SCROUT = INT(ARGSIN(18))
-      ! redirect screen output to a NUL file on Windows
+      ! redirect screen output to void
       IF (SCROUT.EQ.1) THEN
         SCR=STDOUT
       ELSE
@@ -495,10 +505,10 @@
           IUN16=VOID
       ENDIF
 !-GCR read wave group parameters from ini file
-      OPEN(IUN15, FILE=TRIM(COMDIR)//TRIM(CFINI),ACTION='READ',FORM='FORMATTED')
+!      OPEN(IUN15, FILE=TRIM(COMDIR)//TRIM(CFINI),ACTION='READ',FORM='FORMATTED')
 !-GCR continue ...
       WRITE(IUN16,17002) FORTVERS,CPROJ
-      WRITE(SCR,17002)     FORTVERS,CPROJ
+      WRITE(SCR,17002) FORTVERS,CPROJ
       IRESET=1
 !-GCR set row counter for output array
       ROWI=1
@@ -507,14 +517,14 @@
 !     Store array of differences DDT = TDT - UTC:
 !#######################################################################
       IPRINT=0
-!-GCR modified
+!-GCR modified: only call this function if it hasn't been called before
       IF (NDDTAB.LT.10) CALL ETDDTA(IUN16,IUN27,IPRINT)
 !#######################################################################
 !     Read control parameters:
 !#######################################################################
       IPRINT=1
 !-GCR PREDIN has been modified to deal with ARGSIN
-      CALL PREDIN(IUN15,IUN16,IPRINT)
+      CALL PREDIN(IUN16,IPRINT)
 !-GCR define the size of the output matrix
       ROWS = INT(CEILING((DBLE(ISPANH)*3600)/DBLE(IDTSEC)))
       IF (ALLOCATED(ETPDATA)) DEALLOCATE (ETPDATA)
@@ -564,7 +574,8 @@
       CALL ETPOTS(IUN14,IUN16,IUN24,IPRINT,IMODEL,DLAT,DLON,DH,DGRAV,&
         DAZ,IC,DJULD,DAMIN)
       IC2=IC+2
-      ITH=DTH
+!-GCR fixed conversion
+      ITH=INT(DTH)
 !#######################################################################
 !     Print output channel table:
 !#######################################################################
@@ -594,10 +605,14 @@
       DO 930 IW=1,NW
       IF(DTHFR(IW).LT.DFRA(IG)-1.D-10) NA(IG)=IW+1
       IF(DTHFR(IW).LT.DFRE(IG)+1.D-10) NE(IG)=IW
+!-GCR: this is a bug fix: reset lowest wave number to 1 if frequency is zero!
+      IF (DFRA(IG).EQ.0) NA(IG) = 1
+!-GCR end bug fix
   930 CONTINUE
       IF(NA(IG).EQ.0) NA(IG)=1
-      NAK=NA(IG)
-      NEK=NE(IG)
+!-GCR fixed conversion
+      NAK=INT(NA(IG))
+      NEK=INT(NE(IG))
 !#######################################################################
 !     Search for main wave of the group:
 !#######################################################################
@@ -620,15 +635,13 @@
       DO 995 IG=1,NGR
       NANR=IWNR(NA(IG))
       NENR=IWNR(NE(IG))
-      WRITE(IUN16,17015) IG,NANR,NENR,DG0(IG),DPHI0(IG),CNSY(IG),&
-        DAM(IG),DBOD(IG)
-      WRITE(IUN23,17015) IG,NANR,NENR,DG0(IG),DPHI0(IG),CNSY(IG),&
-        DAM(IG),DBOD(IG)
+      WRITE(IUN16,17015) IG,NANR,NENR,DG0(IG),DPHI0(IG),DAM(IG),DBOD(IG)
+      WRITE(IUN23,17015) IG,NANR,NENR,DG0(IG),DPHI0(IG),DAM(IG),DBOD(IG)
       DPHI0(IG)=DPHI0(IG)*DRAD
   995 CONTINUE
       DO 996 IG=1,NGR
       DFAC=DG0(IG)/DBOD(IG)
-      DO 996 IW=NA(IG),NE(IG)
+      DO 996 IW=INT(NA(IG)),INT(NE(IG))
       IF(IRIGID.EQ.1) DBODY(IW)=1.D0
       DX0(IW)=DX0(IW)*DFAC*DBODY(IW)
       DX1(IW)=DX1(IW)*DFAC*DBODY(IW)
@@ -650,7 +663,8 @@
       ITMIN=0
       ITSEC=0
       DDAT=DBLE(ISPANH)/DDTH
-      NDAT=DDAT
+!-GCR fixed conversion
+      NDAT=INT(DDAT)
       CALL ETJULN(IUN16,ITY,ITM,ITD,DTH,DJULD0)
 !#######################################################################
 !     Loop over NDAT samples:
@@ -678,7 +692,7 @@
       IPRINT=1
       CALL ETPHAS(IUN16,IPRINT,IMODEL,DLON,DJULD)
       DO 1025 IG=1,NGR
-      DO 1025 IW=NA(IG),NE(IG)
+      DO 1025 IW=INT(NA(IG)),INT(NE(IG))
       DTHPH(IW)=DTHPH(IW)+DPHI0(IG)
 !#######################################################################
 !     Prepare arrays for recursion algorithm:
@@ -691,7 +705,7 @@
  1033 CONTINUE
       DGT=0.D0
       DO 1030 IG=1,NGR
-      DO 1030 IW=NA(IG),NE(IG)
+      DO 1030 IW=INT(NA(IG)),INT(NE(IG))
       DGT=DGT+(DX0(IW)+DT2000*DX1(IW))*DC0(IW)+&
         (DY0(IW)+DT2000*DY1(IW))*DS0(IW)
 ! ksm (4 lines)
@@ -807,8 +821,8 @@
       WRITE(IUN16,17030) CPROJ,CFPRN,CFOUT,DEXTIM
       WRITE(SCR,17030)     CPROJ,CFPRN,CFOUT,DEXTIM
 !-GCR close all the i/o files if still open
-      INQUIRE(UNIT=IUN15, OPENED=OPENSTAT)
-      IF (OPENSTAT) CLOSE(IUN15)
+!      INQUIRE(UNIT=IUN15, OPENED=OPENSTAT)
+!      IF (OPENSTAT) CLOSE(IUN15)
       INQUIRE(UNIT=IUN16, OPENED=OPENSTAT)
       IF (OPENSTAT) CLOSE(IUN16)
       INQUIRE(UNIT=IUN23, OPENED=OPENSTAT)
@@ -840,7 +854,7 @@
         6x,'Wave groups and observed tidal parameters'//&
         6x,'  no.  from    to ampl.fac. phase lead      ampl.  WD body '/&
         6x,'                               [deg]      [',A10,']'/)
-17015 FORMAT(6x,3I6,2F10.4,1X,A8,2F10.4)
+17015 FORMAT(6x,3I6,2F10.4,1X,2F10.4)
 17016 FORMAT(////&
         6x,'Program PREDICT, version ',A11,' Fortran 90'//&
         6x,'Component ',A24,' IN ',1X,A8//6X,'Date in UT'//)
@@ -865,8 +879,10 @@
         '      *   Output file is:            ',A13,' *'/&
         '      **********************************************'//&
         '      Execution time: ',F10.3,'  seconds'/)
-      END
-      SUBROUTINE ETASTN(IUN16,IPRINT,IMODEL,DLON,DJULD,DUT1,DAS,DASP,DDT)
+END SUBROUTINE
+
+
+SUBROUTINE ETASTN(IUN16,IPRINT,IMODEL,DLON,DJULD,DUT1,DAS,DASP,DDT)
 !#######################################################################
 !     Routine ETASTN, version 1996.05.25 Fortran 90.
 !     The routine ETASTN computes the astronomical elements for
@@ -942,7 +958,8 @@
 !      DATA DRAD/0.174532925197721D-001/
       D1MD=1.D0/(365250.D0*24.D0)
       DMJD=DJULD-2400000.5D0
-      IMJD=DMJD
+!-GCR fixed conversion issue
+      IMJD=INT(DMJD)
       DTH=(DMJD-DBLE(IMJD))*24.D0
 !#######################################################################
 !     Compute Universal Time epoch DTUT in Julian Centuries referring
@@ -1190,11 +1207,13 @@
         6x,'longitude   Jupiter F10',F20.11,' deg  F10.',F18.11,' deg/h'/ &
         6x,'longitude   Saturn  F11',F20.11,' deg  F11.',F18.11,' deg/h'/)
 17030 FORMAT(/6x,'***** Routine ETASTN finished the execution.'/)
-      END
-      SUBROUTINE ETDDTA(IUN16,IUN27,IPRINT)
+END SUBROUTINE
+
+
+SUBROUTINE ETDDTA(IUN16,IUN27,IPRINT)
 !#######################################################################
 !     Routine ETDDTA, version 1996.05.29 Fortran 90.
-!     The routine ETDDTA reads a table of DDT = ET -UTC or TDT - UTC
+!     The routine ETDDTA reads a table of DDT = ET-UTC or TDT-UTC
 !     from file etddt.dat. The file will be opened and after use
 !     closed by the routine.
 !     The table on file etddt.dat has to be extended, when new data
@@ -1251,8 +1270,10 @@
 17003 FORMAT(F10.5,F15.6,F10.3)
 17004 FORMAT(F15.5,F15.6,F15.3)
       RETURN
-      END
-      SUBROUTINE ETDDTB(IUN16,IPRINT,DTUJD,DDT)
+END SUBROUTINE
+
+
+SUBROUTINE ETDDTB(IUN16,IPRINT,DTUJD,DDT)
 !#######################################################################
 !     Routine ETDDTB, version 1996.05.25 Fortran 90.
 !     All variables with D as first character are DOUBLE PRECISION.
@@ -1333,8 +1354,17 @@
 !#######################################################################
 !     Interpolate table between position ITAB and ITAB+1:
 !#######################################################################
-  230 DDT=(DDTTAB(3,ITAB+1)*(DTUJD-DDTTAB(2,ITAB))-DDTTAB(3,ITAB)* &
-        (DTUJD-DDTTAB(2,ITAB+1)))/(DDTTAB(2,ITAB+1)-DDTTAB(2,ITAB))
+!GCR-update:
+  230 CONTINUE
+      ! for gregorian year >= 1972: just use the tabulated leap seconds
+      ! this has been added to avoid interpolation between leap seconds
+      IF (DTUJD >= 2441317.5) THEN
+         DDT=DDTTAB(3,ITAB)
+      ! for gregorian year < 1972 use interpolation (original code!)
+      ELSE
+         DDT=(DDTTAB(3,ITAB+1)*(DTUJD-DDTTAB(2,ITAB))-DDTTAB(3,ITAB)* &
+    		(DTUJD-DDTTAB(2,ITAB+1)))/(DDTTAB(2,ITAB+1)-DDTTAB(2,ITAB))
+      ENDIF
       RETURN
 !#######################################################################
 !     Format statements:
@@ -1348,8 +1378,10 @@
         ' ***** Epoch exceeds the last tabulated value:',F10.5/ &
         ' ***** DDT of last tabulated epoch is used.'/ &
         ' ***** Please try to update tabels in file etddt.dat.'/)
-      END
-      SUBROUTINE PREDIN(IUN15,IUN16,IPRINT)
+END SUBROUTINE
+
+
+SUBROUTINE PREDIN(IUN16,IPRINT)
 !#######################################################################
 !     Routine PREDIN, version 1996.05.25 Fortran 90.
 !     The routine reads the control parameter file *.INI and returns
@@ -1417,12 +1449,11 @@
 !     Last Modification: 1996.05.25 by Hans-Georg Wenzel.
 !#######################################################################
       use MAX_PARS
-      use CONTROL3
-      use CONTROL4
+      use CONTROLMOD
       use INOUT
       IMPLICIT REAL(8) (D)
       IMPLICIT INTEGER (I-N)
-      CHARACTER CINPUT*75,CINTERN*50,CREST*64,CONTROL*10
+!      CHARACTER CINPUT*100,CINTERN*100,CREST*100,CONTROL*10
 !#######################################################################
 !     Define default parameters:
 !#######################################################################
@@ -1435,151 +1466,30 @@
       ITH=0
       IMODEL=8
       IRIGID=0
-      REWIND IUN15
+!      REWIND IUN15
 !#######################################################################
 !     Read control record:
 !#######################################################################
-  100 CONTINUE
-      READ(IUN15,17001,END=5000) CINPUT
-      II=INDEX(CINPUT,'=')
-      IF(II.EQ.0) GOTO 100
+!  100 CONTINUE
+!      READ(IUN15,17001,END=5000) CINPUT
+!      II=INDEX(CINPUT,'=')
+!      IF(II.EQ.0) GOTO 100
 !#######################################################################
 !     Input record contains an equal sign at position II:
 !#######################################################################
-      CONTROL=CINPUT(1:II-1)
+!      CONTROL=CINPUT(1:II-1)
 !#######################################################################
 !     Search for # in the same record:
 !#######################################################################
-      NLE=LEN(CINPUT)
-      INBL=NLE
-      DO 200 I=II+1,NLE
-      IF(CINPUT(I:I).NE.'#') GOTO 200
-      INBL=I
-      GOTO 210
-  200 CONTINUE
-  210 CREST=CINPUT(II+1:INBL-1)
-      WRITE(IUN16,17006) CREST
-!#######################################################################
-!!     Search for sensor name:
-!#######################################################################
-!!      IF(CONTROL.NE.'SENSORNAME') GOTO 1300
-!!      CINST=CREST
-!!      GOTO 100
-!! 1300 CONTINUE
-!#######################################################################
-!!!     Search for sampling interval:
-!#######################################################################
-!!      IF(CONTROL.NE.'SAMPLERATE') GOTO 1400
-!!      WRITE(CINTERN,'(A15)') CREST
-!!      READ(CINTERN,'(I15)')  IDTSEC
-!!      GOTO 100
-!! 1400 CONTINUE
-!#######################################################################
-!!!     Search  for stations latitude:
-!#######################################################################
-!!      IF(CONTROL.NE.'STATLATITU') GOTO 2400
-!!      WRITE(CINTERN,'(A15)')  CREST
-!!      READ(CINTERN,'(F15.4)') DLAT
-!!      GOTO 100
-!! 2400 CONTINUE
-!#######################################################################
-!!!     Search  for stations longitude:
-!#######################################################################
-!!      IF(CONTROL.NE.'STATLONITU') GOTO 2500
-!!      WRITE(CINTERN,'(A15)')  CREST
-!!      READ(CINTERN,'(F15.4)') DLON
-!!      GOTO 100
-!! 2500 CONTINUE
-!#######################################################################
-!!!     Search  for stations height:
-!#######################################################################
-!!      IF(CONTROL.NE.'STATELEVAT') GOTO 2600
-!!      WRITE(CINTERN,'(A15)')  CREST
-!!      READ(CINTERN,'(F15.4)') DH
-!!      GOTO 100
-!! 2600 CONTINUE
-!#######################################################################
-!!!     Search  for stations gravity:
-!#######################################################################
-!!      IF(CONTROL.NE.'STATGRAVIT') GOTO 2700
-!!      WRITE(CINTERN,'(A15)')  CREST
-!!      READ(CINTERN,'(F15.4)') DGRAV
-!!      GOTO 100
-!! 2700 CONTINUE
-!#######################################################################
-!!!     Search  for stations azimuth:
-!#######################################################################
-!!      IF(CONTROL.NE.'STATAZIMUT') GOTO 2800
-!!      WRITE(CINTERN,'(A15)')  CREST
-!!      READ(CINTERN,'(F15.4)') DAZ
-!!      GOTO 100
-!! 2800 CONTINUE
-!#######################################################################
-!!!     Search  for initial epoch:
-!#######################################################################
-!!      IF(CONTROL.NE.'INITIALEPO') GOTO 2900
-!!      WRITE(CINTERN,'(A15)') CREST
-!!      READ(CINTERN,'(3I5)')  ITY,ITM,ITD
-!!      GOTO 100
-!! 2900 CONTINUE
-!#######################################################################
-!!     Search  for tidal component:
-!#######################################################################
-!!     IC...        Earth tide component to be computed.
-!!                  IC=-1: tidal potential, geodetic coefficients
-!!                         in m**2/s**2.
-!!                  IC= 0: vertical tidal acceleration (gravity tide),
-!!                         geodetic coefficients in nm/s**2 (positive
-!!                         down).
-!!                  IC= 1: horizontal tidal acceleration (tidal tilt)
-!!                         in azimuth DAZ, geodetic coefficients in
-!!                         mas = arc sec/1000.
-!!                  IC= 2: vertical tidal displacement, geodetic
-!!                         coefficients in mm.
-!!                  IC= 3: horizontal tidal displacement in azimuth
-!!                         DAZ, geodetic coefficients in mm.
-!!                  IC= 4: vertical tidal strain, geodetic coefficients
-!!                         in 10**-9 = nstr.
-!!                  IC= 5: horizontal tidal strain in azimuth DAZ,
-!!                         geodetic coefficients in 10**-9 = nstr.
-!!                  IC= 6: areal tidal strain, geodetic coefficients
-!!                         in 10**-9 = nstr.
-!!                  IC= 7: shear tidal strain, geodetic coefficients
-!!                         in 10**-9 = nstr.
-!!                  IC= 8: volume tidal strain, geodetic coefficients
-!!                         in 10**-9 = nstr.
-!!                  IC= 9: ocean tides, geodetic coefficients in
-!!                         millimeter.
-!#######################################################################
-!!      IF(CONTROL.NE.'TIDALCOMPO') GOTO 3000
-!!      WRITE(CINTERN,'(A15)') CREST
-!!      READ(CINTERN,'(I15)')  IC
-!!      GOTO 100
-!! 3000 CONTINUE
-!#######################################################################
-!!!     Search  for tidal potential catalogue:
-!#######################################################################
-!!      IF(CONTROL.NE.'TIDALPOTEN') GOTO 3100
-!!      WRITE(CINTERN,'(A15)') CREST
-!!      READ(CINTERN,'(I15)')  IMODEL
-!!      GOTO 100
-!! 3100 CONTINUE
-!#######################################################################
-!!!     Search  for truncation parameter:
-!#######################################################################
-!!      IF(CONTROL.NE.'AMTRUNCATE') GOTO 3150
-!!      WRITE(CINTERN,'(A15)')    CREST
-!!      READ(CINTERN,'(F15.10)')  DAMIN
-!!      GOTO 100
-!! 3150 CONTINUE
-!#######################################################################
-!!!     Search  for print parameter of tidal component development:
-!#######################################################################
-!!      IF(CONTROL.NE.'PRINTDEVEL') GOTO 3200
-!!      WRITE(CINTERN,'(A15)') CREST
-!!      READ(CINTERN,'(I15)')  IR
-!!      GOTO 100
-!! 3200 CONTINUE
+      ! NLE=LEN(CINPUT)
+      ! INBL=NLE
+      ! DO 200 I=II+1,NLE
+      ! IF(CINPUT(I:I).NE.'#') GOTO 200
+      ! INBL=I
+      ! GOTO 210
+  ! 200 CONTINUE
+  ! 210 CREST=CINPUT(II+1:INBL-1)
+      ! WRITE(IUN16,17006) CREST
 
 !-GCR set variables that were previously read from INI file
 ! REQUIRED PARAMETERS:
@@ -1612,115 +1522,31 @@
       DPOLTC = ARGSIN(14)
 !     Length of day tide correction: 'LODTIDECOR' DLODTC
       DLODTC = ARGSIN(15)
+! 	  reset the wave group parameters to avoid errors
+      NGR = NUMWG
+      DFRA = FQMIN
+      DFRE = FQMAX
+      DG0 = AMPF
+      DPHI0 = PHASEF
 
 !#######################################################################
 !     Search  for textheader:
 !#######################################################################
-      IF(CONTROL.NE.'TEXTHEADER') GOTO 3400
-      IF(IH.GT.10) GOTO 3300
-      CHEAD(IH)=CREST
-      IH=IH+1
-      GOTO 100
- 3300 CONTINUE
-!#######################################################################
-!!!     Search  for data error search threshold:
-!#######################################################################
-!!      IF(CONTROL.NE.'SEARDATLIM') GOTO 3400
-!!      WRITE(CINTERN,'(A15)')  CREST
-!!      READ(CINTERN,'(F15.4)') DATLIM
-!!      IDA=1
-!!      IF(DATLIM.LE.0.D0) IDA=0
-!!      GOTO 100
- 3400 CONTINUE
-!#######################################################################
-!!!     Search  for numerical lowpass filter to be selected:
-!#######################################################################
-!!      IF(CONTROL.NE.'NUMHIGPASS') GOTO 3500
-!!      WRITE(CINTERN,'(A15)') CREST
-!!      READ(CINTERN,'(I15)')  KFILT
-!!      GOTO 100
-!! 3500 CONTINUE
-!#######################################################################
-!!!     Search  for print parameter for observations:
-!#######################################################################
-!!      IF(CONTROL.NE.'PRINTOBSER') GOTO 3600
-!!      WRITE(CINTERN,'(A15)') CREST
-!!      READ(CINTERN,'(I15)')  IPROBS
-!!      GOTO 100
-!! 3600 CONTINUE
-!#######################################################################
-!!!     Search  for print parameter for observations:
-!#######################################################################
-!!      IF(CONTROL.NE.'PRINTLFOBS') GOTO 3700
-!!      WRITE(CINTERN,'(A15)') CREST
-!!      READ(CINTERN,'(I15)')  IPRLF
-!!      GOTO 100
-!! 3700 CONTINUE
-!#######################################################################
-!!!     Search  for rigid earth model parameter:
-!#######################################################################
-!!      IF(CONTROL.NE.'RIGIDEARTH') GOTO 3800
-!!      WRITE(CINTERN,'(A15)') CREST
-!!      READ(CINTERN,'(I15)')  IRIGID
-!!      GOTO 100
-!! 3800 CONTINUE
-!#######################################################################
-!!!     Search  for Hann-window parameter:
-!#######################################################################
-!!      IF(CONTROL.NE.'HANNWINDOW') GOTO 3900
-!!      WRITE(CINTERN,'(A15)') CREST
-!!      READ(CINTERN,'(I15)')  IHANN
-!!      IF(IHANN.GT.1) IHANN=1
-!!      GOTO 100
-!! 3900 CONTINUE
-!#######################################################################
-!!!     Search  for quick look adjustment parameter:
-!#######################################################################
-!!      IF(CONTROL.NE.'QUICKLOOKA') GOTO 4000
-!!      WRITE(CINTERN,'(A15)') CREST
-!!      READ(CINTERN,'(I15)')  IQUICK
-!!      GOTO 100
-!! 4000 CONTINUE
-!#######################################################################
-!!!     Search  for pole tide correction parameter:
-!#######################################################################
-!!      IF(CONTROL.NE.'POLTIDECOR') GOTO 4100
-!!      WRITE(CINTERN,'(A15)') CREST
-!!      READ(CINTERN,'(F15.5)')  DPOLTC
-!!      GOTO 100
-!! 4100 CONTINUE
-!#######################################################################
-!!!     Search for length of day tide correction parameter:
-!#######################################################################
-!!      IF(CONTROL.NE.'LODTIDECOR') GOTO 4200
-!!      WRITE(CINTERN,'(A15)') CREST
-!!      READ(CINTERN,'(F15.5)') DLODTC
-!!      GOTO 100
-!! 4200 CONTINUE
-!#######################################################################
-!!!     Search for prediction span:
-!#######################################################################
-!!      IF(CONTROL.NE.'PREDICSPAN') GOTO 4300
-!!      WRITE(CINTERN,'(A15)') CREST
-!!      READ(CINTERN,'(I15)')  ISPANH
-!!      GOTO 100
-!! 4300 CONTINUE
-!#######################################################################
-!     Search  for tidal parameters:
-!#######################################################################
-      IF(CONTROL.NE.'TIDALPARAM') GOTO 4400
-      IGR=IGR+1
-      WRITE(CINTERN,'(A45)')   CREST
-      READ(CINTERN,'(4F10.4,1X,A4)') DFRA(IGR),DFRE(IGR),DG0(IGR),DPHI0(IGR),CNSY(IGR)
-      GOTO 100
- 4400 CONTINUE
+      ! IF(CONTROL.NE.'TEXTHEADER') GOTO 3400
+      ! IF(IH.GT.10) GOTO 3300
+      ! CHEAD(IH)=CREST
+      ! IH=IH+1
+      ! GOTO 100
+! 3300 CONTINUE
+! 3400 CONTINUE
 !#######################################################################
 !     Unknown control parameter name:
 !#######################################################################
 !      WRITE(IUN16,17005) CONTROL
-      GOTO 100
- 5000 CONTINUE
-      NGR=IGR
+!      GOTO 100
+! 5000 CONTINUE
+! GCR: the number of waves is set via inout handover
+!      NGR=IGR
       NF=IF
       IF(IPRINT.EQ.0) RETURN
 !#######################################################################
@@ -1736,7 +1562,7 @@
 !#######################################################################
       WRITE(IUN16,17112) IC,IR,ITY,ITM,ITD,ITH,IMODEL
       DO 5020 IGR=1,NGR
- 5020 WRITE(IUN16,17113) DFRA(IGR),DFRE(IGR),DG0(IGR),DPHI0(IGR),CNSY(IGR)
+ 5020 WRITE(IUN16,17113) DFRA(IGR),DFRE(IGR),DG0(IGR),DPHI0(IGR)
       RETURN
 !#######################################################################
 !     Format statements:
@@ -1760,10 +1586,12 @@
         6x,'print tidal component development (1=yes)    : ',I10/ &
         6x,'initial epoch for tidal development          : ',I4,I3,I3,I3/ &
         6x,'tidal potential catalogue                    : ',I10/)
-17113 FORMAT(6x,'wave group : ',2F10.6,2F10.4,1X,A4)
+17113 FORMAT(6x,'wave group : ',2F10.6,2F10.4,1X)
 17114 FORMAT(1X,A64)
-      END
-      SUBROUTINE ETGCON(IUN16,IPRINT,DLAT,DLON,DH,DGRAV,DAZ,IC,DGK,DPK)
+END
+
+
+SUBROUTINE ETGCON(IUN16,IPRINT,DLAT,DLON,DH,DGRAV,DAZ,IC,DGK,DPK)
 !#######################################################################
 !     Routine ETGCON, version 1997.03.03 Fortran 90.
 !     The routine ETGCON computes the geodetic coefficients for
@@ -1969,10 +1797,11 @@
 !#######################################################################
 !     IC=2, compute geodetic coefficients for vertical displacement
 !           in mm.
-!     Attention: this component has never been tested !#######################################################################
+!     Attention: this component has never been tested
 !#######################################################################
   400 CONTINUE
-      DFAK=1.D3/DGRAV
+!GCR original:     DFAK=1.D3/DGRAV
+	  DFAK=1.D3/DGRAV
       DO 410 I=1,12
       DGK(I)=DGK(I)*DHLAT(I)*DFAK
   410 DPK(I)=0.0D0
@@ -1981,10 +1810,13 @@
 !#######################################################################
 !     IC=3, compute geodetic coefficients for horizontal displacement
 !           in azimuth DAZ in mm.
-!     Attention: this component has never been tested !#######################################################################
+!     Attention: this component has never been tested
 !#######################################################################
   500 CONTINUE
-      DFAK=1.D3*DR/DGRAV
+!GCR original code: DFAK=1.D3*DR/DGRAV
+!GCR different solutions:
+!GCR	  DFAK=1.D8/(DR*DGRAV)
+	  DFAK=1.D-6*DR/DGRAV
       DO 510 I=1,12
       DGK(I)=SQRT((DGX(I)*DCAZ)**2+(DGY(I)*DSAZ)**2)*DLLAT(I)*DFAK
       DPK(I)=0.D0
@@ -2002,13 +1834,13 @@
 !#######################################################################
   600 CONTINUE
       DPOISS=0.25D0
-      DFAK=1.D9*DPOISS/(DPOISS-1.D0)
+      DFAK=1.D9/(DGRAV*DR)*DPOISS/(DPOISS-1.D0)
       DO 610 I=1,3
-  610 DGK(I)=DGK(I)*DFAK*(2.D0*DHLAT(I)-2.D0*3.D0*DLLAT(I))/(DGRAV*DR)
+  610 DGK(I)=DGK(I)*DFAK*(2.D0*DHLAT(I)-2.D0*3.D0*DLLAT(I))
       DO 620 I=4,7
-  620 DGK(I)=DGK(I)*DFAK*(2.D0*DHLAT(I)-3.D0*4.D0*DLLAT(I))/(DGRAV*DR)
+  620 DGK(I)=DGK(I)*DFAK*(2.D0*DHLAT(I)-3.D0*4.D0*DLLAT(I))
       DO 630 I=8,12
-  630 DGK(I)=DGK(I)*DFAK*(2.D0*DHLAT(I)-4.D0*5.D0*DLLAT(I))/(DGRAV*DR)
+  630 DGK(I)=DGK(I)*DFAK*(2.D0*DHLAT(I)-4.D0*5.D0*DLLAT(I))
       DO 640 I=1,12
   640 DPK(I)=0.0D0
       GOTO 2000
@@ -2019,8 +1851,8 @@
   700 CONTINUE
       DTHETA=(90.D0-DPSI)*DRAD
       DAZR=(DAZ+180.D0)*DRAD
-      DCAZ =COS(DAZR)
-      DSAZ =SIN(DAZR)
+      DCAZ=COS(DAZR)
+      DSAZ=SIN(DAZR)
       DSAZ2=SIN(2.D0*DAZR)
       DCSTS=-0.5D0*SIN(2.D0*DAZR)
       DCT=DSPSI
@@ -2029,7 +1861,7 @@
       DST2=DST*DST
       DCC2=COS(2.D0*DPSI*DRAD)
       DC2T=-DCC2
-      DCOTT =1.D0/TAN(DTHETA)
+      DCOTT=1.D0/TAN(DTHETA)
       DCOTT2=1.D0/TAN(2.D0*DTHETA)
       DFAK=1.D9/(DR*DGRAV)
 !#######################################################################
@@ -2095,13 +1927,14 @@
 !           i.e. eps(t,t) + eps(l,l), (see ZUERN and WILHELM 1984,
 !           p. 282).
 !#######################################################################
+      DFAK=1.D9/(DGRAV*DR)
   800 CONTINUE
       DO 810 I=1,3
-  810 DGK(I)=DGK(I)*(2.D0*DHLAT(I)-2.D0*3.D0*DLLAT(I))/(DGRAV*DR)*1.D9
+  810 DGK(I)=DGK(I)*(2.D0*DHLAT(I)-2.D0*3.D0*DLLAT(I))*DFAK
       DO 820 I=4,7
-  820 DGK(I)=DGK(I)*(2.D0*DHLAT(I)-3.D0*4.D0*DLLAT(I))/(DGRAV*DR)*1.D9
+  820 DGK(I)=DGK(I)*(2.D0*DHLAT(I)-3.D0*4.D0*DLLAT(I))*DFAK
       DO 830 I=8,12
-  830 DGK(I)=DGK(I)*(2.D0*DHLAT(I)-4.D0*5.D0*DLLAT(I))/(DGRAV*DR)*1.D9
+  830 DGK(I)=DGK(I)*(2.D0*DHLAT(I)-4.D0*5.D0*DLLAT(I))*DFAK
       DO 840 I=1,12
   840 DPK(I)=0.0D0
       GOTO 2000
@@ -2109,7 +1942,7 @@
 !     IC=7, compute geodetic coefficients for shear tidal strain
 !           at the Earth's deformed surface in 10**-9 units = nstr.
 !           We use a spherical approximation, i.e. eps(t,l)
-!     Attention: this component has never been tested !#######################################################################
+!     Attention: this component has never been tested
 !#######################################################################
   900 CONTINUE
       DTHETA=(90.D0-DPSI)*DRAD
@@ -2225,8 +2058,10 @@
       '      GC 6,5',F14.8,2X,A8,2X,F14.6,' deg'/ &
       '      GC 6,6',F14.8,2X,A8,2X,F14.6,' deg'/)
 17005 FORMAT(/6x,'***** Routine ETGCON finished the execution.'/)
-      END
-      SUBROUTINE ETGREN(IUN16,DJULD,ITY,ITM,ITD,DTH,NERR)
+END
+
+
+SUBROUTINE ETGREN(IUN16,DJULD,ITY,ITM,ITD,DTH,NERR)
 !#######################################################################
 !     Routine ETGREN, version 1996.05.25 Fortran 90.
 !     The routine ETGREN computes Gregorian date from given Julian
@@ -2308,8 +2143,10 @@
       ' *****Year is less -3000 or greater +3000.'/ &
       ' *****Routine ETGREN has not been tested for this case.'/ &
       ' *****Routine ETGREN continues the execution.'/)
-      END
-      SUBROUTINE ETJULN(IUN16,ITY,ITM,ITD,DTH,DJULD)
+END
+
+
+SUBROUTINE ETJULN(IUN16,ITY,ITM,ITD,DTH,DJULD)
 !#######################################################################
 !     Routine ETJULN, version 1996.05.25 Fortran 90.
 !     The routine ETJULN computes the Julian date and the modified
@@ -2376,7 +2213,7 @@
       IF(ITMM.LE.2) THEN
          ITMM=ITMM+12
          ITYY=ITYY-1
-      END IF
+      ENDIF
       IF(DA.LE.15821004.1D0) THEN
          DB=-2+(ITYY+4716)/4-1179
       ELSE
@@ -2398,8 +2235,10 @@
 17051 FORMAT(/' *****Error in routine ETJULN, version 1996.05.25.'/ &
       ' *****Month is greater 12:',2X,3I4,F12.3/ &
       ' *****Routine ETJULN stops the execution.'/)
-      END
-      SUBROUTINE ETLEGN(DCT,DST,LMAX,DP0,DP1)
+END
+
+
+SUBROUTINE ETLEGN(DCT,DST,LMAX,DP0,DP1)
 !#######################################################################
 !     Routine ETLEGN, version 1996.05.25 Fortran 90.
 !     The routine computes the fully normalized Legendre functions
@@ -2565,8 +2404,10 @@
       DP1(24)= SQRT(9009.D0/128.D0)*DST4*(6.D0*DCT2-1.D0)
       DP1(25)= SQRT(27027.D0/128.D0)*DST5*DCT
       RETURN
-      END
-      SUBROUTINE ETLOVE(IUN16,IPRINT,DLAT,DELV)
+END
+
+
+SUBROUTINE ETLOVE(IUN16,IPRINT,DLAT,DELV)
 !#######################################################################
 !     Routine ETLOVE, version 1996.05.25 Fortran 90.
 !     The routine computes latitude dependent LOVE-numbers DH, DK,
@@ -2654,7 +2495,7 @@
 !     The following DATA statements are concerning the elastic
 !     Earth model for the different degree and order constituents.
 !     The latitude dependency is not given for all constituents in
-!     the Wahr-Dehant-Zschau model !#######################################################################
+!     the Wahr-Dehant-Zschau model
 !#######################################################################
       DATA DG0/1.1576D0,1.1542D0,1.1600D0,1.0728D0,1.0728D0,1.0728D0, &
        1.0728D0,1.0363D0,1.0363D0,1.0363D0,1.0363D0,1.0363D0/
@@ -2793,8 +2634,10 @@
 17003 FORMAT(6x,2I7,5F10.6)
 17004 FORMAT(' ')
       RETURN
-      END
-      SUBROUTINE ETPHAS(IUN16,IPRINT,IMODEL,DLON,DJULD)
+END SUBROUTINE
+
+
+SUBROUTINE ETPHAS(IUN16,IPRINT,IMODEL,DLON,DJULD)
 !#######################################################################
 !     Routine ETPHAS, version 1996.08.03 Fortran 90.
 !     The routine ETPHAS computes phases and frequencies for the tidal
@@ -2918,8 +2761,7 @@
 !#######################################################################
       use PARAMS
       use TIDPHAS
-      use TIDWAVE1
-      use TIDWAVE2
+      use TIDWAVE
       IMPLICIT REAL(8) (D)
       IMPLICIT INTEGER (I-N)
       REAL(8) DAS(11),DASP(11)
@@ -2968,8 +2810,10 @@
 17002 FORMAT(//' Routine ETPHAS, version 1996.08.04.'/ &
       'New phases and frequencies computes for',I6,' waves.')
 17003 FORMAT(///' ***** Routine ETPHAS finished execution.'/)
-      END
-      SUBROUTINE ETPOLC(IUN16,IUN30,IUN31,IPRINT,DJULD,DCLAT,DSLAT, &
+END SUBROUTINE
+
+
+SUBROUTINE ETPOLC(IUN16,IUN30,IUN31,IPRINT,DJULD,DCLAT,DSLAT, &
         DCLON,DSLON,DPOLX,DPOLY,DUT1,DTAI,DLOD,DGPOL,DGPOLP,DGLOD,NERR)
 !#######################################################################
 !     Routine ETPOLC, version 1996.05.25 Fortran 90.
@@ -3077,7 +2921,8 @@
       ILAST=0
   200 READ(IUN30,17004) IDAT,ITIM,DMODJI,DPOLX,DPOLY,DUT1,DTAI
       IF(IDAT.EQ.C99) GOTO 300
-      IF(IREC.EQ.2) IFIRST=DMODJI
+      !-GCR fixed real to integer
+      IF(IREC.EQ.2) IFIRST=INT(DMODJI)
       WRITE(IUN31,REC=IREC) DPOLX,DPOLY,DUT1,DTAI
       IF(IPRINT.GT.1) WRITE(IUN16,17005) IDAT,ITIM,IREC,DMODJI,DPOLX,DPOLY,DUT1,DTAI
       ILAST=IREC
@@ -3091,7 +2936,8 @@
 !     IUN31:
 !#######################################################################
  1000 DMODJD=DJULD-2400000.5D0
-      IMJD=DMODJD
+!-GCR fixed real to integer
+      IMJD=INT(DMODJD)
 !#######################################################################
 !     DT is time difference referring to central sample point in days:
 !#######################################################################
@@ -3162,8 +3008,10 @@
 17003 FORMAT(1X,8A10)
 17004 FORMAT(I8,1X,I6,F10.3,5F10.5)
 17005 FORMAT(I9,1X,2I6,F10.3,5F10.5)
-      END
-      SUBROUTINE ETPOTS(IUN14,IUN16,IUN24,IPRINT,IMODEL,DLAT,DLON,DH, &
+END SUBROUTINE
+
+
+SUBROUTINE ETPOTS(IUN14,IUN16,IUN24,IPRINT,IMODEL,DLAT,DLON,DH, &
         DGRAV,DAZ,IC,DJULD,DAMIN)
 !#######################################################################
 !     Routine ETPOTS, version 1996.08.05 Fortran 90.
@@ -3360,8 +3208,7 @@
       use PARAMS
       use LOVE
       use TIDPHAS
-      use TIDWAVE1
-      use TIDWAVE2
+      use TIDWAVE
       IMPLICIT REAL(8) (D)
       IMPLICIT INTEGER (I-N)
       LOGICAL LEX24
@@ -3622,8 +3469,10 @@
        6x,'***** The current number of waves:',I5,' exceeds the ', &
        'maximum number of waves:',I5/ &
        6x,'***** Routine ETPOTS stops the execution.'/)
-      END
-      SUBROUTINE GEOEXT(IUN16,IRESET,DEXTIM,DEXTOT)
+END SUBROUTINE
+
+
+SUBROUTINE GEOEXT(IUN16,IRESET,DEXTIM,DEXTOT)
 !#######################################################################
 !     Routine GEOEXT, version 1996.08.05 Fortran 77/90.
 !     === MS-DOS version for LAHEY-compiler ===================
@@ -3697,4 +3546,4 @@
 17001 FORMAT(6x,'First call of routine GEOEXT, version 1996.08.05.')
 17002 FORMAT(/6x,'Routine GEOEXT. Execution time=',F10.3,' sec'/)
       RETURN
-      END
+END SUBROUTINE
