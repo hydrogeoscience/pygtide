@@ -205,20 +205,14 @@
 !#######################################################################
 module PARAMS
     ! initialise numeric values
-    !IMPLICIT REAL(8) (D)
-    ! Windows specs ######################################
-    ! CHARACTER(3), PARAMETER :: NULLFILE='NUL'
-    ! end windows specs ######################################
-    ! Linux/Mac OS SPECS ######################################
-    ! can be set from inside python
+    ! OS dependent pointer to muted output, will be set from inside python
     CHARACTER(10) :: NULLFILE
-    ! END LINUX SPECS ######################################
+    ! commdat directory, will be set from inside python
+    CHARACTER(256) :: COMDIR
     ! file i/o streams
     INTEGER, PARAMETER :: STDIN=5,STDOUT=6,STDERR=0,VOID=11
     INTEGER SCR,IC2
     DATA SCR/STDOUT/
-    ! commdat directory
-    CHARACTER(256) :: COMDIR
     ! names of the i/o files
     CHARACTER(17), PARAMETER :: CFPRN='pygtide.out.prn',CFOUT='pygtide.out.prd',&
     ETDDTDAT='etddt.dat',ETPOLUTDAT='etpolut1.dat',ETPOLUTBIN='etpolut1.bin'
