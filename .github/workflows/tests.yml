@@ -33,5 +33,5 @@ jobs:
         run: |
           mkdir empty; cd empty
           python -c 'import pygtide; pygtide.test()'
-          python -c 'import pygtide; pygtide.update_data_files()'
+          python -c 'import pygtide; pygtide.update()'
           python -c 'import pygtide; pygtide.test()'
