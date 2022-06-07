@@ -11,7 +11,7 @@ import numpy as np
 import time as tt
 import pandas as pd
 import datetime as dt
-import urllib, re, os
+import urllib, urllib.request, re, os
 
 def timestampToDecyear(ts):
     year=ts.year
