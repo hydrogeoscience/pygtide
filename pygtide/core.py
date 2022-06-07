@@ -112,14 +112,7 @@ class pygtide(object):
         self.data_dir = resource_filename('pygtide', 'commdat/')
         etpred.params.comdir = self.data_dir + ' ' * (256 - len(self.data_dir))
         # set OS dependent module output
-        if os.name == 'posix':
-            etpred.params.nullfile = "/dev/null" + ' ' * (10 - len("/dev/null"))
-        # POSIX system
-        elif os.name == 'nt':
-            etpred.params.nullfile = "NUL" + ' ' * (10 - len("NUL"))
-        else:
-            raise OSError("PyGTide is not supported by this operating system!")
-            
+        etpred.params.nullfile = os.devnull + ' ' * (10 - len(os.devnull))
         self.args = []
         # set some common variables for external access
         etpred.init()
@@ -138,7 +131,7 @@ class pygtide(object):
 
         self.wavegroup_def = np.asarray([[0, 10, 1., 0.]])
         self.set_wavegroup(self.wavegroup_def)
-    
+
     #%% sync the Python object
     def update(self):
         """
@@ -148,7 +141,7 @@ class pygtide(object):
         self.headers = np.char.strip(etpred.inout.header.astype('str'))
         self.args = etpred.inout.argsin
         self.unit = etpred.inout.etpunit.astype('str')
-        
+
     #%% set wave group parameters
     def set_wavegroup(self, wavedata=None):
         if (wavedata is None):
@@ -168,12 +161,12 @@ class pygtide(object):
         # set the wave group parameters
         etpred.waves(wavedata[:, 0], wavedata[:, 1], wavedata[:, 2], wavedata[:, 3], int(wavedata.shape[0]))
         return True
-        
+
     #%% reset the wave group
     def reset_wavegroup(self):
         self.set_wavegroup(self.wavegroup_def)
         return True
-    
+
     # run module etpred and return numbers
     def predict(self, latitude, longitude, height, startdate, duration, samprate, **control):
         """
@@ -383,9 +376,9 @@ class pygtide(object):
         self.args = argsin
         if self.msg:
             print('%s is calculating, please wait ...' % (self.fortran_version))
-            
+
         etpred.predict(argsin)
-        
+
         self.exec = True
         self.exectime = etpred.inout.exectime
         if self.msg:
@@ -507,4 +500,3 @@ def plot_spectrum(*args, ax=None, show=True, **kwargs):
     ax.set_ylabel('amplitude')
     if show:
         plt.show()
-        
