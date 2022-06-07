@@ -21,7 +21,7 @@ def test(msg=False):
            -412.342748, -448.900029, -481.510979, -509.937138, -533.974358,
            -553.454086, -568.244386, -578.250699, -583.41634 , -583.72272 ,
            -579.189308, -569.873325])
-    np.testing.assert_almost_equal(series, expected, 5)
+    np.testing.assert_almost_equal(series, expected, 2)
 
     args = (-20.82071, -70.15288, 830.0, '2020-01-01', 29.5 * 24, 600)
     predict_table(*args, statazimut=90, tidalcompo=8, msg=msg)
@@ -40,6 +40,6 @@ def test(msg=False):
         plot_series(*args, statazimut=90, tidalcompo=8, show=False)
         if msg:
             plt.show()
-    
+
     print('------------------------------------')
     print('Successfully finished PyGTide tests!')
