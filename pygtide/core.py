@@ -349,8 +349,7 @@ class pygtide(object):
         if (enddate > (self.etddt_end + timedelta(days=365))):
             from warnings import warn
             fname = str(etpred.params.etddtdat)
-            warn("Prediction timeframe exceeds the end of the available time database (%s) plus 1 year. "
-                 "For best accuracy, please consider updating '%s'." % (self.etddt_end, fname))
+            warn("Please consider updating the leap second database '%s' (last value is from %s)." % (fname, self.etddt_end))
         # if not (-50*365 < (startdate - dt.datetime.now()).days < 365):
         if ( ((argsin[13] > 0) or (argsin[14] > 0)) and ((startdate < self.etpolut1_start) or (enddate > self.etpolut1_end)) ):
             fname = str(etpred.params.etddtdat)
