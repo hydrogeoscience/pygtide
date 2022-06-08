@@ -1,26 +1,32 @@
 # PyGTide
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1346260.svg)](https://doi.org/10.5281/zenodo.1346260)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4290320.svg)](https://zenodo.org/record/4290320)
 ## A Python module and wrapper for ETERNA PREDICT to compute gravitational tides on Earth
 
 PyGTide is a Python class that wraps around ETERNA PREDICT 3.4 which was compiled from Fortran into a Python DLL using [f2py](https://docs.scipy.org/doc/numpy/f2py/). The original ETERNA PREDICT 3.3 was written by the late Prof. H.-G. Wenzel (Wenzel, 1996) in a mix of Fortran 77 and 90. This was updated by Kudryavtsev (2004) to include the latest tidal catalogue. The Fortran code for ETERNA PREDICT can be downloaded from the [International Geodynamics and
 Earth Tide Service (IGETS)](http://igets.u-strasbg.fr/soft_and_tool.php).
 
 ## How to install and run
-A user guide is available as [PDF download](https://github.com/hydrogeoscience/pygtide/blob/master/PyGTide_v0_5.pdf).
 
 Instructions:
-* Download and install [Anaconda3 for Python 3.5+](https://www.anaconda.com) on Windows 7/10 or Ubuntu (64bit)
-* Use the *Anaconda Navigator* to ensure that the packages [libpython](https://anaconda.org/anaconda/libpython) (as a minimum v2.1) and [mingw](https://anaconda.org/anaconda/mingw) (as a minimum v4.7) are installed. You will also need the following standard libraries: *numpy*, *pandas* and *datetime*.
-* Download [PyGTide](https://github.com/hydrogeoscience/pygtide/archive/master.zip), unzip into a local directory and run *test_pygtide_\*.py*
+* Download and install Anaconda or Miniconda
+* Create an environment with the packages, `numpy pandas datetime requests git`
+* Download and install pygtide, e.g. with `pip install git+https://github.com/trichter/pygtide.git`
+* Run tests with `python -c 'import pygtide; pygtide.test(msg=True)'`
+* Data files can be updated with `python -c 'import pygtide; pygtide.update_data_files()'`
+* See `pygtide/tests.py` for example calls, e.g.:
 
-Attention:
-
-Please only use the data files that are provided in the commdat subfolder in this repository and avoid using files from other sources such as IGETS. This is because the code was changed to avoid interpolating leap seconds from the year 1972 onwards.
+```
+from pygtide import predict_series
+args = (-20.82071, -70.15288, 830.0, '2020-01-01', 6, 600)
+series = predict_series(*args, statazimut=90, tidalcompo=8)
+```
 
 ## How to cite
 If you use PyGTide, please cite the work as:
 
-*Rau, Gabriel C. (2018) hydrogeoscience/pygtide: PyGTide v0.2 (Version v0.2). Zenodo. [http://doi.org/10.5281/zenodo.1346664](http://doi.org/10.5281/zenodo.1346664).*
+*Rau, Gabriel C. (2018) hydrogeoscience/pygtide: PyGTid. Zenodo. https://zenodo.org/record/4290320*
+
+(original repository)
 
 ## Example
 <img src="https://raw.githubusercontent.com/hydrogeoscience/pygtide/master/earth_tide_example.png" width="500">

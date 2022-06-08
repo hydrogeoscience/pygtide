@@ -1,0 +1,42 @@
+v0.6:
+  * Fortran code is now platform independent and specific variables are now set from Python (Fortran and Python)
+  * updated Python to comply with proper package structure
+  * update routine of the database files (etddt.dat and etpolut1.dat) has been redesigned with proper terminal output (Python code)
+
+v0.5:
+  * this version was not released!
+  * control of waves previously done using *.ini file has been handed over to the Python class
+  * fixed bug that was not reading the lowest waves from the input
+  * restricted leap second interpolation for years <1972 only (Fortran code), absolute value thereafter
+  * vertical strain calculation magnitude was fixed (Fortran code)
+
+v0.4.0+trichters.fork:
+  * add download routines so data files can easily be kept up to date
+
+v0.3.0+trichters.fork:
+  * build extionsion from sources within setup.py
+  * add convenient functions predict_series, predict_spectrum, predict_table
+  * add convenient functions plot_series, plot_spectrum
+  * add test function
+
+v0.2:
+  * initial Python version
+
+v0.1:
+  * Modifications to the original Fortran code aimed at a successful compile using f2py:
+  *- Paths to external files were made relative (now uses subdirectory ‘commdat’ where executable resides)
+  *- The code was changed from fixed format (file extension .f) to free format (file extension .f90)
+  *- COMMON blocks were changed to modules
+  *- Continuous lines were adapted to the F90 standard
+  *- The main program was put into a subroutine called ‘PREDICT(ARGS)’ where ‘ARGS’ is an array of size 17 containing the control parameters handed over from Python
+  *- The calculated data is stored in an internal array called ‘ETPDATA’ in the module ‘OUT’
+  *- Headers are also constructed in the array ‘HEADER’ in the module ‘OUT’
+  *- Screen and file (.prd and .prn) output is muted by default, but can be enabled using flags in ‘ARGS’
+  * Code enhancements:
+  *- Moved all constants into module ‘CONSTANTS’ for easy modification. These included numeric as well as file names, output headers, etc.
+  *- Created a parameter for original ‘commdat’ directory, including a path separator variable for different systems
+  *- The data output format for the .prd and .prn files were changed to 6 digits to reflect the improved accuracy of the KSM03 tidal catalogue
+  *- Output times in .prn and .prd files were zero padded for easier handling (if required)
+  *- Changed the record length for the binary file ‘etpolut1.bin’ to 32 bytes (reflecting 4 double reals at 8 bytes each)
+  * Bug fix:
+  *- A time bug produced wrong HH:MM:SS format in output due to a rounding error when sampling rate was smaller than 60 seconds. This bug was fixed and the code now works properly with any time resolution
