@@ -8,8 +8,10 @@ Earth Tide Service (IGETS)](http://igets.u-strasbg.fr/soft_and_tool.php).
 ## How to install and run
 
 Instructions:
-* Download and install Anaconda or Miniconda
-* Create an environment with the packages, `numpy pandas datetime requests git`
+* Download and install [*Anaconda*](https://www.anaconda.com/products/distribution) or [*Miniconda*](https://docs.conda.io/en/latest/miniconda.html)
+* *Optional*: Create a new environment
+* Make sure the sollowing packages are installed <br />
+ `conda install numpy pandas datetime requests git`
 * Download and install pygtide:
   * Linux or MacOS: <br />
    `pip install git+https://github.com/hydrogeoscience/pygtide.git`
