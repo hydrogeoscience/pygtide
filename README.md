@@ -19,7 +19,8 @@ Instructions:
    `pip install --global-option build_ext --global-option --compiler=mingw32 --fcompiler=gnu95 git+https://github.com/hydrogeoscience/pygtide.git` <br />
    *Important note*: Fortran compilation in Windows must be done with the Mingw32 and GNU95 compilers integrated into Anaconda.
 * Run tests with `python -c 'import pygtide; pygtide.test(msg=True)'`
-* Data files can be updated with `python -c 'import pygtide; pygtide.update()'`
+* The internal database files can be updated as follows: <br />
+ `python -c 'import pygtide; pygtide.update()'`
 * See `pygtide/tests.py` for example calls, e.g.:
 
 ```
