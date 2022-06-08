@@ -39,4 +39,4 @@ This image shows Earth tides calculated for the city Karlsruhe (Germany) in the 
 * McMillan, T. C., and Rau, G. C., and Timms, W. A., and Andersen, M. S. (2019), Utilizing the impact of Earth and atmospheric tides on groundwater systems: A review reveals the future potential, Reviews of Geophysics, https://dx.doi.org/10.1029/2018RG000630.
 
 ## License
-PyGTide is released by [Gabriel C. Rau](https://hydrogeo.science) under the [Mozilla Public License 2.0](https://www.mozilla.org/en-US/MPL/2.0/)
+PyGTide is released by [Gabriel C. Rau](https://hydrogeo.science) and [Tom Eulenfeld](https://scholar.google.com/citations?user=SJXF3mwAAAAJ&hl=en) under the [Mozilla Public License 2.0](https://www.mozilla.org/en-US/MPL/2.0/)
