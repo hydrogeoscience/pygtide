@@ -12,7 +12,7 @@ Instructions:
 * Create an environment with the packages, `numpy pandas datetime requests git`
 * Download and install pygtide, e.g. with `pip install git+https://github.com/trichter/pygtide.git`
 * Run tests with `python -c 'import pygtide; pygtide.test(msg=True)'`
-* Data files can be updated with `python -c 'import pygtide; pygtide.update_data_files()'`
+* Data files can be updated with `python -c 'import pygtide; pygtide.update()'`
 * See `pygtide/tests.py` for example calls, e.g.:
 
 ```
