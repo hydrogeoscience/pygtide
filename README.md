@@ -21,6 +21,12 @@ args = (-20.82071, -70.15288, 830.0, '2020-01-01', 6, 600)
 series = predict_series(*args, statazimut=90, tidalcompo=8)
 ```
 
+
+## How to use
+
+An updated user guide is currently in progress ...
+
+
 ## How to cite
 If you use PyGTide, please cite the work as:
 
