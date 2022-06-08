@@ -11,8 +11,10 @@ Instructions:
 * Download and install Anaconda or Miniconda
 * Create an environment with the packages, `numpy pandas datetime requests git`
 * Download and install pygtide:
-  * Linux or MacOS: `pip install git+https://github.com/hydrogeoscience/pygtide.git`
-  * Windows `pip install --global-option build_ext --global-option --compiler=mingw32 --fcompiler=gnu95 git+https://github.com/hydrogeoscience/pygtide.git`
+  * Linux or MacOS: <br />
+   `pip install git+https://github.com/hydrogeoscience/pygtide.git`
+  * Windows: <br />
+   `pip install --global-option build_ext --global-option --compiler=mingw32 --fcompiler=gnu95 git+https://github.com/hydrogeoscience/pygtide.git`
 * Run tests with `python -c 'import pygtide; pygtide.test(msg=True)'`
 * Data files can be updated with `python -c 'import pygtide; pygtide.update()'`
 * See `pygtide/tests.py` for example calls, e.g.:
