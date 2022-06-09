@@ -1,8 +1,5 @@
 name: pypi
 on:
-  push:
-    tags:
-      - '*'
   release:
     types: [published]
 
@@ -23,23 +20,6 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           path: dist/*.tar.gz
-
-  publish_test:
-    name: publish tag to testpypi
-    if: github.event_name == 'push' && github.ref_type == 'tag'
-    needs: [build_sdist]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/download-artifact@v3
-        with:
-          name: artifact
-          path: dist
-
-      - uses: pypa/gh-action-pypi-publish@v1
-        with:
-          user: __token__
-          password: ${{ secrets.TESTPYPI }}
-          repository_url: https://test.pypi.org/legacy/
 
   publish:
     name: publish release
