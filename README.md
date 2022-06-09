@@ -1,4 +1,5 @@
 # PyGTide v0.6
+[![tests](https://github.com/hydrogeoscience/pygtide/actions/workflows/tests.yml/badge.svg)](https://github.com/hydrogeoscience/pygtide/actions/workflows/tests.yml)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4290320.svg)](https://zenodo.org/record/4290320)
 ## A Python module and wrapper for ETERNA PREDICT to compute gravitational tides on Earth
 
