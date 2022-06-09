@@ -14,10 +14,11 @@ Instructions:
  `conda install numpy pandas datetime requests git`
 * Download and install pygtide:
   * Linux or MacOS: <br />
-   `pip install git+https://github.com/hydrogeoscience/pygtide.git`
-  * Windows: <br />
-   `pip install --global-option build_ext --global-option --compiler=mingw32 --fcompiler=gnu95 git+https://github.com/hydrogeoscience/pygtide.git` <br />
-   *Important note*: Fortran compilation in Windows must be done with the Mingw32 and GNU95 compilers integrated into Anaconda.
+   `pip install pygtide`
+  * On Windows the exact install command depends on the compilers availlable. When using the compilers integrated into Anaconda (Mingw32 and GNU95 compilers) the following command is recommended:<br />
+   `pip install --global-option build_ext --global-option --compiler=mingw32 --fcompiler=gnu95 pygtide`
+  * The development version can be installed by downloading the Github repository and running `pip install download_path` <br />
+    Alternatively, in one step: `pip install git+https://github.com/hydrogeoscience/pygtide.git`
 * Run tests with `python -c 'import pygtide; pygtide.test(msg=True)'`
 * The internal database files can be updated as follows: <br />
  `python -c 'import pygtide; pygtide.update()'`
@@ -39,8 +40,6 @@ An updated user guide is currently in progress ...
 If you use PyGTide, please cite the work as:
 
 *Rau, Gabriel C. (2018) hydrogeoscience/pygtide: PyGTid. Zenodo. https://zenodo.org/record/4290320*
-
-(original repository)
 
 ## Example
 <img src="https://raw.githubusercontent.com/hydrogeoscience/pygtide/master/earth_tide_example.png" width="500">
