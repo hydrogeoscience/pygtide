@@ -92,6 +92,7 @@ The original Fortran code was also modified for use with f2py:
 """
 import pygtide.etpred as etpred
 from datetime import datetime, timedelta, date
+from warnings import warn
 import numpy as np
 import pandas as pd
 from pkg_resources import resource_filename
@@ -342,19 +343,16 @@ class pygtide(object):
         enddate = startdate + timedelta(hours=duration)
         # check if requested prediction series exceeds permissible time
         if (startdate < self.etddt_start):
-            from warnings import warn
             fname = str(etpred.params.etddtdat)
             warn("Prediction timeframe is earlier than the available time database (%s). "
                  "For details refer to the file '%s'." % (self.etddt_start, fname))
         if (enddate > (self.etddt_end + timedelta(days=365))):
-            from warnings import warn
             fname = str(etpred.params.etddtdat)
             warn("Please consider updating the leap second database '%s' (last value is from %s)." % (fname, self.etddt_end))
         # if not (-50*365 < (startdate - dt.datetime.now()).days < 365):
         if ( ((argsin[13] > 0) or (argsin[14] > 0)) and ((startdate < self.etpolut1_start) or (enddate > self.etpolut1_end)) ):
             fname = str(etpred.params.etddtdat)
-            raise ValueError("Dates exceed permissible range for pole/LOD tide correction (interval %s to %s). "\
-                "Please update file '%s'." % (self.etpolut1_start, self.etpolut1_end, fname))
+            warn("Dates exceed permissible range for pole/LOD tide correction (interval %s to %s). Consider update file '%s'." % (self.etpolut1_start, self.etpolut1_end, fname))
         # set the start date and time
         argsin[3:6] = [startdate.year,startdate.month,startdate.day]
         # test sammprate validity
