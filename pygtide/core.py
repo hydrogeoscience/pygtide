@@ -353,16 +353,18 @@ class pygtide(object):
         if ( ((argsin[13] > 0) or (argsin[14] > 0)) and ((startdate < self.etpolut1_start) or (enddate > self.etpolut1_end)) ):
             fname = str(etpred.params.etddtdat)
             warn("Dates exceed permissible range for pole/LOD tide correction (interval %s to %s). Consider update file '%s'." % (self.etpolut1_start, self.etpolut1_end, fname))
+        if ( ((argsin[13] > 0) or (argsin[14] > 0)) and (startdate < datetime.strptime('1600-01-01', "%Y-%m-%d")) ):
+             raise ValueError("PyGTide should not be used for dates before the year 1600.")
         # set the start date and time
         argsin[3:6] = [startdate.year,startdate.month,startdate.day]
         # test sammprate validity
         if not (0 < samprate <= 24*3600):
-            raise ValueError("Samprate exceeds permissible range!")
+            raise ValueError("samprate exceeds permissible range!")
         else:
             argsin[7] = int(samprate)
         # test that samprate is not larger than duration
         if (samprate/3600 >  duration):
-            raise ValueError("Samprate exceeds duration!")
+            raise ValueError("samprate exceeds duration!")
         # ####################################################
         # BUGFIX: fix a weird bug where the program stops before
         # the etpdata table is filled completely
