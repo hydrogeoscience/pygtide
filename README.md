@@ -1,4 +1,4 @@
-# PyGTide v0.6
+# PyGTide
 [![tests](https://github.com/hydrogeoscience/pygtide/actions/workflows/tests.yml/badge.svg)](https://github.com/hydrogeoscience/pygtide/actions/workflows/tests.yml)
 [![version](https://img.shields.io/pypi/v/pygtide.svg)](https://pypi.python.org/pypi/pygtide)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4290320.svg)](https://zenodo.org/record/4290320)
