@@ -15,9 +15,6 @@ def find_version(*paths):
 
 VERSION = find_version('pygtide', '__init__.py')
 
-with open('README.md', 'r') as f:
-    long_description = f.read()
-
 ext = [Extension(name='pygtide.etpred',
                  sources=['src/etpred.f90'])]
 
@@ -33,6 +30,4 @@ setup(
     url='http://doi.org/10.5281/zenodo.1346664',
     description=('A Python module and wrapper for ETERNA PREDICT to compute '
                  'gravitational tides on Earth'),
-    long_description=long_description,
-    long_description_content_type='text/markdown'
     )
