@@ -1,3 +1,5 @@
+v0.7:
+  * pygtide now working for years before 1962 back until 1600
 v0.6:
   * Fortran code is now platform independent and specific variables are now set from Python (Fortran and Python)
   * updated Python to comply with proper package structure

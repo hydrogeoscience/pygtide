@@ -1,9 +1,10 @@
-# PyGTide v0.6
+# PyGTide
+[![tests](https://github.com/hydrogeoscience/pygtide/actions/workflows/tests.yml/badge.svg)](https://github.com/hydrogeoscience/pygtide/actions/workflows/tests.yml)
+[![version](https://img.shields.io/pypi/v/pygtide.svg)](https://pypi.python.org/pypi/pygtide)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4290320.svg)](https://zenodo.org/record/4290320)
 ## A Python module and wrapper for ETERNA PREDICT to compute gravitational tides on Earth
 
-PyGTide is a Python class that wraps around ETERNA PREDICT 3.4 which is compiled from Fortran into a Python DLL using [f2py](https://docs.scipy.org/doc/numpy/f2py/). The original ETERNA PREDICT 3.3 was written by the late Prof. H.-G. Wenzel (Wenzel, 1996) in a mix of Fortran 77 and 90. This was updated by Kudryavtsev (2004) to include the latest tidal catalogue. The Fortran code for ETERNA PREDICT can be downloaded from the [International Geodynamics and
-Earth Tide Service (IGETS)](http://igets.u-strasbg.fr/soft_and_tool.php). Note that the original Fortran code was comprehensively revised in order to facilitate seamless integration into Python.
+PyGTide is a Python module that wraps around ETERNA PREDICT 3.4 which is compiled from Fortran into an executable using [f2py](https://docs.scipy.org/doc/numpy/f2py/). The original ETERNA PREDICT 3.3 was written by the late Prof. H.-G. Wenzel (Wenzel, 1996) in a mix of Fortran 77 and 90. This was updated by Kudryavtsev (2004) to include the latest tidal catalogue. Note that the original Fortran code was comprehensively revised in order to facilitate integration into Python. The original Fortran code for ETERNA PREDICT can be downloaded from the [International Geodynamics and Earth Tide Service (IGETS)](http://igets.u-strasbg.fr/soft_and_tool.php).
 
 ## How to install and run
 
@@ -14,10 +15,11 @@ Instructions:
  `conda install numpy pandas datetime requests git`
 * Download and install pygtide:
   * Linux or MacOS: <br />
-   `pip install git+https://github.com/hydrogeoscience/pygtide.git`
-  * Windows: <br />
-   `pip install --global-option build_ext --global-option --compiler=mingw32 --fcompiler=gnu95 git+https://github.com/hydrogeoscience/pygtide.git` <br />
-   *Important note*: Fortran compilation in Windows must be done with the Mingw32 and GNU95 compilers integrated into Anaconda.
+   `pip install pygtide`
+  * On Windows the exact install command depends on the compilers availlable. When using the compilers integrated into Anaconda (Mingw32 and GNU95 compilers) the following command is recommended:<br />
+   `pip install --global-option build_ext --global-option --compiler=mingw32 --fcompiler=gnu95 pygtide`
+  * The development version can be installed by downloading the Github repository and running `pip install download_path` <br />
+    Alternatively, in one step: `pip install git+https://github.com/hydrogeoscience/pygtide.git`
 * Run tests with `python -c 'import pygtide; pygtide.test(msg=True)'`
 * The internal database files can be updated as follows: <br />
  `python -c 'import pygtide; pygtide.update()'`
@@ -39,8 +41,6 @@ An updated user guide is currently in progress ...
 If you use PyGTide, please cite the work as:
 
 *Rau, Gabriel C. (2018) hydrogeoscience/pygtide: PyGTid. Zenodo. https://zenodo.org/record/4290320*
-
-(original repository)
 
 ## Example
 <img src="https://raw.githubusercontent.com/hydrogeoscience/pygtide/master/earth_tide_example.png" width="500">

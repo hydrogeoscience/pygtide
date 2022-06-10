@@ -31,6 +31,10 @@ def test(msg=False):
     freqM2expected = 1 / 12.421
     assert abs(freqM2 - freqM2expected) / freqM2expected < 2e-3
 
+    # test date before 1962
+    args2 = (-20.82071, -70.15288, 830.0, '1800-01-01', 6, 600)
+    series = predict_series(*args2, statazimut=90, tidalcompo=0)
+
     try:
         import matplotlib.pyplot as plt
     except ImportError:
