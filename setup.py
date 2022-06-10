@@ -27,7 +27,7 @@ setup(
     install_requires=['numpy', 'pandas','requests'],
     author='Gabriel C. Rau, Tom Eulenfeld',
     author_email='gabriel@hydrogeo.science',
-    url='http://doi.org/10.5281/zenodo.1346664',
+    url='https://github.com/hydrogeoscience/pygtide',
     description=('A Python module and wrapper for ETERNA PREDICT to compute '
                  'gravitational tides on Earth'),
     )
