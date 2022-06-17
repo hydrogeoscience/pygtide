@@ -15,9 +15,6 @@ def find_version(*paths):
 
 VERSION = find_version('pygtide', '__init__.py')
 
-with open('README.md', 'r') as f:
-    long_description = f.read()
-
 ext = [Extension(name='pygtide.etpred',
                  sources=['src/etpred.f90'])]
 
@@ -30,9 +27,7 @@ setup(
     install_requires=['numpy', 'pandas','requests'],
     author='Gabriel C. Rau, Tom Eulenfeld',
     author_email='gabriel@hydrogeo.science',
-    url='http://doi.org/10.5281/zenodo.1346664',
+    url='https://github.com/hydrogeoscience/pygtide',
     description=('A Python module and wrapper for ETERNA PREDICT to compute '
                  'gravitational tides on Earth'),
-    long_description=long_description,
-    long_description_content_type='text/markdown'
     )
