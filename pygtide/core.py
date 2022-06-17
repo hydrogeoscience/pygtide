@@ -396,7 +396,7 @@ class pygtide(object):
         """
         if self.exec:
             # format date and time into padded number strings
-#            print(etpred.inout.etpdata[:,1])
+            print(etpred.inout.etpdata[:,1])
             date = np.char.mod("%08.0f ", etpred.inout.etpdata[:,0])
             time = np.char.mod("%06.0f", etpred.inout.etpdata[:,1])
             # merge date and time arrays

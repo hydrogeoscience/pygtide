@@ -2973,6 +2973,7 @@ SUBROUTINE ETPOLC(IUN16,IUN30,IUN31,IPRINT,DJULD,DCLAT,DSLAT, &
 !     Quadratic interpolation for pole coordinates and DTAI:
 !     Linear interpolation for DUT1:
 !#######################################################################
+!GCR todo fix jagedness of LOD tide - quadratic interpolation?
  1100 DPOLXA0=DPOLX2
       DPOLXA1=(DPOLX3-DPOLX1)*0.5D0
       DPOLXA2=(DPOLX1-2.D0*DPOLX2+DPOLX3)*0.5D0
@@ -2985,20 +2986,18 @@ SUBROUTINE ETPOLC(IUN16,IUN30,IUN31,IPRINT,DJULD,DCLAT,DSLAT, &
       DPOLXP=DPOLXA1+2.D0*DPOLXA2*DT
       DPOLYP=DPOLYA1+2.D0*DPOLYA2*DT
       DGPOLP=DOM**2*DA*2.D0*DCLAT*DSLAT*(DPOLXP*DCLON-DPOLYP*DSLON)*DRAD/3600.D0*1.D9
-	  !GCR todo fix jagedness of LOD tide - quadratic interpolation?
-	  ! ??????????
-	  ! LOD tide
-      !DTAIA0=DTAI2
-      !DTAIA1=(DTAI3-DTAI1)*0.5D0
-      !DTAIA2=(DTAI1-2.D0*DTAI2+DTAI3)*0.5D0
-      !DLOD = DTAIA1+2.D0*DTAIA2*DT
+	  
+	  !GCR-LOD tide faulty
+	  !GCR check units ???
       DTAIA0=DTAI2
-      DTAIA1=DTAI3-DTAI2
-	  DLOD = DTAIA1
-      DGLOD=2.D0*DLOD*DOM**2*DA*DCLAT*DCLAT*1.D9/86400.D0
-	  !GCR-not required: 
-	  !DTAI =DTAIA0 +DT*DTAIA1 +DT2*DTAIA2
-	  ! DUT and delta DUT
+      DTAIA1=(DTAI3-DTAI1)*0.5D0
+      DTAIA2=(DTAI1-2.D0*DTAI2+DTAI3)*0.5D0
+	  !DLOD = DTAIA1+2.D0*DTAIA2*DT
+	  DTAI =DTAIA0 +DT*DTAIA1 +DT2*DTAIA2
+	  DLOD = DTAI/86400.D0
+	  !GCR-old: DGLOD=2.D0*DLOD*DOM**2*DA*DCLAT*DCLAT*1.D9/86400.D0
+      DGLOD=DOM**2*DA*2.D0*DLOD*DCLAT*DSLAT*1.D9/3600.D0
+	  
       DUT10=DUT12
       DDUT1=DUT13-DUT12
       IF(DDUT1.GT. 0.9D0) DDUT1=DDUT1-1.D0
