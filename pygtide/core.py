@@ -396,9 +396,18 @@ class pygtide(object):
         """
         if self.exec:
             # format date and time into padded number strings
-            print(etpred.inout.etpdata[:,1])
-            date = np.char.mod("%08.0f ", etpred.inout.etpdata[:,0])
-            time = np.char.mod("%06.0f", etpred.inout.etpdata[:,1])
+            # catch a weird bug:
+            # when etpred is asked to provide odd sampling rates
+            # the output array is zero at the end
+            etpred_data = np.array(etpred.inout.etpdata)
+            idx = (etpred_data[:,0] == 0)
+            if any(idx):
+                tmp = etpred_data[~idx, :]
+            else:
+                tmp = etpred.inout.etpdata
+            # end fix bug
+            date = np.char.mod("%08.0f ", tmp[:,0])
+            time = np.char.mod("%06.0f", tmp[:,1])
             # merge date and time arrays
             datetime = np.core.defchararray.add(date, time)
             # get the headers from Fortran
@@ -407,7 +416,7 @@ class pygtide(object):
             etdata = pd.DataFrame(columns=allcols)
             etdata['UTC'] = pd.to_datetime(datetime, format="%Y%m%d %H%M%S", utc=True)
             # obtain header strings from routine and convert
-            etdata[cols[2:]] = np.around(etpred.inout.etpdata[:, 2:], digits)
+            etdata[cols[2:]] = np.around(tmp[:, 2:], digits)
             return etdata
         else:
             return None
