@@ -10,6 +10,7 @@ def test(msg=False):
     pt.predict(*args, statazimut=90, tidalcompo=8)
     pt.results()
 
+    # test against a proven array
     args = (-20.82071, -70.15288, 830.0, '2017-01-01', 6, 600)
     series = predict_series(*args, statazimut=90, tidalcompo=0)
     expected = np.array([ 607.605208,  630.191908,  646.733272,  657.225859,  661.710055,
@@ -19,9 +20,8 @@ def test(msg=False):
              97.051682,   40.30299 ,  -16.321912,  -72.362132, -127.366285,
            -180.895731, -232.527698, -281.858255, -328.505135, -372.110372,
            -412.342748, -448.900029, -481.510979, -509.937138, -533.974358,
-           -553.454086, -568.244386, -578.250699, -583.41634 , -583.72272 ,
-           -579.189308, -569.873325])
-    np.testing.assert_almost_equal(series, expected, 2)
+           -553.454086])
+    np.testing.assert_almost_equal(series, expected, 5)
 
     args = (-20.82071, -70.15288, 830.0, '2020-01-01', 29.5 * 24, 600)
     predict_table(*args, statazimut=90, tidalcompo=8, msg=msg)
@@ -30,10 +30,6 @@ def test(msg=False):
     freqM2 = freq[index] * 3600
     freqM2expected = 1 / 12.421
     assert abs(freqM2 - freqM2expected) / freqM2expected < 2e-3
-
-    # test date before 1962
-    args2 = (-20.82071, -70.15288, 830.0, '1800-01-01', 6, 600)
-    series = predict_series(*args2, statazimut=90, tidalcompo=0)
 
     try:
         import matplotlib.pyplot as plt
@@ -44,6 +40,6 @@ def test(msg=False):
         plot_series(*args, statazimut=90, tidalcompo=8, show=False)
         if msg:
             plt.show()
-
+    
     print('------------------------------------')
     print('Successfully finished PyGTide tests!')
