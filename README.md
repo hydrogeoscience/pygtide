@@ -1,7 +1,8 @@
 # PyGTide
 [![tests](https://github.com/hydrogeoscience/pygtide/actions/workflows/tests.yml/badge.svg)](https://github.com/hydrogeoscience/pygtide/actions/workflows/tests.yml)
 [![version](https://img.shields.io/pypi/v/pygtide.svg)](https://pypi.python.org/pypi/pygtide)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4290320.svg)](https://zenodo.org/record/4290320)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1346260.svg)](https://zenodo.org/record/6630682)
+
 ## A Python module and wrapper for ETERNA PREDICT to compute gravitational tides on Earth
 
 PyGTide is a Python module that wraps around ETERNA PREDICT 3.4 which is compiled from Fortran into an executable using [f2py](https://docs.scipy.org/doc/numpy/f2py/). The original ETERNA PREDICT 3.3 was written by the late Prof. H.-G. Wenzel (Wenzel, 1996) in a mix of Fortran 77 and 90. This was updated by Kudryavtsev (2004) to include the latest tidal catalogue. Note that the original Fortran code was comprehensively revised in order to facilitate integration into Python. The original Fortran code for ETERNA PREDICT can be downloaded from the [International Geodynamics and Earth Tide Service (IGETS)](http://igets.u-strasbg.fr/soft_and_tool.php).
