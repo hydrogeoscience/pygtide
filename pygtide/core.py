@@ -365,12 +365,6 @@ class pygtide(object):
         # test that samprate is not larger than duration
         if (samprate/3600 >  duration):
             raise ValueError("samprate exceeds duration!")
-        # ####################################################
-        # BUGFIX: fix a weird bug where the program stops before
-        # the etpdata table is filled completely
-        argsin[6] = duration + 1
-        # run prediction routine
-        # ######################################################
         # print(argsin)
         self.args = argsin
         if self.msg:
@@ -395,28 +389,23 @@ class pygtide(object):
         keyword 'digits' sets the number of digits returned.
         """
         if self.exec:
-            # format date and time into padded number strings
-            # catch a weird bug:
-            # when etpred is asked to provide odd sampling rates
-            # the output array is zero at the end
-            etpred_data = np.array(etpred.inout.etpdata)
-            idx = (etpred_data[:,0] == 0)
-            if any(idx):
-                tmp = etpred_data[~idx, :]
-            else:
-                tmp = etpred.inout.etpdata
-            # end fix bug
-            date = np.char.mod("%08.0f ", tmp[:,0])
-            time = np.char.mod("%06.0f", tmp[:,1])
-            # merge date and time arrays
-            datetime = np.core.defchararray.add(date, time)
             # get the headers from Fortran
             cols = np.char.strip(etpred.inout.header.astype('str'))
             allcols = np.insert(cols[2:], 0, 'UTC')
             etdata = pd.DataFrame(columns=allcols)
+            # format date and time into padded number strings
+            etpred_data = np.array(etpred.inout.etpdata)
+            # print(etpred.inout.etpdata[:, 0])
+            # catch non-complete container fills from odd duration/sampling pairs
+            etpred_data = etpred_data[etpred_data[:,1] > 0, :]
+            # convert 
+            date = np.char.mod("%08.0f ", etpred_data[:,0])
+            time = np.char.mod("%06.0f", etpred_data[:,1])
+            # merge date and time arrays
+            datetime = np.core.defchararray.add(date, time)
             etdata['UTC'] = pd.to_datetime(datetime, format="%Y%m%d %H%M%S", utc=True)
             # obtain header strings from routine and convert
-            etdata[cols[2:]] = np.around(tmp[:, 2:], digits)
+            etdata[cols[2:]] = np.around(etpred_data[:, 2:], digits)
             return etdata
         else:
             return None
