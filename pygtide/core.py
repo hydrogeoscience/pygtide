@@ -395,7 +395,7 @@ class pygtide(object):
             etdata = pd.DataFrame(columns=allcols)
             # format date and time into padded number strings
             etpred_data = np.array(etpred.inout.etpdata)
-            # print(etpred.inout.etpdata[:, 0])
+            #print(etpred.inout.etpdata[:, 0])
             # catch non-complete container fills from odd duration/sampling pairs
             etpred_data = etpred_data[etpred_data[:,1] > 0, :]
             # convert 
