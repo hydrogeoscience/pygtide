@@ -424,7 +424,7 @@ SUBROUTINE PREDICT(ARGS)
 !      CHARACTER CHANNEL(MAXCHAN)*10
       DIMENSION DCOUT(MAXCHAN),DZERO(MAXCHAN)
 !-GCR new 2D array declaration to store data for return to Python
-      INTEGER ROWS, ROWI
+      INTEGER NDAT, ROWI
       LOGICAL OPENSTAT
       ! open a void stream to redirect output (if required)
       OPEN(UNIT=VOID,FILE=TRIM(NULLFILE),STATUS='OLD')
@@ -507,7 +507,7 @@ SUBROUTINE PREDICT(ARGS)
       IRESET=1
 !-GCR set row counter for output array
       ROWI=1
-      CALL GEOEXT(IUN16,IRESET,DEXTIM,DEXTOT)
+      !CALL GEOEXT(IUN16,IRESET,DEXTIM,DEXTOT)
 !#######################################################################
 !     Store array of differences DDT = TDT - UTC:
 !#######################################################################
@@ -521,12 +521,12 @@ SUBROUTINE PREDICT(ARGS)
 !-GCR PREDIN has been modified to deal with ARGSIN
       CALL PREDIN(IUN16,IPRINT)
 !-GCR define the size of the output matrix
-      ROWS = INT(NINT((DBLE(ISPANH))/(DBLE(IDTSEC)/3600)))
+      NDAT = INT(NINT((DBLE(ISPANH))/(DBLE(IDTSEC)/3600.D0)))
       IF (ALLOCATED(ETPDATA)) DEALLOCATE (ETPDATA)
-      ALLOCATE (ETPDATA(ROWS,6))
+      ALLOCATE (ETPDATA(NDAT,6))
       ETPDATA = 0.0D0
 !-GCR end modification
-      DDTH=DBLE(IDTSEC)/3600.D0
+      DDTH=DBLE(IDTSEC/3600.D0)
       DDTD=DDTH/24.D0
       DTH=0.D0
       IF(IRIGID.EQ.1) WRITE(IUN16,17009)
@@ -648,7 +648,7 @@ SUBROUTINE PREDICT(ARGS)
         DY2(IW)=DY2(IW)*DFAC*DBODY(IW)
       ENDIF
   996 CONTINUE
-      CALL GEOEXT(IUN16,IRESET,DEXTIM,DEXTOT)
+      !CALL GEOEXT(IUN16,IRESET,DEXTIM,DEXTOT)
 !#######################################################################
 !     Print hourly model tides with format 6F13.6:
 !#######################################################################
@@ -657,9 +657,9 @@ SUBROUTINE PREDICT(ARGS)
       WRITE(IUN23,17020) (DZERO(J),J=1,NC)
       ITMIN=0
       ITSEC=0
-      DDAT=DBLE(ISPANH)/DDTH
 !-GCR fixed conversion
-      NDAT=INT(DDAT)
+!-GCR fixed total number of samples calculation 
+      ! NDAT=NINT(DBLE(ISPANH)/DDTH)
       CALL ETJULN(IUN16,ITY,ITM,ITD,DTH,DJULD0)
 !#######################################################################
 !     Loop over NDAT samples:
@@ -766,7 +766,7 @@ SUBROUTINE PREDICT(ARGS)
       WRITE(IUN23,17021) IDAT,ITIM,(DCOUT(JC),JC=1,NC)
       IF(ITIM.EQ.0) WRITE(SCR,17021) IDAT,ITIM,(DCOUT(JC),JC=1,NC)
 !-GCR fill new array for handback to Python
-      IF (ROWI.LE.ROWS) THEN
+      IF (ROWI.LE.NDAT) THEN
         ETPDATA(ROWI,1)=IDAT
         ETPDATA(ROWI,2)=ITIM
         ETPDATA(ROWI,3:6)=DCOUT
@@ -812,7 +812,7 @@ SUBROUTINE PREDICT(ARGS)
  1090 CONTINUE
       WRITE(IUN23,'(I8)') C99
       WRITE(IUN23,'(I8)') C88
-      CALL GEOEXT(IUN16,IRESET,DEXTIM,DEXTOT)
+      !CALL GEOEXT(IUN16,IRESET,DEXTIM,DEXTOT)
       WRITE(IUN16,17030) CPROJ,CFPRN,CFOUT,DEXTIM
       WRITE(SCR,17030)     CPROJ,CFPRN,CFOUT,DEXTIM
 !-GCR close all the i/o files if still open
@@ -3467,81 +3467,4 @@ SUBROUTINE ETPOTS(IUN14,IUN16,IUN24,IPRINT,IMODEL,DLAT,DLON,DH, &
        6x,'***** The current number of waves:',I5,' exceeds the ', &
        'maximum number of waves:',I5/ &
        6x,'***** Routine ETPOTS stops the execution.'/)
-END SUBROUTINE
-
-
-SUBROUTINE GEOEXT(IUN16,IRESET,DEXTIM,DEXTOT)
-!#######################################################################
-!     Routine GEOEXT, version 1996.08.05 Fortran 77/90.
-!     === MS-DOS version for LAHEY-compiler ===================
-!     The routine GEOEXT computes the actual job time and writes
-!     the actual execution time on printer output unit IUN6.
-!     For the first call of routine GEOEXT, the actual jobtime will
-!     be computed (in secs since midnight) and stored. For the next
-!     call(s) of routine GEOEXT, the actual jobtime will be computed
-!     and the execution time (actual jobtime minus jobtime of the
-!     first call of routine GEOEXT) will be printed.
-!     Input parameter description:
-!     ----------------------------
-!     IUN16:       formatted printer unit.
-!     IRESET:      DEXTIM will be resetted, if IRESET=1.
-!     Output parameter description:
-!     -----------------------------
-!     DEXTIM:      actual jobtime in seconds (time elapsed from the
-!                  last call of routine GEOEXT with IRESET=1 to the
-!                  actual call of routine GEOEXT), double precision.
-!     DEXTOT:      total jobtime in seconds (time elapsed from the
-!                  first call of routine GEOEXT), double precision.
-!     Used routines:
-!     --------------
-!     SYSTEM-CLOCK
-!     Program creation:  1979.08.30 by Hans-Georg Wenzel,
-!                        Black Forest Observatory,
-!                        Universitaet Karlsruhe,
-!                        Englerstr. 7,
-!                        D-76128 KARLSRUHE,
-!                        Germany.
-!                        Tel.: 0721-6082301.
-!                        FAX:  0721-694552.
-!                        e-mail: wenzel@gik.bau-verm.uni-karlsruhe.de
-!     Last Modification: 1996.08.05 by Hans-Georg Wenzel.
-!#######################################################################
-      use INOUT
-      IMPLICIT REAL(8) (D)
-! MSFOR:      INTEGER*2 IH,IM,IS,IS100
-      DATA IFIRST/1/
-      SAVE DTIME1
-      IF(IRESET.NE.1) GOTO 6003
-! MSFOR:      CALL GETTIM(IH,IM,IS,IS100)
-! MSFOR:      DTIME1=DBLE(IS+IM*60+IH*3600)+0.01*FLOAT(IS100)
-! LAHEY 90:
-      CALL SYSTEM_CLOCK(IC,ICR)
-      DTIME1=DBLE(IC)/DBLE(ICR)
-! UNIX:      DTIME1=DBLE(SECNDS(RDUMMY))
-      WRITE(IUN16,17001)
-      DEXTIM=0.D0
-      DEXTOT=0.D0
-      IF(IFIRST.EQ.1) THEN
-        DTIME0=DTIME1
-        IFIRST=0
-      ENDIF
-      IRESET=0
-      RETURN
- 6003 CONTINUE
-! MSFOR:      CALL GETTIM(IH,IM,IS,IS100)
-! MSFOR:      DTIME2=DBLE(IS+IM*60+IH*3600)+0.01*FLOAT(IS100)
-! LAHEY:
-      CALL SYSTEM_CLOCK(IC,ICR)
-      DTIME2=DBLE(IC)/DBLE(ICR)
-! UNIX: DTIME2=DBLE(SECNDS(RDUMMY))
-      DEXTIM=DTIME2-DTIME1
-      DEXTOT=DTIME2-DTIME0
-      EXECTIME = DEXTIM
-      WRITE(IUN16,17002) DEXTIM
-!#######################################################################
-!     Format statements:
-!#######################################################################
-17001 FORMAT(6x,'First call of routine GEOEXT, version 1996.08.05.')
-17002 FORMAT(/6x,'Routine GEOEXT. Execution time=',F10.3,' sec'/)
-      RETURN
 END SUBROUTINE
