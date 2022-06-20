@@ -45,6 +45,29 @@ def test(msg=False):
         plot_series(*args, statazimut=90, tidalcompo=8, show=False)
         if msg:
             plt.show()
-    
+
     print('------------------------------------')
     print('Successfully finished PyGTide tests!')
+
+
+def plot_pole_and_lod_tide():
+    try:
+        import matplotlib.pyplot as plt
+    except ImportError:
+        return False
+    ploty = ['Signal [nm/s**2]', 'Pole tide [nm/s**2]', 'LOD tide [nm/s**2]']
+    dates = ['1961-12-24', '2016-12-24', '2023-06-01']
+    for date in dates:
+        args = (20, 0, 0, date, 24*30, 600)
+        tab = predict_table(*args)
+        tab.plot(x='UTC', y=ploty, sharex=True, subplots=True)
+        plt.savefig(f'tides_{date}.png')
+    args = (-20.82071, -70.15288, 830.0, '2017-01-01', 10, 600)
+    tab = predict_table(*args, statazimut=90)
+    tab.plot(x='UTC', y=ploty, sharex=True, subplots=True)
+    plt.savefig('tides_2017-01-01_10h.png')
+    plt.show()
+
+
+
+#_plot_tides()
