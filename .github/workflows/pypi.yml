@@ -1,9 +1,7 @@
 name: pypi
 on:
-  push:
   release:
     types: [published]
-
 
 jobs:
   build_sdist:
