@@ -212,7 +212,7 @@ module PARAMS
     ! file i/o streams
     INTEGER, PARAMETER :: STDIN=5,STDOUT=6,STDERR=0,VOID=11
     INTEGER SCR,IC2
-    DATA SCR/STDOUT/
+    DATA SCR/VOID/
     ! names of the i/o files
     CHARACTER(17), PARAMETER :: CFPRN='pygtide.out.prn',CFOUT='pygtide.out.prd',&
     ETDDTDAT='etddt.dat',ETPOLUTDAT='etpolut1.dat',ETPOLUTBIN='etpolut1.bin'
@@ -334,8 +334,7 @@ module INOUT
     CHARACTER(25), DIMENSION(6,25) :: HEADER
     CHARACTER(8) :: ETPUNIT
     !CHARACTER(6), PARAMETER :: CREST='PyGTide'
-    CHARACTER(7), PARAMETER :: CPROJ='pygtide'
-    CHARACTER(3), PARAMETER :: VERSION='0.7'
+    CHARACTER(7), PARAMETER :: CPROJ='PyGTide'
     CHARACTER(32), PARAMETER :: VERS='ETERNA PREDICT v3.4 (10/02/2013)'
     CHARACTER(10), PARAMETER :: FORTVERS='3.4 130210'
     save
