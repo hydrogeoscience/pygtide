@@ -12,19 +12,20 @@ PyGTide is a Python module that wraps around ETERNA PREDICT 3.4 which is compile
 Instructions:
 * Download and install [*Anaconda*](https://www.anaconda.com/products/distribution) or [*Miniconda*](https://docs.conda.io/en/latest/miniconda.html)
 * *Optional*: Create a new environment
-* Make sure the following packages are installed <br />
+* Make sure the following packages are installed: <br />
  `conda install numpy pandas datetime requests git`
 * Download and install pygtide:
   * Linux or MacOS: <br />
    `pip install pygtide`
-  * On Windows the exact install command depends on the compilers availlable. When using the compilers integrated into Anaconda (Mingw32 and GNU95 compilers) the following command is recommended:<br />
+  * On Windows it is recommended to use the compilers integrated into Anaconda (i.e., Mingw32 and GNU95) with the following command:<br />
    `pip install --global-option build_ext --global-option --compiler=mingw32 --fcompiler=gnu95 pygtide`
-  * The development version can be installed by downloading the Github repository and running `pip install download_path` <br />
-    Alternatively, in one step: `pip install git+https://github.com/hydrogeoscience/pygtide.git`
-* Run tests with `python -c 'import pygtide; pygtide.test(msg=True)'`
+  * The development version can be installed by downloading the Github repository and running `pip install download_path`. <br />
+    Alternatively, in one step as: `pip install git+https://github.com/hydrogeoscience/pygtide.git`
+* Run tests: <br /> 
+ `python -c 'import pygtide; pygtide.test(msg=True)'`
 * The internal database files can be updated as follows: <br />
  `python -c 'import pygtide; pygtide.update()'`
-* See `pygtide/tests.py` for example calls, e.g.:
+* See `pygtide/tests.py` for example usage:
 
 ```
 from pygtide import predict_series
