@@ -107,8 +107,6 @@ class pygtide(object):
         pygtide.init() initialises the etpred (Fortran) module and sets global variables
         """
         self.msg = msg
-        self.version = 'PyGTide v0.6'
-        self.exectime = 0
         self.fortran_version = etpred.inout.vers.astype(str)
         self.data_dir = resource_filename('pygtide', 'commdat/')
         etpred.params.comdir = self.data_dir + ' ' * (256 - len(self.data_dir))
@@ -138,7 +136,6 @@ class pygtide(object):
         """
         self.update() refreshes the variables of PyGTide based on the Fortran module etpred
         """
-        self.exectime = etpred.inout.exectime
         self.headers = np.char.strip(etpred.inout.header.astype('str'))
         self.args = etpred.inout.argsin
         self.unit = etpred.inout.etpunit.astype('str')
@@ -369,13 +366,11 @@ class pygtide(object):
         self.args = argsin
         if self.msg:
             print('%s is calculating, please wait ...' % (self.fortran_version))
-
+        
+        # hand over variables
         etpred.predict(argsin)
 
         self.exec = True
-        self.exectime = etpred.inout.exectime
-        if self.msg:
-            print('Done after %.3f s.' % (self.exectime))
         self.update()
         return True
 
