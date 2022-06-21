@@ -1,5 +1,6 @@
 name: pypi
 on:
+  push:
   release:
     types: [published]
 
@@ -27,7 +28,6 @@ jobs:
 
   publish:
     name: publish release
-    if: github.event_name == 'release'
     needs: [build_sdist]
     runs-on: ubuntu-latest
     steps:
@@ -35,7 +35,7 @@ jobs:
         with:
           name: artifact
           path: dist
-      - uses: pypa/gh-action-pypi-publish@v1
+      - uses: pypa/gh-action-pypi-publish@release/v1
         with:
           user: __token__
           password: ${{ secrets.PYPI }}
