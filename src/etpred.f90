@@ -658,7 +658,7 @@ SUBROUTINE PREDICT(ARGS)
       ITMIN=0
       ITSEC=0
 !-GCR fixed conversion
-!-GCR fixed total number of samples calculation 
+!-GCR fixed total number of samples calculation
       ! NDAT=NINT(DBLE(ISPANH)/DDTH)
       CALL ETJULN(IUN16,ITY,ITM,ITD,DTH,DJULD0)
 !#######################################################################
@@ -2808,6 +2808,67 @@ SUBROUTINE ETPHAS(IUN16,IPRINT,IMODEL,DLON,DJULD)
 END SUBROUTINE
 
 
+SUBROUTINE INTERP_QUADRATIC(DY1, DY2, DY3, DT, &
+        DOUT)
+!#######################################################################
+!     Original quadratic interpolation routine by Tom Eulenfeld
+!#######################################################################
+    IMPLICIT REAL(8) (D)
+
+    DOUT = DY2 + (DY3-DY1)*0.5D0*DT + (DY1-2.D0*DY2+DY3)*0.5D0 * DT * DT
+    ! difference is then given by
+    !DOUT = (DY3-DY1)*0.5D0 + (DY1-2.D0*DY2+DY3)* DT
+
+END SUBROUTINE
+
+
+SUBROUTINE INTERP(Y0, Y1, Y2, Y3, X0, DT, &
+        DOUT)
+!#######################################################################
+!     Cubic interpolation routine by Tom Eulenfeld
+!     Cubic spline interpolation of values between Y1 and Y2
+!     For cubic spline we need 4 constraints
+!     * curve goes through Y1
+!     * curve goes through Y2
+!     * derivative at Y1 given by differences Y2-Y0
+!     * derivative at Y2 given by differences Y3-Y1
+!#######################################################################
+    IMPLICIT REAL(8) (D)
+    REAL (8) x0, dx, y0, y1, y2, y3, a, b, c, d
+    dx = 1.0d0
+    a = 1.0d0*(2.0d0*dx**3*y0 - 3.0d0*dx**3*y1 + 3.0d0*dx**3*y2 - 1.0d0*dx** &
+        3*y3 + 4.0d0*dx**2*x0*y0 - 9.5d0*dx**2*x0*y1 + 8.0d0*dx**2*x0*y2 &
+        - 2.5d0*dx**2*x0*y3 + 2.5d0*dx*x0**2*y0 - 7.0d0*dx*x0**2*y1 + &
+        6.5d0*dx*x0**2*y2 - 2.0d0*dx*x0**2*y3 + 0.5d0*x0**3*y0 - 1.5d0*x0 &
+        **3*y1 + 1.5d0*x0**3*y2 - 0.5d0*x0**3*y3)/dx**3
+    b = 1.0d0*(-4.0d0*dx**2*y0 + 9.5d0*dx**2*y1 - 8.0d0*dx**2*y2 + 2.5d0*dx &
+        **2*y3 - 5.0d0*dx*x0*y0 + 14.0d0*dx*x0*y1 - 13.0d0*dx*x0*y2 + &
+        4.0d0*dx*x0*y3 - 1.5d0*x0**2*y0 + 4.5d0*x0**2*y1 - 4.5d0*x0**2*y2 &
+        + 1.5d0*x0**2*y3)/dx**3
+    c = 1.0d0*(2.5d0*dx*y0 - 7.0d0*dx*y1 + 6.5d0*dx*y2 - 2.0d0*dx*y3 + 1.5d0 &
+        *x0*y0 - 4.5d0*x0*y1 + 4.5d0*x0*y2 - 1.5d0*x0*y3)/dx**3
+    d = 1.0d0*(-0.5d0*y0 + 1.5d0*y1 - 1.5d0*y2 + 0.5d0*y3)/dx**3
+    DOUT = a + b * DT + c * DT * DT + d * DT * DT * DT
+END SUBROUTINE
+
+
+
+SUBROUTINE INTERP_DIF(DY0, DY1, DY2, DY3, DX0, DT, &
+        DOUT)
+!#######################################################################
+!     Differentiate and cubic interpolation routine by Tom Eulenfeld
+!#######################################################################
+    IMPLICIT REAL(8) (D)
+    REAL(8) Y0, Y1, Y2, Y3
+    Y1 = 0.5d0 * (DY2 - DY0)
+    Y2 = 0.5d0 * (DY3 - DY1)
+    Y0 = Y2 - 2.0d0*(DY2 - 2.0d0*DY1 + DY0)
+    Y3 = 2.0d0*(DY3 - 2.0d0*DY2 + DY1) + Y1
+    CALL INTERP(Y0, Y1, Y2, Y3, DX0, DT, DOUT)
+END SUBROUTINE
+
+
+
 SUBROUTINE ETPOLC(IUN16,IUN30,IUN31,IPRINT,DJULD,DCLAT,DSLAT, &
         DCLON,DSLON,DPOLX,DPOLY,DUT1,DTAI,DLOD,DGPOL,DGPOLP,DGLOD,NERR)
 !#######################################################################
@@ -2938,14 +2999,14 @@ SUBROUTINE ETPOLC(IUN16,IUN30,IUN31,IPRINT,DJULD,DCLAT,DSLAT, &
 !     DT is time difference referring to central sample point in days:
 !#######################################################################
       DT=DMODJD-DBLE(IMJD)
-      DT2=DT*DT
       IREC=IMJD-IFIRST+2
-      IF(IREC.LT.2) THEN
+      IF(IREC.LT.3) THEN
         DPOLX=0.D0
         DPOLY=0.D0
         DUT1 =0.D0
         DTAI =0.D0
         DLOD =0.D0
+        DGLOD =0.D0
         DGPOL=0.D0
         DGPOLP=0.D0
         NERR=1
@@ -2957,44 +3018,39 @@ SUBROUTINE ETPOLC(IUN16,IUN30,IUN31,IPRINT,DJULD,DCLAT,DSLAT, &
 !#######################################################################
         READ(IUN31,REC=ILAST)   DPOLX,DPOLY,DUT1,DTAI
         DLOD =0.D0
+        DGLOD =0.D0
         DGPOL=DOM**2*DA*2.D0*DCLAT*DSLAT*(DPOLX*DCLON-DPOLY*DSLON)*DRAD/3600.D0*1.D9
         DGPOLP=0.D0
         NERR=1
         RETURN
       ENDIF
-      IF(IMJD.EQ.IMJDO) GOTO 1100
-	  !GCR fix bug here (which likely has no influence):
-	  ! READ(IUN31,REC=IREC-1) DPOLX1,DPOLY1,DUT12,DTAI1
       READ(IUN31,REC=IREC-1) DPOLX1,DPOLY1,DUT11,DTAI1
       READ(IUN31,REC=IREC)   DPOLX2,DPOLY2,DUT12,DTAI2
       READ(IUN31,REC=IREC+1) DPOLX3,DPOLY3,DUT13,DTAI3
-      IMJDO=IMJD
+      IF(IREC.EQ.ILAST-1) THEN
+        DPOLX4=DPOLX3
+        DPOLY4=DPOLY3
+        DTAI4=DTAI3
+      ELSE
+        READ(IUN31,REC=IREC+2) DPOLX4,DPOLY4,DUT14,DTAI4
+      ENDIF
 !#######################################################################
-!     Quadratic interpolation for pole coordinates and DTAI:
+!     Cubic interpolation for pole coordinates and DTAI:
 !     Linear interpolation for DUT1:
+!     TE: use cubic interpolation instead of quadratic
 !#######################################################################
- 1100 DPOLXA0=DPOLX2
-      DPOLXA1=(DPOLX3-DPOLX1)*0.5D0
-      DPOLXA2=(DPOLX1-2.D0*DPOLX2+DPOLX3)*0.5D0
-      DPOLYA0=DPOLY2
-      DPOLYA1=(DPOLY3-DPOLY1)*0.5D0
-      DPOLYA2=(DPOLY1-2.D0*DPOLY2+DPOLY3)*0.5D0
-      DTAIA0=DTAI2
-      DTAIA1=(DTAI3-DTAI1)*0.5D0
-      DTAIA2=(DTAI1-2.D0*DTAI2+DTAI3)*0.5D0
-      DUT10=DUT12
-      DDUT1=DUT13-DUT12
+      CALL INTERP(DTAI1, DTAI2, DTAI3, DTAI4, -1.0d0, DT, DTAI)
+      CALL INTERP(DPOLX1, DPOLX2, DPOLX3, DPOLX4, -1.0d0, DT, DPOLX)
+      CALL INTERP(DPOLY1, DPOLY2, DPOLY3, DPOLY4, -1.0d0, DT, DPOLY)
+      CALL INTERP_DIF(DTAI1, DTAI2, DTAI3, DTAI4, -1.0d0, DT, DLOD)
+      CALL INTERP_DIF(DPOLX1, DPOLX2, DPOLX3, DPOLX4, -1.0d0, DT, DPOLXP)
+      CALL INTERP_DIF(DPOLY1, DPOLY2, DPOLY3, DPOLY4, -1.0d0, DT, DPOLYP)
+      DDUT1 = DUT13-DUT12
       IF(DDUT1.GT. 0.9D0) DDUT1=DDUT1-1.D0
       IF(DDUT1.LT.-0.9D0) DDUT1=DDUT1+1.D0
-      DLOD = DTAIA1+2.D0*DTAIA2*DT
+      DUT1 = DDUT1 * DT + DUT12
       DGLOD=2.D0*DLOD*DOM**2*DA*DCLAT*DCLAT*1.D9/86400.D0
-      DPOLX=DPOLXA0+DT*DPOLXA1+DT2*DPOLXA2
-      DPOLY=DPOLYA0+DT*DPOLYA1+DT2*DPOLYA2
-      DUT1 =DUT10  +DT*DDUT1
-      DTAI =DTAIA0 +DT*DTAIA1 +DT2*DTAIA2
       DGPOL=DOM**2*DA*2.D0*DCLAT*DSLAT*(DPOLX*DCLON-DPOLY*DSLON)*DRAD/3600.D0*1.D9
-      DPOLXP=DPOLXA1+2.D0*DPOLXA2*DT
-      DPOLYP=DPOLYA1+2.D0*DPOLYA2*DT
       DGPOLP=DOM**2*DA*2.D0*DCLAT*DSLAT*(DPOLXP*DCLON-DPOLYP*DSLON)*DRAD/3600.D0*1.D9
       RETURN
 !#######################################################################
