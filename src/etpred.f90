@@ -299,8 +299,8 @@ module TIDWAVE
     use MAX_PARS
     INTEGER NW,IWNR(MAXNW),IAARG(MAXNW,12)
     REAL(8) DX0(MAXNW),DX1(MAXNW),DX2(MAXNW),DY0(MAXNW),&
-    DY1(MAXNW),DY2(MAXNW),DTHPH(MAXNW),DTHFR(MAXNW),DBODY(MAXNW),&
-    DC0(MAXNW),DS0(MAXNW),DDC(MAXNW),DDS(MAXNW)
+		DY1(MAXNW),DY2(MAXNW),DTHPH(MAXNW),DTHFR(MAXNW),DBODY(MAXNW),&
+		DC0(MAXNW),DS0(MAXNW),DDC(MAXNW),DDS(MAXNW)
     save
 end module TIDWAVE
 
@@ -575,8 +575,8 @@ SUBROUTINE PREDICT(ARGS)
 !     Print output channel table:
 !#######################################################################
       DO 100 JC=1,NC
-      WRITE(IUN16,17003)  JC,CHANNEL(JC),CUNIT(IC2)
-  100 WRITE(IUN23,17003)  JC,CHANNEL(JC),CUNIT(IC2)
+      WRITE(IUN16,17003) JC,CHANNEL(JC),CUNIT(IC2)
+  100 WRITE(IUN23,17003) JC,CHANNEL(JC),CUNIT(IC2)
 !#######################################################################
 !     Print alphanumeric comment:
 !#######################################################################
@@ -1065,7 +1065,7 @@ SUBROUTINE ETASTN(IUN16,IPRINT,IMODEL,DLON,DJULD,DUT1,DAS,DASP,DDT)
 !     with the correct DDT, the effect in GMST would be 1.0027*DDT.
 !     This effect is corrected below.
 !#######################################################################
-      DAS(1)=DAS(1)-0.0027D0*DDT*15.D0/3600.D0
+      DAS(1) =DAS(1)-0.0027D0*DDT*15.D0/3600.D0
       DAS(2) =DS
       DASP(2)=DSP
       DAS(3) =DH
@@ -1179,7 +1179,7 @@ SUBROUTINE ETASTN(IUN16,IPRINT,IMODEL,DLON,DJULD,DUT1,DAS,DASP,DDT)
 !     Print astronomical elements:
 !#######################################################################
       WRITE(IUN16,17004) (DAS(K),DASP(K),K=1,11)
-
+	
 ! 5000 CONTINUE
       WRITE(IUN16,17030)
       RETURN
