@@ -231,7 +231,12 @@ C****************************************************************\n"""
         else:
             print('Update failed!')
             pass
-
+        
+        #%% remove temporary files
+        os.remove(leapsec_file)
+        os.remove(iauhist_file)
+        os.remove(iaucurr_file)
+        return
 
     #%% update the etpolut1 binary file from the text file
     def etpolut1_dat2bin(self):
