@@ -3000,7 +3000,7 @@ SUBROUTINE ETPOLC(IUN16,IUN30,IUN31,IPRINT,DJULD,DCLAT,DSLAT, &
 !#######################################################################
       DT=DMODJD-DBLE(IMJD)
       IREC=IMJD-IFIRST+2
-      IF(IREC.LT.2) THEN
+      IF(IREC.LT.3) THEN
         DPOLX=0.D0
         DPOLY=0.D0
         DUT1 =0.D0
