@@ -23,14 +23,8 @@ Instructions:
    ```
    pip install --global-option build_ext --global-option --compiler=mingw32 --global-option --fcompiler=gnu95 pygtide
    ```
-   *Note*: We recommend using the compilers integrated into Anaconda (i.e., Mingw32 and GNU95).
+   *Note*: For Windows we recommend using the compilers integrated into Anaconda (i.e., Mingw32 and GNU95).
    
-  * Development version: This can be installed by downloading the Github repository and running:
-   `pip install download_path`. <br />
-    Alternatively, in one step as: <br />
-    ```
-    pip install git+https://github.com/hydrogeoscience/pygtide.git
-    ```
 * Run tests: <br /> 
  ```
  python -c "import pygtide; pygtide.test(msg=True)"
@@ -47,6 +41,12 @@ args = (-20.82071, -70.15288, 830.0, '2020-01-01', 6, 600)
 series = predict_series(*args, statazimut=90, tidalcompo=8)
 ```
 
+* Development version: This can be installed by downloading the Github repository and running:
+ `pip install download_path`. <br />
+  Alternatively, in one step as: <br />
+  ```
+  pip install git+https://github.com/hydrogeoscience/pygtide.git
+  ```
 
 ## How to use
 
