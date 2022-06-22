@@ -19,11 +19,14 @@ Instructions:
    ```
    pip install pygtide
    ```
-  * On *Windows* it is recommended to use the compilers integrated into Anaconda (i.e., Mingw32 and GNU95) with the following command:<br />
+  * *Windows*:<br />
    ```
    pip install --global-option build_ext --global-option --compiler=mingw32 --global-option --fcompiler=gnu95 pygtide
    ```
-  * The development version can be installed by downloading the Github repository and running `pip install download_path`. <br />
+   *Note*: We recommend using the compilers integrated into Anaconda (i.e., Mingw32 and GNU95).
+   
+  * Development version: This can be installed by downloading the Github repository and running:
+   `pip install download_path`. <br />
     Alternatively, in one step as: <br />
     ```
     pip install git+https://github.com/hydrogeoscience/pygtide.git
