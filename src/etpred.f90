@@ -211,8 +211,7 @@ module PARAMS
     CHARACTER(256) :: COMDIR
     ! file i/o streams
     INTEGER, PARAMETER :: STDIN=5,STDOUT=6,STDERR=0,VOID=11
-    INTEGER SCR,IC2
-    DATA SCR/VOID/
+    INTEGER IC2
     ! names of the i/o files
     CHARACTER(17), PARAMETER :: CFPRN='pygtide.out.prn',CFOUT='pygtide.out.prd',&
     ETDDTDAT='etddt.dat',ETPOLUTDAT='etpolut1.dat',ETPOLUTBIN='etpolut1.bin'
@@ -369,7 +368,7 @@ subroutine INIT
         !WRITE(*,*) MYPOS
         ! go back by a specific number to the beginning of the previous line
         READ(IUN30, '(I8,A)', POS=MYPOS-74) ETPOL_END, TXT
-        !WRITE(SCR,*) "Last line:" // TXT
+        !WRITE(STDOUT,*) "Last line:" // TXT
         !WRITE(*,*) "etpolut1.dat:",ETPOL_END
         CLOSE(IUN30)
     ENDIF
@@ -476,12 +475,6 @@ SUBROUTINE PREDICT(ARGS)
 !-GCR-del      CLOSE(IUN15)
 !-GCR check for screen output option, default: silent (0)
       SCROUT = INT(ARGSIN(18))
-      ! redirect screen output to void
-      IF (SCROUT.EQ.1) THEN
-        SCR=STDOUT
-      ELSE
-        SCR=VOID
-      ENDIF
 !-GCR 'FILEPRD' writes the PRD file if set to 1
       FILEPRD = INT(ARGSIN(16))
       IF (FILEPRD.EQ.1) THEN
@@ -502,7 +495,7 @@ SUBROUTINE PREDICT(ARGS)
 !      OPEN(IUN15, FILE=TRIM(COMDIR)//TRIM(CFINI),ACTION='READ',FORM='FORMATTED')
 !-GCR continue ...
       WRITE(IUN16,17002) FORTVERS,CPROJ
-      WRITE(SCR,17002) FORTVERS,CPROJ
+      IF (SCROUT.EQ.1) WRITE(STDOUT,17002) FORTVERS,CPROJ
       IRESET=1
 !-GCR set row counter for output array
       ROWI=1
@@ -763,7 +756,7 @@ SUBROUTINE PREDICT(ARGS)
       ITIM=ITH*10000+ITMIN*100+ITSEC
 !-GCR end time fix
       WRITE(IUN23,17021) IDAT,ITIM,(DCOUT(JC),JC=1,NC)
-      IF(ITIM.EQ.0) WRITE(SCR,17021) IDAT,ITIM,(DCOUT(JC),JC=1,NC)
+      IF(ITIM.EQ.0) WRITE(STDOUT,17021) IDAT,ITIM,(DCOUT(JC),JC=1,NC)
 !-GCR fill new array for handback to Python
       IF (ROWI.LE.NDAT) THEN
         ETPDATA(ROWI,1)=IDAT
@@ -813,7 +806,7 @@ SUBROUTINE PREDICT(ARGS)
       WRITE(IUN23,'(I8)') C88
       !CALL GEOEXT(IUN16,IRESET,DEXTIM,DEXTOT)
       WRITE(IUN16,17030) CPROJ,CFPRN,CFOUT,DEXTIM
-      WRITE(SCR,17030)     CPROJ,CFPRN,CFOUT,DEXTIM
+      IF (SCROUT.EQ.1) WRITE(STDOUT,17030)     CPROJ,CFPRN,CFOUT,DEXTIM
 !-GCR close all the i/o files if still open
 !      INQUIRE(UNIT=IUN15, OPENED=OPENSTAT)
 !      IF (OPENSTAT) CLOSE(IUN15)
@@ -821,7 +814,9 @@ SUBROUTINE PREDICT(ARGS)
       IF (OPENSTAT) CLOSE(IUN16)
       INQUIRE(UNIT=IUN23, OPENED=OPENSTAT)
       IF (OPENSTAT) CLOSE(IUN23)
-
+	  INQUIRE(UNIT=VOID, OPENED=OPENSTAT)
+      IF (OPENSTAT) CLOSE(VOID)
+	  
 !#######################################################################
 !     Format statements:
 !#######################################################################
