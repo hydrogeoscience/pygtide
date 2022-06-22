@@ -42,7 +42,7 @@ An updated user guide is currently in progress ...
 ## How to cite
 If you use PyGTide, please cite the work as:
 
-*Rau, Gabriel C. (2018) hydrogeoscience/pygtide: PyGTid. Zenodo. https://zenodo.org/record/4290320*
+*Rau, Gabriel C. (2018) hydrogeoscience/pygtide: PyGTid. Zenodo. [https://doi.org/10.5281/zenodo.1346260](https://doi.org/10.5281/zenodo.1346260)*
 
 ## Example
 <img src="https://raw.githubusercontent.com/hydrogeoscience/pygtide/master/earth_tide_example.png" width="500">
