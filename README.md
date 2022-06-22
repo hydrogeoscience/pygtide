@@ -11,7 +11,7 @@ PyGTide is a Python module that wraps around ETERNA PREDICT 3.4 which is compile
 
 Instructions:
 * Download and install [*Anaconda*](https://www.anaconda.com/products/distribution) or [*Miniconda*](https://docs.conda.io/en/latest/miniconda.html)
-* *Optional*: Create a new environment
+  * *Optional*: Create a new environment
 * Make sure the following packages are installed: <br />
  `conda install numpy pandas datetime requests git`
 * Download and install pygtide:
