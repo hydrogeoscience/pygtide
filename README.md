@@ -30,11 +30,11 @@ Instructions:
     ```
 * Run tests: <br /> 
  ```
- python -c 'import pygtide; pygtide.test(msg=True)'
+ python -c "import pygtide; pygtide.test(msg=True)"
  ```
 * The internal database files can be updated as follows: <br />
  ```
- python -c 'import pygtide; pygtide.update()'
+ python -c "import pygtide; pygtide.update()"
  ```
 * See `pygtide/tests.py` for example usage:
 
