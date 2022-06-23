@@ -15,8 +15,7 @@ def find_version(*paths):
 
 VERSION = find_version('pygtide', '__init__.py')
 
-ext = [Extension(name='pygtide.etpred',
-                 sources=['src/etpred.f90'])]
+ext = [Extension(name='pygtide.etpred', sources=['src/etpred.f90'])]
 
 setup(
     name='pygtide',
@@ -24,7 +23,7 @@ setup(
     packages=['pygtide'],
     package_data={'pygtide': ['commdat/*']},
     ext_modules=ext,
-    install_requires=['numpy', 'pandas','requests'],
+    install_requires=['numpy', 'pandas'],
     author='Gabriel C. Rau, Tom Eulenfeld',
     author_email='gabriel@hydrogeo.science',
     url='https://github.com/hydrogeoscience/pygtide',
