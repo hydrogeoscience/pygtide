@@ -16,7 +16,7 @@ Instructions:
  `conda install numpy pandas datetime requests git`
 * Download and install pygtide:
   * *Linux* or *MacOS*: <br />
-     **NOTE**: Make sure a suitable C++ and Fortran compiler is available.
+     **NOTE**: Make sure a suitable C++ and Fortran compiler are available.
      ```
      pip install pygtide
      ```
