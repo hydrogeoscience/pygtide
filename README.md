@@ -19,11 +19,14 @@ Instructions:
    ```
    pip install pygtide
    ```
+   **NOTE**: Make sure a suitable C++ and Fortran compiler is available.
+   
   * *Windows*:<br />
    ```
    pip install --global-option build_ext --global-option --compiler=mingw32 --global-option --fcompiler=gnu95 pygtide
    ```
-   *Note*: For Windows we recommend using the compilers integrated into Anaconda (i.e., Mingw32 and GNU95).
+   *Note*: For Windows we recommend using the compilers integrated into Anaconda (i.e., Mingw32 and GNU95 available [here](https://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win64/Personal%20Builds/mingw-builds/7.2.0/threads-posix/seh/)).<br />
+   Further help is available [here](https://itecnote.com/tecnote/compile-fortran-module-with-f2py-and-python-3-6-on-windows-10/).
    
 * Run tests: <br /> 
  ```
