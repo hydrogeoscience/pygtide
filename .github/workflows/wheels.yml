@@ -28,7 +28,7 @@ jobs:
       # this does not apply to tags
       fail-fast: false
       matrix:
-        os: [windows-2019]
+        os: [windows-2016]
         build: [cp37, cp38, cp39, cp310]
         exclude-flag:
           - ${{ github.ref_name == 'master' && github.event_name == 'push' }}
