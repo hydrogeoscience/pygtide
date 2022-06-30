@@ -19,6 +19,7 @@ jobs:
       CIBW_BEFORE_BUILD_MACOS: 'pip install numpy && ln -s /usr/local/bin/gfortran-11 /usr/local/bin/gfortran && gfortran --version'
       CIBW_BEFORE_BUILD_WINDOWS: 'pip install numpy && cd {package} && echo >> setup.cfg && echo [build_ext] >> setup.cfg && echo compiler=mingw32 >> setup.cfg  && echo fcompiler=gnu95 >> setup.cfg && cat setup.cfg'
       CIBW_BEFORE_BUILD_LINUX: pip install numpy
+      CIBW_ENVIRONMENT: SETUPTOOLS_USE_DISTUTILS=stdlib
       CIBW_BUILD_VERBOSITY: 1
       CIBW_TEST_COMMAND: python -c "import pygtide; pygtide.test(); pygtide.update(); pygtide.test()"
     strategy:
