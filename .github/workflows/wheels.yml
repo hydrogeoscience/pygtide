@@ -17,7 +17,8 @@ jobs:
       CIBW_BUILD: '${{ matrix.build }}-*'
       CIBW_SKIP: '*i686 *win32 *s390x *ppc64le *musllinux* *aarch64'
       CIBW_BEFORE_BUILD_MACOS: 'pip install numpy "setuptools<60" && ln -s /usr/local/bin/gfortran-11 /usr/local/bin/gfortran && gfortran --version'
-      CIBW_BEFORE_BUILD_WINDOWS: 'pip install numpy "setuptools<60" && cd {package} && echo >> setup.cfg && echo [build_ext] >> setup.cfg && echo compiler=mingw32 >> setup.cfg  && echo fcompiler=gnu95 >> setup.cfg && cat setup.cfg'
+      #CIBW_BEFORE_BUILD_WINDOWS: 'pip install numpy "setuptools<60" && cd {package} && echo >> setup.cfg && echo [build_ext] >> setup.cfg && echo compiler=mingw32 >> setup.cfg  && echo fcompiler=gnu95 >> setup.cfg && cat setup.cfg'
+      CIBW_BEFORE_BUILD_WINDOWS: 'pip install numpy "setuptools<60" && cd {package} && echo >> setup.cfg && echo [build_ext] >> setup.cfg && echo --inplace >> setup.cfg && echo compiler=mingw32 >> setup.cfg  && echo fcompiler=gnu95 >> setup.cfg && cat setup.cfg'
       #CIBW_BEFORE_BUILD_WINDOWS: 'pip install numpy "setuptools<60"'
       CIBW_BEFORE_BUILD_LINUX: 'pip install numpy "setuptools<60"'
       #CIBW_ENVIRONMENT: SETUPTOOLS_USE_DISTUTILS=stdlib

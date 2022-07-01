@@ -1,5 +1,6 @@
-import os.path
+import os
 import re
+import platform
 
 from numpy.distutils.core import setup, Extension
 
@@ -14,8 +15,11 @@ def find_version(*paths):
 
 
 VERSION = find_version('pygtide', '__init__.py')
-
-ext = [Extension(name='pygtide.etpred', sources=['src/etpred.f90'])]
+extra_link_args = None
+if platform.system() == 'Windows' and os.environ['CIBW_BUILD']:
+    extra_link_args = ('-static', '-static-libgfortran', '-static-libgcc')
+ext = [Extension(name='pygtide.etpred', sources=['src/etpred.f90'],
+                 extra_link_args=extra_link_args)]
 
 setup(
     name='pygtide',
