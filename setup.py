@@ -18,7 +18,6 @@ VERSION = find_version('pygtide', '__init__.py')
 extra_link_args = None
 if platform.system() == 'Windows' and os.environ['CIBW_BUILD']:
     # provide extra link args for wheel building on Windows
-    raise
     extra_link_args = ('-static', '-static-libgfortran', '-static-libgcc')
 ext = [Extension(name='pygtide.etpred', sources=['src/etpred.f90'],
                  extra_link_args=extra_link_args)]
