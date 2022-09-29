@@ -10,8 +10,8 @@ PyGTide is a Python module that wraps around ETERNA PREDICT 3.4 which is compile
 ## How to use
 
 There are two options:
-* Download and install (see below instructions)
-* Use our online calculator through <a href="https://groundwater.app/app.php?app=pygtide" target="_blank">groundwater.app</a>
+* Download and install on your system (see below instructions)
+* Via our online calculator: <a href="https://groundwater.app/app.php?app=pygtide" target="_blank">groundwater.app</a>
 
 
 ## How to install and run
