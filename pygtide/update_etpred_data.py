@@ -130,7 +130,7 @@ class update_etpred_db(object):
 
         if status:
             #%% read leap second history
-            dateparse = lambda x: dt.datetime.strptime(x, '%d %m %Y')
+            dateparse = lambda x: pd.to_datetime(x, format='%d %m %Y')
             leapsdf = pd.read_csv(leapsec_file, comment='#', header=None, parse_dates= {'date':[1,2,3]}, \
                     date_parser=dateparse, delimiter=r"\s+")
             leapsdf.columns = ['date', 'MJD', 'leaps']
@@ -139,22 +139,24 @@ class update_etpred_db(object):
             # insert row at the beginning
             leapsdf.loc[0] = [dt.datetime(1962,1,1), 10]
             leapsdf.sort_index(inplace=True)
+            
             #%% read historic pole coordinates
             # convert = {3: lambda x: np.around(np.float64(x), 3)}
-            dateparse = lambda x: dt.datetime.strptime(x, '%Y %m %d')
+            dateparse = lambda x: pd.to_datetime(x, format='%Y %m %d')
             iauhist = pd.read_csv(iauhist_file, skiprows=13, header=None, parse_dates= {'date':[0,1,2]}, \
                     date_parser=dateparse, delimiter=r"\s+", usecols=[0,1,2,3,4,5,6])
             iauhist.columns = ['date', 'MJD', 'x', 'y', 'UT1-UTC']
             #iauhist = iauhist.set_index('date')
 
             #%% read current pole coordinates
-            dateparse = lambda x,y,z: dt.datetime.strptime(x.zfill(2)+y.zfill(2)+z.zfill(2), '%y%m%d')
+            # dateparse = lambda x,y,z: pd.to_datetime(x.zfill(2)+y.zfill(2)+z.zfill(2), format='%y%m%d')
+            # convert = {'date': lambda x,y,z: pd.to_datetime(x.zfill(2)+y.zfill(2)+z.zfill(2), format='%y%m%d')}
             fw = [2,2,2,9,3,9,9,10,9,3,10,10]
-            iaucurr = pd.read_fwf(iaucurr_file, header=None, widths=fw, parse_dates={'date':[0,1,2]}, date_parser=dateparse, \
-                usecols=[0,1,2,3,5,7,10])
+            iaucurr = pd.read_fwf(iaucurr_file, header=None, widths=fw, usecols=[0,1,2,3,5,7,10])
+            iaucurr.iloc[:, 0] = pd.to_datetime(iaucurr.iloc[:, 0].astype(str).str.zfill(2) + '-' + iaucurr.iloc[:, 1].astype(str).str.zfill(2) + '-' + iaucurr.iloc[:, 2].astype(str).str.zfill(2), format='%y-%m-%d')
+            iaucurr.drop(iaucurr.columns[[1, 2]], axis=1, inplace=True)
             iaucurr.columns = ['date', 'MJD', 'x', 'y', 'UT1-UTC']
             #iaucurr = iaucurr.set_index('date')
-            #%%
             mask = (iaucurr['date'] > iauhist['date'].values[-1])
             # etpolut = iauhist.append(iaucurr[mask])
             etpolut = pd.concat([iauhist, iaucurr[mask]])
@@ -357,3 +359,5 @@ def update(msg=True):
     print(etddt.iloc[-10:, :])
     pt.update_etpolut1()
     print("---------------------")
+
+# update()
