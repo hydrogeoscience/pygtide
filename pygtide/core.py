@@ -322,7 +322,7 @@ class pygtide(object):
             raise ValueError('Longitude exceeds permissible range!')
         else:
             argsin[1] = longitude
-        if not (-10000 <= height <= 10000):
+        if not (-1000000 <= height <= 10000):
             raise ValueError('Height exceeds permissible range!')
         else:
             argsin[2] = height
