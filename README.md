@@ -18,7 +18,7 @@ There are two options:
 
 Instructions:
 * Download and install [*Anaconda*](https://www.anaconda.com/products/distribution) or [*Miniconda*](https://docs.conda.io/en/latest/miniconda.html)
-  * *Optional*: Create a new environment
+* Create a new environment with **Python 3.6** ([see Anaconda help](https://conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#activating-an-environment)). *Note that this package won't work for Python > 3.6 on Windows.*
 * Make sure the following packages are installed: <br />
  `conda install numpy pandas datetime requests git`
 * Download and install pygtide:
