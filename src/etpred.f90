@@ -330,13 +330,13 @@ module INOUT
     INTEGER :: FILEPRD,FILEPRN,SCROUT,ETPOL_START,ETPOL_END
     LOGICAL :: ISINIT
     ! CHARACTER(255) :: MESSAGE
-    CHARACTER(25), DIMENSION(6,25) :: HEADER
+    CHARACTER(25), DIMENSION(6) :: HEADER
     CHARACTER(8) :: ETPUNIT
     !CHARACTER(6), PARAMETER :: CREST='PyGTide'
     CHARACTER(7), PARAMETER :: CPROJ='PyGTide'
     CHARACTER(32), PARAMETER :: VERS='ETERNA PREDICT v3.4 (10/02/2013)'
     CHARACTER(10), PARAMETER :: FORTVERS='3.4 130210'
-    save
+    SAVE
 end module INOUT
 ! ##################################################################
 
@@ -346,9 +346,9 @@ subroutine INIT
     use PARAMS
     use DDT_MOD
     use INOUT
-    INTEGER IUN16,IUN27,IUN30,MYPOS,IOS,IPRINT
+    INTEGER :: MYPOS,IOS
     CHARACTER(100) TXT
-    DATA IUN16/16/,IUN30/30/,IUN27/27/,IPRINT/0/
+    INTEGER :: IUN16 = 16, IUN30 = 30, IUN27 = 27, IPRINT = 0
     ! find out the date limitations from the files for f2py to prevent calculation
     ! SUCCESS IN READING THE LAST LINE FROM ETPOLUT1.DAT FORMATTED
     OPEN(UNIT=IUN30,FILE=TRIM(COMDIR)//TRIM(ETPOLUTDAT),FORM='FORMATTED',&
@@ -412,6 +412,8 @@ SUBROUTINE PREDICT(ARGS)
       use INOUT
       IMPLICIT REAL(8) (D)
       REAL(8), DIMENSION(18), INTENT(IN) :: ARGS
+      INTEGER :: IUN14 = 14, IUN16 = 16, IUN23 = 23, IUN24 = 24, IUN27 = 27, IUN30 = 30, IUN31 = 31
+	  ! REAL(8) :: DZERO = 0.0D0
 !-GCR store control arguments
       DIMENSION DGI(6)
 !#######################################################################
@@ -427,8 +429,8 @@ SUBROUTINE PREDICT(ARGS)
       ! open a void stream to redirect output (if required)
       OPEN(UNIT=VOID,FILE=TRIM(NULLFILE),STATUS='OLD')
 !-GCR calculate row number and allocate new array
-      HEADER(1,:)='Date [UTC]'
-      HEADER(2,:)='Time [UTC]'
+      HEADER(1)='Date [UTC]'
+      HEADER(2)='Time [UTC]'
 !-GCR VERY IMPORTANT DIRECTIVE FOR F2PY (handover of control inputs from Python)
       ARGSIN = ARGS
 !#######################################################################
@@ -464,9 +466,7 @@ SUBROUTINE PREDICT(ARGS)
 !     22    2.002737    2.451943    2.005476      K2
 !     23    2.451944    7.000000    2.898410      M3M6
 !#######################################################################
-      DATA IUN14/14/,IUN16/16/,IUN23/23/,IUN24/24/,IUN27/27/
-      DATA IUN30/30/,IUN31/31/
-      DATA DZERO/4*0.D0/
+
 !#######################################################################
 !     Read project name:
 !#######################################################################
@@ -756,7 +756,11 @@ SUBROUTINE PREDICT(ARGS)
       ITIM=ITH*10000+ITMIN*100+ITSEC
 !-GCR end time fix
       WRITE(IUN23,17021) IDAT,ITIM,(DCOUT(JC),JC=1,NC)
-      IF(ITIM.EQ.0) WRITE(STDOUT,17021) IDAT,ITIM,(DCOUT(JC),JC=1,NC)
+      IF (SCROUT.EQ.1) THEN
+		IF(ITIM.EQ.0) THEN
+			WRITE(STDOUT,17021) IDAT,ITIM,(DCOUT(JC),JC=1,NC)
+		ENDIF
+      ENDIF
 !-GCR fill new array for handback to Python
       IF (ROWI.LE.NDAT) THEN
         ETPDATA(ROWI,1)=IDAT
@@ -766,10 +770,10 @@ SUBROUTINE PREDICT(ARGS)
       ! set header at first row once only
       IF (ROWI.EQ.1) THEN
         ETPUNIT=TRIM(ADJUSTL(CUNIT(IC2)))
-        HEADER(3,:)=TRIM(CHANNEL(1)) //' [' // TRIM(ADJUSTL(ETPUNIT)) // ']'
-        HEADER(4,:)=TRIM(CHANNEL(2)) //' [' // TRIM(ADJUSTL(ETPUNIT)) // ']'
-        HEADER(5,:)=TRIM(CHANNEL(3)) //' [' // TRIM(ADJUSTL(ETPUNIT)) // ']'
-        HEADER(6,:)=TRIM(CHANNEL(4)) //' [' // TRIM(ADJUSTL(ETPUNIT)) // ']'
+        HEADER(3)=TRIM(CHANNEL(1)) //' [' // TRIM(ADJUSTL(ETPUNIT)) // ']'
+        HEADER(4)=TRIM(CHANNEL(2)) //' [' // TRIM(ADJUSTL(ETPUNIT)) // ']'
+        HEADER(5)=TRIM(CHANNEL(3)) //' [' // TRIM(ADJUSTL(ETPUNIT)) // ']'
+        HEADER(6)=TRIM(CHANNEL(4)) //' [' // TRIM(ADJUSTL(ETPUNIT)) // ']'
         !WRITE (*,'(A20)') HEADER
       ENDIF
       ! advance row counter
@@ -1306,7 +1310,7 @@ SUBROUTINE ETDDTB(IUN16,IPRINT,DTUJD,DDT)
       use DDT_MOD
       IMPLICIT REAL(8) (D)
       IMPLICIT INTEGER (I-N)
-      DATA IWARN/1/,ITAB/1/
+      INTEGER :: IWARN = 1, ITAB = 1
       IF(DTUJD.LT.DDTTAB(2,NDDTAB)) GOTO 100
 !#######################################################################
 !     DTUJD exceeds last tabulated epoch DDTTAB(2,NDDTAB).
@@ -1679,7 +1683,7 @@ SUBROUTINE ETGCON(IUN16,IPRINT,DLAT,DLON,DH,DGRAV,DAZ,IC,DGK,DPK)
 !     DEA  is major semi axis in meter.
 !     DEE  is square of first excentricity (without dimension).
 !#######################################################################
-      DATA DEA/6378136.3D0/,DEE/6.69439795140D-3/
+      REAL(8) :: DEA = 6378136.3D0, DEE = 6.69439795140D-3
       IF(IPRINT.GT.0) WRITE(IUN16,17000) DEA,DEE
 !#######################################################################
 !     DCLAT is cos and DSLAT is sin of ellipsoidal latitude.
@@ -2091,7 +2095,7 @@ SUBROUTINE ETGREN(IUN16,DJULD,ITY,ITM,ITD,DTH,NERR)
       IMPLICIT REAL(8) (D)
       IMPLICIT INTEGER (I-N)
       SAVE
-      DATA DGREG/2299160.499999D0/
+      REAL(8) :: DGREG = 2299160.499999D0
       NERR=0
       IF(DJULD.LT.625307.D0.OR.DJULD.GT.2817153.D0) THEN
         NERR=1
@@ -2480,50 +2484,54 @@ SUBROUTINE ETLOVE(IUN16,IPRINT,DLAT,DELV)
       REAL(8) DL0(12),DLP(12),DLM(12)
       REAL(8) DLATP(12),DLATM(12)
       SAVE
+	  REAL(8) DEA, DEE
 !#######################################################################
 !     The following DATA statements are concerning the elastic
 !     Earth model for the different degree and order constituents.
 !     The latitude dependency is not given for all constituents in
 !     the Wahr-Dehant-Zschau model
 !#######################################################################
-      DATA DG0/1.1576D0,1.1542D0,1.1600D0,1.0728D0,1.0728D0,1.0728D0, &
-       1.0728D0,1.0363D0,1.0363D0,1.0363D0,1.0363D0,1.0363D0/
-      DATA DGP/-0.0016D0,-0.0018D0,-0.0010D0,0.D0,0.D0,0.D0,-0.0010D0, &
-       0.D0,0.D0,0.D0,0.D0,-0.000315D0/
-      DATA DGM/0.0054D0,0.D0,0.D0,0.D0,0.D0,0.D0,0.D0,0.D0,0.D0,0.D0, &
-       0.D0,0.D0/
-      DATA DH0/0.6165D0,0.6069D0,0.6133D0,0.2946D0,0.2946D0,0.2946D0, &
-       0.2946D0,0.1807D0,0.1807D0,0.1807D0,0.1807D0,0.1807D0/
-      DATA DHP/0.0007D0,0.0007D0,0.0005D0,0.D0,0.D0,0.D0,0.0003D0, &
-       0.D0,0.D0,0.D0,0.D0,0.00015D0/
-      DATA DHM/0.0018D0,0.D0,0.D0,0.D0,0.D0,0.D0,0.D0,0.D0,0.D0,0.D0, &
-       0.D0,0.D0/
-      DATA DK0/0.3068D0,0.3009D0,0.3034D0,0.0942D0,0.0942D0,0.0942D0, &
-       0.0942D0,0.0427D0,0.0427D0,0.0427D0,0.0427D0,0.0427D0/
-      DATA DKP/0.0015D0,0.0014D0,0.0009D0,0.D0,0.D0,0.D0,0.0007D0, &
-       0.D0,0.D0,0.D0,0.D0,0.00066D0/
-      DATA DKM/-0.0004D0,0.D0,0.D0,0.D0,0.D0,0.D0,0.D0,0.D0,0.D0,0.D0, &
-       0.D0,0.D0/
+      DG0 = [1.1576D0, 1.1542D0, 1.1600D0, 1.0728D0, 1.0728D0, 1.0728D0, &
+       1.0728D0, 1.0363D0, 1.0363D0, 1.0363D0, 1.0363D0, 1.0363D0]
+      DGP = [-0.0016D0, -0.0018D0, -0.0010D0, 0.D0, 0.D0, 0.D0, -0.0010D0, &
+        0.D0, 0.D0, 0.D0, 0.D0, -0.000315D0]
+      DGM = [0.0054D0, 0.D0, 0.D0, 0.D0, 0.D0, 0.D0, 0.D0, 0.D0, 0.D0, 0.D0, &
+        0.D0, 0.D0]
+      DH0 = [0.6165D0, 0.6069D0, 0.6133D0, 0.2946D0, 0.2946D0, 0.2946D0, &
+        0.2946D0, 0.1807D0, 0.1807D0, 0.1807D0, 0.1807D0, 0.1807D0]
+      DHP = [0.0007D0, 0.0007D0, 0.0005D0, 0.D0, 0.D0, 0.D0, 0.0003D0, &
+        0.D0, 0.D0, 0.D0, 0.D0, 0.00015D0]
+      DHM = [0.0018D0, 0.D0, 0.D0, 0.D0, 0.D0, 0.D0, 0.D0, 0.D0, 0.D0, 0.D0, &
+        0.D0, 0.D0]
+      DK0 = [0.3068D0, 0.3009D0, 0.3034D0, 0.0942D0, 0.0942D0, 0.0942D0, &
+        0.0942D0, 0.0427D0, 0.0427D0, 0.0427D0, 0.0427D0, 0.0427D0]
+      DKP = [0.0015D0, 0.0014D0, 0.0009D0, 0.D0, 0.D0, 0.D0, 0.0007D0, &
+        0.D0, 0.D0, 0.D0, 0.D0, 0.00066D0]
+      DKM = [-0.0004D0, 0.D0, 0.D0, 0.D0, 0.D0, 0.D0, 0.D0, 0.D0, 0.D0, 0.D0, &
+        0.D0, 0.D0]
+
 !#######################################################################
 !     Shida-numbers:
 !#######################################################################
-      DATA DL0/ 0.0840D0,0.0841D0,0.0852D0,0.0149D0,0.0149D0,0.0149D0, &
-       0.0149D0,0.0100D0,0.0100D0,0.0100D0,0.0100D0,0.0100D0/
-      DATA DLP/-0.002D0,-0.002D0,-0.001D0,0.0000D0,0.0000D0,0.0000D0, &
-       0.0000D0,0.0000D0,0.0000D0,0.0000D0,0.0000D0,0.0000D0/
-      DATA DLM/ 0.0000D0,0.0000D0,0.0000D0,0.0000D0,0.0000D0,0.0000D0, &
-       0.0000D0,0.0000D0,0.0000D0,0.0000D0,0.0000D0,0.0000D0/
-      DATA DLATP/0.D0,0.D0,0.D0,0.D0,0.D0,0.D0,0.D0,0.D0,0.D0,0.D0, &
-       0.D0,0.D0/
-      DATA DLATM/0.D0,0.D0,0.D0,0.D0,0.D0,0.D0,0.D0,0.D0,0.D0,0.D0, &
-       0.D0,0.D0/
+      DL0 = [0.0840D0, 0.0841D0, 0.0852D0, 0.0149D0, 0.0149D0, 0.0149D0, &
+       0.0149D0, 0.0100D0, 0.0100D0, 0.0100D0, 0.0100D0, 0.0100D0]
+      DLP = [-0.002D0, -0.002D0, -0.001D0, 0.0000D0, 0.0000D0, 0.0000D0, &
+        0.0000D0, 0.0000D0, 0.0000D0, 0.0000D0, 0.0000D0, 0.0000D0]
+      DLM = [0.0000D0, 0.0000D0, 0.0000D0, 0.0000D0, 0.0000D0, 0.0000D0, &
+		0.0000D0, 0.0000D0, 0.0000D0, 0.0000D0, 0.0000D0, 0.0000D0]
+      DLATP = [0.D0, 0.D0, 0.D0, 0.D0, 0.D0, 0.D0, 0.D0, 0.D0, 0.D0, 0.D0, &
+        0.D0, 0.D0]
+      DLATM = [0.D0, 0.D0, 0.D0, 0.D0, 0.D0, 0.D0, 0.D0, 0.D0, 0.D0, 0.D0, &
+        0.D0, 0.D0]
+
 !#######################################################################
 !     Definition of parameters of Geodetic Reference System 1980.
 !     DEA  is major semi axis in meter.
 !     DEE  is square of first excentricity (without dimnension).
 !     DEGM is geocentric gravitational constant in m*3/s**2.
 !#######################################################################
-      DATA DEA/6378137.00D0/,DEE/6.69438002290D-3/
+      DEA = 6378137.00D0
+	  DEE = 6.69438002290D-3
 !#######################################################################
 !     Define resonance frequency and resonance factors:
 !#######################################################################
@@ -2755,7 +2763,7 @@ SUBROUTINE ETPHAS(IUN16,IPRINT,IMODEL,DLON,DJULD)
       IMPLICIT INTEGER (I-N)
       REAL(8) DAS(11),DASP(11)
       SAVE
-      DATA IUN30/30/,IUN31/31/
+      INTEGER :: IUN30=30, IUN31=31				  
       IF(IPRINT.GT.0) WRITE(IUN16,17001) CMODEL(IMODEL)
  1000 CONTINUE
 !#######################################################################
@@ -2934,10 +2942,11 @@ SUBROUTINE ETPOLC(IUN16,IUN30,IUN31,IPRINT,DJULD,DCLAT,DSLAT, &
       IMPLICIT REAL(8) (D)
       IMPLICIT INTEGER (I-N)
       CHARACTER CHEAD(8)*10
-      SAVE
+	  SAVE	  
 	  ! frequency of earth rotation (rad/sec) / earth radius (m)
-      DATA DOM/7.292115D-5/,DA/6378137.D0/
-      DATA ISTART/1/,IMJDO/0/
+      REAL(8) :: DOM=7.292115D-5, DA=6378137.D0
+      INTEGER :: ISTART=1, IMJDO=0
+
       NERR=0
       IF(ISTART.EQ.0) GOTO 1000
 !#######################################################################
@@ -3271,7 +3280,7 @@ SUBROUTINE ETPOTS(IUN14,IUN16,IUN24,IPRINT,IMODEL,DLAT,DLON,DH, &
 !#######################################################################
       REAL(8) DELTA(25)
 !& increase maxnw
-      DATA IUN30/30/,IUN31/31/
+      INTEGER :: IUN30=30, IUN31=31
 !& increase cmodel
       IF(IPRINT.GT.0) WRITE(IUN16,17001) CMODEL(IMODEL)
       OPEN(UNIT=IUN14,FILE=TRIM(COMDIR)//TRIM(CFFILE(IMODEL)),FORM='FORMATTED',STATUS='OLD')

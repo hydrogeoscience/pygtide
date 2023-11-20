@@ -18,20 +18,22 @@ There are two options:
 
 Instructions:
 * Download and install [*Anaconda*](https://www.anaconda.com/products/distribution) or [*Miniconda*](https://docs.conda.io/en/latest/miniconda.html)
-* Create a new environment with **Python 3.6** ([see Anaconda help](https://conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#activating-an-environment)). *Note that this package won't work for Python > 3.6 on Windows.*
+
 * Make sure the following packages are installed: <br />
- `conda install numpy pandas datetime requests git`
+ `conda install numpy pandas requests git`
+ 
 * Download and install pygtide:
   * *Linux* or *MacOS*: <br />
-     **NOTE**: Make sure a suitable C++ and Fortran compiler are available.
+     **NOTE**: Make sure suitable C++ and Fortran compilers are available.
      ```
      pip install pygtide
      ```
    
   * *Windows*:<br />
-       **Note**: For Windows we recommend using the compilers integrated into Anaconda (i.e., Mingw32 and GNU95 available [here](https://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win64/Personal%20Builds/mingw-builds/7.2.0/threads-posix/seh/)). Further help is available [here](https://itecnote.com/tecnote/compile-fortran-module-with-f2py-and-python-3-6-on-windows-10/).
+       Download the correct wheel for your Python version (available for 3.8 to 3.11) from the subfolder "windows" onto your system.
+	   Then navigate your Anaconda explorer to the download location and execute:
      ```
-     pip install --global-option build_ext --global-option --compiler=mingw32 --global-option --fcompiler=gnu95 pygtide
+     pip install [wheel_name_depending_on_python_version]
      ```
    
 * Run tests: <br /> 

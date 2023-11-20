@@ -130,9 +130,8 @@ class update_etpred_db(object):
 
         if status:
             #%% read leap second history
-            dateparse = lambda x: pd.to_datetime(x, format='%d %m %Y')
             leapsdf = pd.read_csv(leapsec_file, comment='#', header=None, parse_dates= {'date':[1,2,3]}, \
-                    date_parser=dateparse, delimiter=r"\s+")
+                    date_format='%d %m %Y', delimiter=r"\s+")
             leapsdf.columns = ['date', 'MJD', 'leaps']
             leapsdf.drop(['MJD'], axis=1, inplace=True)
             leapsdf.index += 1
@@ -142,9 +141,8 @@ class update_etpred_db(object):
             
             #%% read historic pole coordinates
             # convert = {3: lambda x: np.around(np.float64(x), 3)}
-            dateparse = lambda x: pd.to_datetime(x, format='%Y %m %d')
             iauhist = pd.read_csv(iauhist_file, skiprows=13, header=None, parse_dates= {'date':[0,1,2]}, \
-                    date_parser=dateparse, delimiter=r"\s+", usecols=[0,1,2,3,4,5,6])
+                    date_format='%Y %m %d', delimiter=r"\s+", usecols=[0,1,2,3,4,5,6])
             iauhist.columns = ['date', 'MJD', 'x', 'y', 'UT1-UTC']
             #iauhist = iauhist.set_index('date')
 
@@ -314,8 +312,7 @@ C****************************************************************\n"""
         etddt = pd.read_csv(old_etddt_file, names=cols, skiprows=num, header=None, delimiter=r"\s+")
 
         #%% read leap second history
-        dateparse = lambda x: dt.datetime.strptime(x, '%d %m %Y')
-        leapsdf = pd.read_csv(leapsec_file, comment='#', header=None, parse_dates= {'date':[1,2,3]}, date_parser=dateparse, delimiter=r"\s+")
+        leapsdf = pd.read_csv(leapsec_file, comment='#', header=None, parse_dates= {'date':[1,2,3]}, date_format='%d %m %Y', delimiter=r"\s+")
         leapsdf.columns = ['date', 'MJD', 'leaps']
         # leapsdf = leapsdf.set_index('date')
         # DDT = delta-T + delta-UT = leaps + 32.184 s offset
@@ -360,4 +357,4 @@ def update(msg=True):
     pt.update_etpolut1()
     print("---------------------")
 
-# update()
+update()
