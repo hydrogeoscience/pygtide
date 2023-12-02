@@ -1,5 +1,6 @@
-import os.path
+import os
 import re
+import platform
 
 from numpy.distutils.core import setup, Extension
 
@@ -14,9 +15,12 @@ def find_version(*paths):
 
 
 VERSION = find_version('pygtide', '__init__.py')
-
-ext = [Extension(name='pygtide.etpred',
-                 sources=['src/etpred.f90'])]
+extra_link_args = None
+if platform.system() == 'Windows' and os.environ['CIBW_BUILD']:
+    # provide extra link args for wheel building on Windows
+    extra_link_args = ('-static', '-static-libgfortran', '-static-libgcc')
+ext = [Extension(name='pygtide.etpred', sources=['src/etpred.f90'],
+                 extra_link_args=extra_link_args)]
 
 setup(
     name='pygtide',
@@ -24,7 +28,7 @@ setup(
     packages=['pygtide'],
     package_data={'pygtide': ['commdat/*']},
     ext_modules=ext,
-    install_requires=['numpy', 'pandas','requests'],
+    install_requires=['numpy', 'pandas'],
     author='Gabriel C. Rau, Tom Eulenfeld',
     author_email='gabriel@hydrogeo.science',
     url='https://github.com/hydrogeoscience/pygtide',
