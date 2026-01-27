@@ -9,7 +9,7 @@ build-backend = "mesonpy"
 
 [project]
 name = "pygtide"
-version = "0.81"
+version = "0.8.0
 description = "A Python module and wrapper for ETERNA PREDICT to compute gravitational tides on Earth"
 readme = "README.md"
 license = {text = "MPL-2.0"}
