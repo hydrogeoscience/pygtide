@@ -1,3 +1,5 @@
+v0.8.0:
+  * modernisation of update script and test script and build system by Craig Miller, ESNZ.
 v0.7.1:
   * record length was corrected
   * length of day (LOD) tide is now properly interpolated
