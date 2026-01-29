@@ -19,7 +19,7 @@ jobs:
       - uses: fortran-lang/setup-fortran@v1
         id: setup-fortran
         with:
-          compiler: gcc
+          compiler: ${{ startsWith(matrix.os, 'windows') && 'ifx' || 'gcc' }}
       - name: setup conda
         uses: conda-incubator/setup-miniconda@v3
         with:
