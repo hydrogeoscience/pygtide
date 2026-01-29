@@ -19,13 +19,16 @@ jobs:
       - uses: fortran-lang/setup-fortran@v1
         id: setup-fortran
         with:
-          compiler: ${{ startsWith(matrix.os, 'windows') && 'ifx' || 'gcc' }}
+          compiler: gcc
       - name: setup conda
         uses: conda-incubator/setup-miniconda@v3
         with:
           python-version: ${{ matrix.python }}
           auto-update-conda: true
           environment-file: .github/test_conda_env.yml
+      - name: install gfortran runtime (Windows)
+        if: runner.os == 'Windows'
+        run: conda install -y -c conda-forge gfortran
       - name: print conda environment info
         run: |
           conda info -a
