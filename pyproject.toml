@@ -13,6 +13,7 @@ name = "pygtide"
 version = "0.8.0"
 description = "A Python module and wrapper for ETERNA PREDICT to compute gravitational tides on Earth"
 readme = "README.md"
+license = "MPL-2.0"
 requires-python = ">=3.8"
 authors = [
     { name = "Gabriel C. Rau", email = "gabriel@hydrogeo.science" },
@@ -26,7 +27,6 @@ dependencies = [
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Science/Research",
-    "License :: OSI Approved :: Mozilla Public License 2.0 (MPL 2.0)",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.8",
