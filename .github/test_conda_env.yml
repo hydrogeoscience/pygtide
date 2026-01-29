@@ -4,4 +4,4 @@ channels:
 dependencies:
   - numpy
   - pandas
-  - fortran-compiler
+  - requests
