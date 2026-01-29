@@ -86,6 +86,7 @@ class update_etpred_db(object):
         start = tt.time()
         if status:
             try:
+                print("Start downloading: {:s} ...".format(self.leapsec_rfile))
                 urllib.request.urlopen(self.leapsec_rfile)
             except OSError as error:
                 print(
@@ -97,13 +98,13 @@ class update_etpred_db(object):
                 status = False
                 pass
             else:
-                print("Start downloading: {:s} ...".format(self.leapsec_rfile))
                 urllib.request.urlretrieve(self.leapsec_rfile, leapsec_file)
                 end = tt.time()
                 print("Finished downloading ({:.1f} s).".format((end - start)))
 
         if status:
             try:
+                print("Start downloading: {:s} ...".format(self.iauhist_rfile))
                 urllib.request.urlopen(self.iauhist_rfile)
             except OSError as error:
                 print(
@@ -115,13 +116,13 @@ class update_etpred_db(object):
                 status = False
                 pass
             else:
-                print("Start downloading: {:s} ...".format(self.iauhist_rfile))
                 urllib.request.urlretrieve(self.iauhist_rfile, iauhist_file)
                 end = tt.time()
                 print("Finished downloading ({:.1f} s).".format((end - start)))
 
         if status:
             try:
+                print("Start downloading: {:s} ...".format(self.iaucurr_rfile))
                 urllib.request.urlopen(self.iaucurr_rfile)
             except OSError as error:
                 print(
@@ -133,7 +134,6 @@ class update_etpred_db(object):
                 status = False
                 pass
             else:
-                print("Start downloading: {:s} ...".format(self.iaucurr_rfile))
                 urllib.request.urlretrieve(self.iaucurr_rfile, iaucurr_file)
                 end = tt.time()
                 print("Finished downloading ({:.1f} s).".format((end - start)))
@@ -400,13 +400,13 @@ C****************************************************************\n"""
         # %% download leap second history
         start = tt.time()
         try:
+            print("Start downloading: {:s} ...".format(leapsec_file.as_posix()))
             urllib.request.urlopen(self.leapsec_rfile)
         except OSError as error:
             print("ERROR: Could not connect to remote server!")
             print("MESSAGE: {0}.".format(error))
             pass
         else:
-            print("Start downloading: {:s} ...".format(leapsec_file.as_posix()))
             urllib.request.urlretrieve(self.leapsec_rfile, leapsec_file)
             end = tt.time()
             print("Finished downloading ({:.1f} s).".format((end - start)))
