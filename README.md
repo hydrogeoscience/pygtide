@@ -33,25 +33,28 @@ pip install [wheel_name_depending_on_python_version]
 #### Option 2: Build from source (Linux, macOS, Windows; Python 3.8–3.14)
 
 **Requirements for building:**
-- A Fortran compiler (e.g., `gfortran` via MinGW on Windows; included in Linux/macOS gcc toolchains)
+- A Fortran compiler (e.g., `gfortran` via MinGW on Windows; included in Linux/macOS gcc toolchains) `conda install gfortran`
 - Meson build system: automatically installed via `pip` (see below)
 - Ninja (optional but recommended): `conda install ninja` or `pip install ninja`
 
-**Install from GitHub:**
+**Clone repo from git:**
 ```bash
-pip install git+https://github.com/hydrogeoscience/pygtide.git
+git clone https://github.com/hydrogeoscience/pygtide.git
 ```
 
 **Install from local repository:**
 ```bash
 cd /path/to/pygtide
-pip install -e .
+python setup.py
 ```
 
 If Meson or Ninja are missing, pip will attempt to install them automatically. For faster builds, pre-install them:
 ```bash
 pip install meson-python meson ninja
 ```
+
+Add the repo path to your pythonpath.
+
 
 ### After installation
 

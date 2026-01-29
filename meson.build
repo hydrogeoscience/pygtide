@@ -1,71 +1,74 @@
 project('pygtide', 'fortran',
-  version : '0.81',
-  license : 'MPL-2.0',
+  version : '0.8.0',
   meson_version : '>=1.1.0',
 )
 
-# Get Python installation
 py = import('python').find_installation()
 
-# Determine file extension based on OS
 host_os = host_machine.system()
+fc = meson.get_compiler('fortran')
+
 if host_os == 'windows'
   ext = 'pyd'
+  if fc.get_id() == 'msvc'
+    f90flags = ['/O2']
+  else
+    f90flags = ['-O3']
+  endif
 else
   ext = 'so'
+  f90flags = ['-fPIC', '-O3']
 endif
 
-# Source file
 src = 'src/etpred.f90'
+f90_flag_args = ['--f90flags=' + ' '.join(f90flags)]
 
-# Build the Fortran extension module using f2py
-# f2py generates a version-specific filename like etpred.cp314-win_amd64.pyd
-etpred_module = custom_target(
+# --------------------------------------------------
+# 1. Build f2py (ABI-tagged output)
+# --------------------------------------------------
+etpred_build = custom_target(
   'etpred_build',
   input : src,
-  output : 'etpred.' + ext,
+  output : 'etpred.build.stamp',
   command : [
     py,
     '-m', 'numpy.f2py',
     '-c',
-    '--f90flags=-fPIC -O3',
+  ] + f90_flag_args + [
     '-m', 'etpred',
     '@INPUT@',
   ],
   build_by_default : true,
 )
 
-# Final copy: after the module is built, copy the versioned file into the
-# package directory with a stable name `pygtide/etpred.{ext}` so imports work.
-copy_code = 'import glob,shutil,os; os.chdir(os.environ.get("MESON_SOURCE_ROOT","../..")); files=glob.glob(os.path.join("build","**","etpred*.' + ext + '"),recursive=True); files and shutil.copy(files[0],os.path.join("pygtide","etpred.' + ext + '")) and print("Copied to pygtide/etpred.' + ext + '")'
+# --------------------------------------------------
+# 2. Copy ABI module → pygtide/etpred.pyd
+# --------------------------------------------------
+copy_code = '''
+import glob, os, shutil, sys
 
-final_copy = custom_target(
-  'copy_etpred_final',
-  input : etpred_module,
-  output : 'copy_etpred.stamp',
+build_dir = os.getcwd()
+src_root = r"@0@"
+
+pattern = os.path.join(build_dir, '**', 'etpred*.@1@')
+matches = glob.glob(pattern, recursive=True)
+
+if not matches:
+    print("ERROR: etpred ABI module not found")
+    sys.exit(1)
+
+dst = os.path.join(src_root, 'pygtide', 'etpred.@1@')
+shutil.copy(matches[0], dst)
+print(f"Copied {matches[0]} -> {dst}")
+'''.format(
+  meson.project_source_root(),
+  ext
+)
+
+custom_target(
+  'copy_etpred',
+  input : etpred_build,
+  output : 'etpred.copy.stamp',
   command : [py, '-c', copy_code],
   build_by_default : true,
-  depends : etpred_module,
-)
-
-# Install package data (commdat files)
-install_subdir(
-  'pygtide/commdat',
-  install_dir : py.get_install_dir() / 'pygtide',
-  exclude_files : ['.gitkeep']
-)
-
-# Install the .pyd/.so file that was copied to pygtide/ by the copy_etpred_final target
-install_data(
-  'pygtide/etpred.' + ext,
-  install_dir : py.get_install_dir() / 'pygtide',
-)
-
-# Install Python source files
-install_data(
-  'pygtide/__init__.py',
-  'pygtide/core.py',
-  'pygtide/tests.py',
-  'pygtide/update_etpred_data.py',
-  install_dir : py.get_install_dir() / 'pygtide',
 )
