@@ -19,23 +19,22 @@ There are two options:
 * Download and install [*Anaconda*](https://www.anaconda.com/products/distribution) or [*Miniconda*](https://docs.conda.io/en/latest/miniconda.html)
 * Install required packages:
   ```
-  conda install numpy pandas requests git
+  conda install numpy pandas requests
   ```
 
 ### Installation options
 
-#### Option 1: Pre-built wheels (Windows, Python 3.8–3.11)
-Download the correct wheel for your Python version from the `windows/` subfolder and install:
-```powershell
-pip install [wheel_name_depending_on_python_version]
+#### Option 1: Install and compile source distribution from PyPi (Linux, macOS, Windows; Python 3.8–3.14)
+
+```bash
+pip install pygtide
 ```
 
-#### Option 2: Build from source (Linux, macOS, Windows; Python 3.8–3.14)
+#### Option 2: Build from source locally (Linux, macOS, Windows; Python 3.8–3.14)
 
 **Requirements for building:**
 - A Fortran compiler (e.g., `gfortran` via MinGW on Windows; included in Linux/macOS gcc toolchains) `conda install gfortran`
-- Meson build system: automatically installed via `pip` (see below)
-- Ninja (optional but recommended): `conda install ninja` or `pip install ninja`
+- Meson build system with ninja: automatically installed via `pip`
 
 **Clone repo from git:**
 ```bash
@@ -46,14 +45,18 @@ git clone https://github.com/hydrogeoscience/pygtide.git
 ```bash
 cd /path/to/pygtide
 
-python build.py
-
-pip install . --no-build-isolation
+pip install .
 ```
 
 If Meson or Ninja are missing, pip will attempt to install them automatically. For faster builds, pre-install them:
 ```bash
 pip install meson-python meson ninja
+```
+
+#### Option 3: Pre-built wheels (Windows, Python 3.8–3.11)
+Download the correct wheel for your Python version from the `windows/` subfolder and install:
+```powershell
+pip install [wheel_name_depending_on_python_version]
 ```
 
 ### After installation
