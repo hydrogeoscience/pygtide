@@ -105,7 +105,7 @@ class update_etpred_db(object):
         if status:
             try:
                 print("Start downloading: {:s} ...".format(self.iauhist_rfile))
-                urllib.request.urlopen(self.iauhist_rfile)
+                urllib.request.urlopen(self.iauhist_rfile, timeout=1)
             except OSError as error:
                 print(
                     "ERROR: Could not connect to remote server: {:s}".format(
