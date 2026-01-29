@@ -420,7 +420,7 @@ C****************************************************************\n"""
             regex = re.compile(r"^\s*updated\s*\:.*$", re.IGNORECASE)
             for num, line in enumerate(f, 1):
                 line = regex.sub(
-                    "Updated    : %s" % dt.datetime.now(dt.UTC).strftime("%d/%m/%Y"),
+                    "Updated    : %s" % dt.datetime.now(dt.timezone.utc).strftime("%d/%m/%Y"),
                     line,
                 )
                 header.append(line)
