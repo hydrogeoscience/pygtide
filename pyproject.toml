@@ -1,27 +1,25 @@
 [build-system]
 requires = [
-    "meson-python",
-    "meson>=1.1.0",
-    "ninja",
-    "numpy>=1.21.0",
+    "setuptools>=61",
+    "wheel",
+    "numpy>=1.21.0"
 ]
-build-backend = "mesonpy"
+build-backend = "setuptools.build_meta"
 
 [project]
 name = "pygtide"
-version = "0.8.0
+version = "0.8.0"
 description = "A Python module and wrapper for ETERNA PREDICT to compute gravitational tides on Earth"
 readme = "README.md"
-license = {text = "MPL-2.0"}
-authors = [
-    {name = "Gabriel C. Rau", email = "gabriel@hydrogeo.science"},
-    {name = "Tom Eulenfeld"},
-]
 requires-python = ">=3.8"
+authors = [
+    { name = "Gabriel C. Rau", email = "gabriel@hydrogeo.science" },
+    { name = "Tom Eulenfeld" }
+]
 dependencies = [
     "numpy>=1.21.0",
     "pandas",
-    "requests",
+    "requests"
 ]
 classifiers = [
     "Development Status :: 4 - Beta",
@@ -36,7 +34,7 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: 3.14",
-    "Topic :: Scientific/Engineering :: Physics",
+    "Topic :: Scientific/Engineering :: Physics"
 ]
 
 [project.urls]
@@ -44,3 +42,13 @@ Homepage = "https://github.com/hydrogeoscience/pygtide"
 Documentation = "https://hydrogeo.science"
 Repository = "https://github.com/hydrogeoscience/pygtide.git"
 Issues = "https://github.com/hydrogeoscience/pygtide/issues"
+
+# ----------------------------
+# Setuptools-specific configuration
+# ----------------------------
+[tool.setuptools]
+packages = ["pygtide"]             # <-- move packages here
+include-package-data = true        # include package data
+
+[tool.setuptools.package-data]
+pygtide = ["etpred.*", "commdat/*"]

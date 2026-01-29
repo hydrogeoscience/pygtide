@@ -45,16 +45,16 @@ git clone https://github.com/hydrogeoscience/pygtide.git
 **Install from local repository:**
 ```bash
 cd /path/to/pygtide
-python setup.py
+
+python build.py
+
+pip install . --no-build-isolation
 ```
 
 If Meson or Ninja are missing, pip will attempt to install them automatically. For faster builds, pre-install them:
 ```bash
 pip install meson-python meson ninja
 ```
-
-Add the repo path to your pythonpath.
-
 
 ### After installation
 
