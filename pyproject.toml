@@ -22,7 +22,6 @@ authors = [
 dependencies = [
     "numpy>=1.21.0",
     "pandas",
-    "requests"
 ]
 classifiers = [
     "Development Status :: 4 - Beta",
