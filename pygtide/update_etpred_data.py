@@ -288,7 +288,7 @@ Leap sec.: $5$
 Date     Time   MJD         x         y       UT1-UTC   TAI-UT1
                            ["]       ["]      [sec]     [sec]
 C****************************************************************\n"""
-            header = header.replace("$1$", dt.datetime.now(dt.UTC).strftime("%d/%m/%Y"))
+            header = header.replace("$1$", dt.datetime.now(dt.timezone.utc).strftime("%d/%m/%Y"))
             header = header.replace(
                 "$2$",
                 etpolut["date"].iloc[0].strftime("%d/%m/%Y")
