@@ -1,48 +1,35 @@
 # setup.py
+from pathlib import Path
 import sys
-import os
-from setuptools import setup, Extension, find_packages
+
+from setuptools import setup, Extension
+
 
 # Detect platform-specific ABI extension
-ext = '.pyd' if sys.platform.startswith('win') else '.so'
-etpred_path = os.path.join('pygtide', f'etpred{ext}')
+HERE = Path(__file__).resolve().parent
 
-if not os.path.exists(etpred_path):
-    raise FileNotFoundError(f"Prebuilt ABI module not found: {etpred_path}\n"
-                            "Run build.py first to generate it.")
+ext = '.pyd' if sys.platform.startswith('win') else '.so'
+etpred_path = HERE / 'pygtide' / f'etpred{ext}'
+
+if etpred_path.exists():
+    print(f"Use ABI module {etpred_path}")
+else:
+    print(f"Prebuilt ABI module not found: {etpred_path}\n"
+            "Run build_pygtide_abi.py")
+    sys.path.insert(0, str(HERE))
+    import build_pygtide_abi
+    build_pygtide_abi.build()
+    if not etpred_path.exists():
+        raise FileNotFoundError(f"No ABI module, error in Meson build")
+
 
 # Define the prebuilt extension
 etpred_module = Extension(
     name='pygtide.etpred',
     sources=[],               # No sources; using prebuilt ABI
-    extra_objects=[etpred_path],
+    extra_objects=[str(etpred_path)],
 )
 
-# Setup configuration
-setup(
-    name='pygtide',
-    version='0.8.0',
-    description='A Python module and wrapper for ETERNA PREDICT to compute gravitational tides on Earth',
-    author='Gabriel C. Rau',
-    author_email='gabriel@hydrogeo.science',
-    packages=find_packages(),  # finds 'pygtide'
-    #ext_modules=[etpred_module],
-    include_package_data=True,  # ensures any package data is included
-    package_data={
-        'pygtide': ['etpred.*', 'commdat/*'],
-    },
-    python_requires='>=3.8',
-    install_requires=[
-        'numpy>=1.21.0',
-        'pandas',
-        'requests',
-    ],
-    classifiers=[
-        "Development Status :: 4 - Beta",
-        "Intended Audience :: Science/Research",
-        "License :: OSI Approved :: Mozilla Public License 2.0 (MPL 2.0)",
-        "Operating System :: OS Independent",
-        "Programming Language :: Python :: 3",
-        "Topic :: Scientific/Engineering :: Physics",
-    ],
-)
+
+# Metadata pulled from pyproject.toml
+setup()
