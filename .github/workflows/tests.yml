@@ -15,11 +15,7 @@ jobs:
             python: "3.10"
         include:
           - os: windows-latest
-            python: "3.11"
-          - os: windows-latest
             python: "3.12"
-          - os: windows-latest
-            python: "3.13"
     runs-on: ${{ matrix.os }}
     defaults:
       run:
