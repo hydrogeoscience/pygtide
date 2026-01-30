@@ -4,8 +4,10 @@ requires = [
     "wheel",
     "numpy>=1.21.0",
     "meson",
+#    "meson-python",
     "ninja"
 ]
+#build-backend = 'mesonpy'
 build-backend = "setuptools.build_meta"
 
 [project]
