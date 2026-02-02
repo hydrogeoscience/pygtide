@@ -90,83 +90,110 @@ The original Fortran code was also modified for use with f2py:
     sampling rate was lower than 60 seconds. This was successfully fixed.
 ===============================================================================
 """
+
 import pygtide.etpred as etpred
 from datetime import datetime, timedelta, date
 from warnings import warn
 import numpy as np
 import pandas as pd
-from pkg_resources import resource_filename
+from importlib import resources
 import os
+
 
 class pygtide(object):
     """
     The PyGTide class will initialise internal variables
     """
+
     def __init__(self, msg=True):
         """
         pygtide.init() initialises the etpred (Fortran) module and sets global variables
         """
         self.msg = msg
         self.fortran_version = etpred.inout.vers.astype(str)
-        self.data_dir = resource_filename('pygtide', 'commdat/')
-        etpred.params.comdir = self.data_dir + ' ' * (256 - len(self.data_dir))
-        # set OS dependent module output
-        etpred.params.nullfile = os.devnull + ' ' * (10 - len(os.devnull))
+        # Resolve package data directory directly from filesystem.
+        # Avoid importlib.resources.as_file() which creates temp dirs that get cleaned up.
+        pkg_dir = os.path.dirname(__file__)
+        self.data_dir = os.path.join(pkg_dir, "commdat")
+        if not self.data_dir.endswith(os.sep):
+            self.data_dir += os.sep
+
+        # Fortran expects a fixed-length string (256 chars)
+        etpred.params.comdir = self.data_dir + " " * (256 - len(self.data_dir))
+
+        # OS-dependent null file
+        etpred.params.nullfile = os.devnull + " " * (10 - len(os.devnull))
+
         self.args = []
-        # set some common variables for external access
+
+        # Initialise Fortran module
         etpred.init()
+
         # capture end date of file "etddt.dat" from module
         year = int(etpred.inout.etd_start)
         self.etddt_start = datetime(year, 1, 1)
         year = etpred.inout.etd_end
-        self.etddt_end = (datetime(int(year), 1, 1) + timedelta(days=(year - int(year)) * 365))
+        self.etddt_end = datetime(int(year), 1, 1) + timedelta(
+            days=(year - int(year)) * 365
+        )
+
         # capture end date of file "etpolut1.dat" from module
         self.etpolut1_start = datetime.strptime(str(etpred.inout.etpol_start), "%Y%m%d")
         self.etpolut1_end = datetime.strptime(str(etpred.inout.etpol_end), "%Y%m%d")
 
-        self.headers = np.char.strip(etpred.inout.header.astype('str'))
+        self.headers = np.char.strip(etpred.inout.header.astype("str"))
         # self.units = ['(m/s)**2','nm/s**2','mas','mm','mm','nstr','nstr','nstr','nstr','nstr','mm']
         self.exec = False
 
-        self.wavegroup_def = np.asarray([[0, 10, 1., 0.]])
+        self.wavegroup_def = np.asarray([[0, 10, 1, 0.0]])
         self.set_wavegroup(self.wavegroup_def)
 
-    #%% sync the Python object
+    # %% sync the Python object
     def update(self):
         """
         self.update() refreshes the variables of PyGTide based on the Fortran module etpred
         """
-        self.headers = np.char.strip(etpred.inout.header.astype('str'))
+        self.headers = np.char.strip(etpred.inout.header.astype("str"))
         self.args = etpred.inout.argsin
-        self.unit = etpred.inout.etpunit.astype('str')
+        self.unit = etpred.inout.etpunit.astype("str")
 
-    #%% set wave group parameters
+    # %% set wave group parameters
     def set_wavegroup(self, wavedata=None):
-        if (wavedata is None):
+        if wavedata is None:
             wavedata = self.wavegroup_def
         # require at least 4 columns
-        if (wavedata.shape[1] != 4):
+        if wavedata.shape[1] != 4:
             raise ValueError("The wave group input must have 4 columns!")
             return False
         # require frequency ranges to increase and not overlap
         freq_diffs = np.diff(wavedata[:, 0:1].flatten())
-        if ((freq_diffs < 0).any()):
-            raise ValueError("Wave group frequency ranges must be increasing and not overlapping!")
+        if (freq_diffs < 0).any():
+            raise ValueError(
+                "Wave group frequency ranges must be increasing and not overlapping!"
+            )
             return False
-        if ((wavedata[:, 2] < 0).any()):
+        if (wavedata[:, 2] < 0).any():
             raise ValueError("Amplitude factors must be positive!")
             return False
         # set the wave group parameters
-        etpred.waves(wavedata[:, 0], wavedata[:, 1], wavedata[:, 2], wavedata[:, 3], int(wavedata.shape[0]))
+        etpred.waves(
+            wavedata[:, 0],
+            wavedata[:, 1],
+            wavedata[:, 2],
+            wavedata[:, 3],
+            int(wavedata.shape[0]),
+        )
         return True
 
-    #%% reset the wave group
+    # %% reset the wave group
     def reset_wavegroup(self):
         self.set_wavegroup(self.wavegroup_def)
         return True
 
     # run module etpred and return numbers
-    def predict(self, latitude, longitude, height, startdate, duration, samprate, **control):
+    def predict(
+        self, latitude, longitude, height, startdate, duration, samprate, **control
+    ):
         """
         self.predict(latitude, longitude, height, startdate, duration, samprate, **control):
         -------------------------------------------------------------------------------
@@ -256,77 +283,77 @@ class pygtide(object):
         # tidal catalog
         argsin[10] = 8
         # amplitude truncation
-        argsin[12] = 1.0E-10
+        argsin[12] = 1.0e-10
         # values from: https://dx.doi.org/10.1016/j.jog.2005.08.035
         argsin[13] = 1.16
         argsin[14] = 1.16
 
         # iterate through optional arguments passed
-        if 'statgravit' in control:
-            if not (0 <= control['statgravit'] <= 20):
-                raise ValueError('Station gravity exceeds permissible range!')
+        if "statgravit" in control:
+            if not (0 <= control["statgravit"] <= 20):
+                raise ValueError("Station gravity exceeds permissible range!")
             else:
-                argsin[8] = control['statgravit']
-        if 'statazimut' in control:
-            if not (0 <= control['statazimut'] <= 180):
-                raise ValueError('Statazimut exceeds permissible range!')
+                argsin[8] = control["statgravit"]
+        if "statazimut" in control:
+            if not (0 <= control["statazimut"] <= 180):
+                raise ValueError("Statazimut exceeds permissible range!")
             else:
-                argsin[9] = control['statazimut']
-        if 'tidalpoten' in control:
-            if control['tidalpoten'] not in range(1,9):
-                raise ValueError('Tidalpoten must be an integer between 1 and 8!')
+                argsin[9] = control["statazimut"]
+        if "tidalpoten" in control:
+            if control["tidalpoten"] not in range(1, 9):
+                raise ValueError("Tidalpoten must be an integer between 1 and 8!")
             else:
-                argsin[10] = control['tidalpoten']
-        if 'tidalcompo' in control:
-            if control['tidalcompo'] not in range(-1,10):
-                raise ValueError('Tidalcompo must be an integer between -1 and 9!')
+                argsin[10] = control["tidalpoten"]
+        if "tidalcompo" in control:
+            if control["tidalcompo"] not in range(-1, 10):
+                raise ValueError("Tidalcompo must be an integer between -1 and 9!")
             else:
-                argsin[11] = control['tidalcompo']
-        if 'amtruncate' in control:
-            if not (0 <= control['amtruncate']):
-                raise ValueError('Amtruncate must be greater than 0!')
+                argsin[11] = control["tidalcompo"]
+        if "amtruncate" in control:
+            if not (0 <= control["amtruncate"]):
+                raise ValueError("Amtruncate must be greater than 0!")
             else:
-                argsin[12] = control['amtruncate']
-        if 'poltidecor' in control:
-            if not (control['poltidecor'] >= 0):
-                raise ValueError('Poltidecor must be >= 0!')
+                argsin[12] = control["amtruncate"]
+        if "poltidecor" in control:
+            if not (control["poltidecor"] >= 0):
+                raise ValueError("Poltidecor must be >= 0!")
             else:
-                argsin[13] = control['poltidecor']
-        if 'lodtidecor' in control:
-            if not (control['lodtidecor'] >= 0):
-                raise ValueError('Lodtidecor must be >= 0!')
+                argsin[13] = control["poltidecor"]
+        if "lodtidecor" in control:
+            if not (control["lodtidecor"] >= 0):
+                raise ValueError("Lodtidecor must be >= 0!")
             else:
-                argsin[14] = control['lodtidecor']
+                argsin[14] = control["lodtidecor"]
         # additional control parameters
-        if 'fileprd' in control:
-            if control['fileprd'] not in range(0,2):
-                raise ValueError('Fileprd flag must be 0 or 1!')
+        if "fileprd" in control:
+            if control["fileprd"] not in range(0, 2):
+                raise ValueError("Fileprd flag must be 0 or 1!")
             else:
-                argsin[15] = control['fileprd']
-        if 'fileprn' in control:
-            if control['fileprn'] not in range(0,2):
-                raise ValueError('Fileprn flag must be 0 or 1!')
+                argsin[15] = control["fileprd"]
+        if "fileprn" in control:
+            if control["fileprn"] not in range(0, 2):
+                raise ValueError("Fileprn flag must be 0 or 1!")
             else:
-                argsin[16] = control['fileprn']
-        if 'screenout' in control:
-            if control['screenout'] not in range(0,2):
-                raise ValueError('Screenout flag must be 0 or 1!')
+                argsin[16] = control["fileprn"]
+        if "screenout" in control:
+            if control["screenout"] not in range(0, 2):
+                raise ValueError("Screenout flag must be 0 or 1!")
             else:
-                argsin[17] = control['screenout']
+                argsin[17] = control["screenout"]
         # process required parameters here
         if not (-90 <= latitude <= 90):
-            raise ValueError('Latitude exceeds permissible range!')
+            raise ValueError("Latitude exceeds permissible range!")
         else:
             argsin[0] = latitude
         if not (-180 <= longitude <= 180):
-            raise ValueError('Longitude exceeds permissible range!')
+            raise ValueError("Longitude exceeds permissible range!")
         else:
             argsin[1] = longitude
         if not (-500 <= height <= 5000):
-            raise ValueError('Height exceeds permissible range!')
+            raise ValueError("Height exceeds permissible range!")
         else:
             argsin[2] = height
-        if not (0 <  duration <= 10*24*365):
+        if not (0 < duration <= 10 * 24 * 365):
             raise ValueError("Duration exceeds permissible range!")
         else:
             argsin[6] = int(duration)
@@ -336,37 +363,51 @@ class pygtide(object):
             try:
                 startdate = datetime.strptime(startdate, "%Y-%m-%d")
             except ValueError:
-                raise ValueError("Startdate has incorrect format (YYYY-MM-DD)!" )
+                raise ValueError("Startdate has incorrect format (YYYY-MM-DD)!")
         enddate = startdate + timedelta(hours=duration)
         # check if requested prediction series exceeds permissible time
-        if (startdate < self.etddt_start):
+        if startdate < self.etddt_start:
             fname = str(etpred.params.etddtdat)
-            warn("Prediction timeframe is earlier than the available time database (%s). "
-                 "For details refer to the file '%s'." % (self.etddt_start, fname))
-        if (enddate > (self.etddt_end + timedelta(days=365))):
+            warn(
+                "Prediction timeframe is earlier than the available time database (%s). "
+                "For details refer to the file '%s'." % (self.etddt_start, fname)
+            )
+        if enddate > (self.etddt_end + timedelta(days=365)):
             fname = str(etpred.params.etddtdat)
-            warn("Please consider updating the leap second database '%s' (last value is from %s)." % (fname, self.etddt_end))
+            warn(
+                "Please consider updating the leap second database '%s' (last value is from %s)."
+                % (fname, self.etddt_end)
+            )
         # if not (-50*365 < (startdate - dt.datetime.now()).days < 365):
-        if ( ((argsin[13] > 0) or (argsin[14] > 0)) and ((startdate < self.etpolut1_start) or (enddate > self.etpolut1_end)) ):
+        if ((argsin[13] > 0) or (argsin[14] > 0)) and (
+            (startdate < self.etpolut1_start) or (enddate > self.etpolut1_end)
+        ):
             fname = str(etpred.params.etddtdat)
-            warn("Dates exceed permissible range for pole/LOD tide correction (interval %s to %s). Consider update file '%s'." % (self.etpolut1_start, self.etpolut1_end, fname))
-        if ( ((argsin[13] > 0) or (argsin[14] > 0)) and (startdate < datetime.strptime('1600-01-01', "%Y-%m-%d")) ):
-             raise ValueError("PyGTide should not be used for dates before the year 1600.")
+            warn(
+                "Dates exceed permissible range for pole/LOD tide correction (interval %s to %s). Consider update file '%s'."
+                % (self.etpolut1_start, self.etpolut1_end, fname)
+            )
+        if ((argsin[13] > 0) or (argsin[14] > 0)) and (
+            startdate < datetime.strptime("1600-01-01", "%Y-%m-%d")
+        ):
+            raise ValueError(
+                "PyGTide should not be used for dates before the year 1600."
+            )
         # set the start date and time
-        argsin[3:6] = [startdate.year,startdate.month,startdate.day]
+        argsin[3:6] = [startdate.year, startdate.month, startdate.day]
         # test sammprate validity
-        if not (0 < samprate <= 24*3600):
+        if not (0 < samprate <= 24 * 3600):
             raise ValueError("samprate exceeds permissible range!")
         else:
             argsin[7] = int(samprate)
         # test that samprate is not larger than duration
-        if (samprate/3600 >  duration):
+        if samprate / 3600 > duration:
             raise ValueError("samprate exceeds duration!")
         # print(argsin)
         self.args = argsin
         if self.msg:
-            print('%s is calculating, please wait ...' % (self.fortran_version))
-        
+            print("%s is calculating, please wait ..." % (self.fortran_version))
+
         # hand over variables
         etpred.predict(argsin)
 
@@ -385,20 +426,20 @@ class pygtide(object):
         """
         if self.exec:
             # get the headers from Fortran
-            cols = np.char.strip(etpred.inout.header.astype('str'))
-            allcols = np.insert(cols[2:], 0, 'UTC')
+            cols = np.char.strip(etpred.inout.header.astype("str"))
+            allcols = np.insert(cols[2:], 0, "UTC")
             etdata = pd.DataFrame(columns=allcols)
             # format date and time into padded number strings
             etpred_data = np.array(etpred.inout.etpdata)
             # print(etpred.inout.etpdata[:, 0])
             # catch non-complete container fills from odd duration/sampling pairs
-            etpred_data = etpred_data[etpred_data[:,0] > 0, :]
-            # convert 
-            date = np.char.mod("%08.0f ", etpred_data[:,0])
-            time = np.char.mod("%06.0f", etpred_data[:,1])
+            etpred_data = etpred_data[etpred_data[:, 0] > 0, :]
+            # convert
+            date = np.char.mod("%08.0f ", etpred_data[:, 0])
+            time = np.char.mod("%06.0f", etpred_data[:, 1])
             # merge date and time arrays
             datetime = np.core.defchararray.add(date, time)
-            etdata['UTC'] = pd.to_datetime(datetime, format="%Y%m%d %H%M%S", utc=True)
+            etdata["UTC"] = pd.to_datetime(datetime, format="%Y%m%d %H%M%S", utc=True)
             # obtain header strings from routine and convert
             etdata[cols[2:]] = np.around(etpred_data[:, 2:], digits)
             return etdata
@@ -443,22 +484,22 @@ class pygtide(object):
         """
         if self.exec:
             # reformat the date and time values obtained from ETERNA
-            date = np.char.mod("%08.0f", etpred.inout.etpdata[:,0])
-            time = np.char.mod("%06.0f", etpred.inout.etpdata[:,1])
+            date = np.char.mod("%08.0f", etpred.inout.etpdata[:, 0])
+            time = np.char.mod("%06.0f", etpred.inout.etpdata[:, 1])
             return np.stack((date, time), axis=1)
         else:
             return None
 
 
 def predict_table(*args, msg=False, **kwargs):
-    kwargs.setdefault('screenout', int(msg))
+    kwargs.setdefault("screenout", int(msg))
     pt = pygtide(msg=msg)
     pt.predict(*args, **kwargs)
     return pt.results()
 
 
 def predict_series(*args, msg=False, index=0, **kwargs):
-    kwargs.setdefault('screenout', int(msg))
+    kwargs.setdefault("screenout", int(msg))
     pt = pygtide(msg=msg)
     pt.predict(*args, **kwargs)
     return pt.data()[:, index]
@@ -466,6 +507,7 @@ def predict_series(*args, msg=False, index=0, **kwargs):
 
 def predict_spectrum(*args, nfft=None, **kwargs):
     from numpy.fft import rfft, rfftfreq
+
     sr = args[-1]
     data = predict_series(*args, **kwargs)
     if nfft is None:
@@ -480,15 +522,18 @@ def plot_series(*args, indices=(0, 1), show=True, **kwargs):
     table.plot(*indices)
     if show:
         import matplotlib.pyplot as plt
+
         plt.show()
+
 
 def plot_spectrum(*args, ax=None, show=True, **kwargs):
     import matplotlib.pyplot as plt
+
     freq, spec = predict_spectrum(*args, **kwargs)
     if ax is None:
         ax = plt.subplot(111)
     ax.plot(freq * 24 * 3600, np.abs(spec))
-    ax.set_xlabel('freq (cycles per day)')
-    ax.set_ylabel('amplitude')
+    ax.set_xlabel("freq (cycles per day)")
+    ax.set_ylabel("amplitude")
     if show:
         plt.show()

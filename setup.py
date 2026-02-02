@@ -1,33 +1,35 @@
-import os.path
-import re
+# setup.py
+from pathlib import Path
+import sys
 
-from numpy.distutils.core import setup, Extension
-
-def find_version(*paths):
-    fname = os.path.join(os.path.dirname(__file__), *paths)
-    with open(fname) as fp:
-        code = fp.read()
-    match = re.search(r"^__version__ = ['\"]([^'\"]*)['\"]", code, re.M)
-    if match:
-        return match.group(1)
-    raise RuntimeError("Unable to find version string.")
+from setuptools import setup, Extension
 
 
-VERSION = find_version('pygtide', '__init__.py')
+# Detect platform-specific ABI extension
+HERE = Path(__file__).resolve().parent
 
-ext = [Extension(name='pygtide.etpred',
-                 sources=['src/etpred.f90'])]
+ext = '.pyd' if sys.platform.startswith('win') else '.so'
+etpred_path = HERE / 'pygtide' / f'etpred{ext}'
 
-setup(
-    name='pygtide',
-    version=VERSION,
-    packages=['pygtide'],
-    package_data={'pygtide': ['commdat/*']},
-    ext_modules=ext,
-    install_requires=['numpy', 'pandas','requests'],
-    author='Gabriel C. Rau, Tom Eulenfeld',
-    author_email='gabriel@hydrogeo.science',
-    url='https://github.com/hydrogeoscience/pygtide',
-    description=('A Python module and wrapper for ETERNA PREDICT to compute '
-                 'gravitational tides on Earth'),
-    )
+if etpred_path.exists():
+    print(f"Use ABI module {etpred_path}")
+else:
+    print(f"Prebuilt ABI module not found: {etpred_path}\n"
+            "Run build_pygtide_abi.py")
+    sys.path.insert(0, str(HERE))
+    import build_pygtide_abi
+    build_pygtide_abi.build()
+    if not etpred_path.exists():
+        raise FileNotFoundError(f"No ABI module, error in Meson build")
+
+
+# Define the prebuilt extension
+etpred_module = Extension(
+    name='pygtide.etpred',
+    sources=[],               # No sources; using prebuilt ABI
+    extra_objects=[str(etpred_path)],
+)
+
+
+# Metadata pulled from pyproject.toml
+setup()

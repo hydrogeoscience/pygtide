@@ -8,20 +8,33 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python: ["3.10", "3.14"]
+        exclude:
+          - os: windows-latest
+            python: "3.10"
         include:
-          - python: "3.10"
+          - os: windows-latest
+            python: "3.12"
     runs-on: ${{ matrix.os }}
     defaults:
       run:
         shell: bash -l {0}
     steps:
       - uses: actions/checkout@v3
+      - uses: fortran-lang/setup-fortran@v1
+        id: setup-fortran
+        with:
+          compiler: gcc
       - name: setup conda
-        uses: conda-incubator/setup-miniconda@v2
+        uses: conda-incubator/setup-miniconda@v3
         with:
           python-version: ${{ matrix.python }}
+          auto-update-conda: true
           environment-file: .github/test_conda_env.yml
+      - name: install gfortran runtime (Windows)
+        if: runner.os == 'Windows'
+        run: conda install -y -c conda-forge gfortran
       - name: print conda environment info
         run: |
           conda info -a

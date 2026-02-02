@@ -14,48 +14,72 @@ There are two options:
 
 ## How to install and run
 
-Instructions:
+### Prerequisites
+
 * Download and install [*Anaconda*](https://www.anaconda.com/products/distribution) or [*Miniconda*](https://docs.conda.io/en/latest/miniconda.html)
+* Install required packages:
+  ```
+  conda install numpy pandas requests
+  ```
 
-* Make sure the following packages are installed: <br />
- `conda install numpy pandas requests git`
- 
-* Download and install pygtide:
-  * *Linux* or *MacOS*: <br />
-     **NOTE**: Make sure suitable C++ and Fortran compilers are available.
-     ```
-     pip install pygtide
-     ```
-   
-  * *Windows*:<br />
-       Download the correct wheel for your Python version (available for 3.8 to 3.11) from the subfolder "windows" onto your system.
-	   Then navigate your Anaconda explorer to the download location and execute:
-     ```
-     pip install [wheel_name_depending_on_python_version]
-     ```
-   
-* Run tests: <br /> 
- ```
- python -c "import pygtide; pygtide.test(msg=True)"
- ```
-* The internal database files can be updated as follows: <br />
- ```
- python -c "import pygtide; pygtide.update()"
- ```
-* See `pygtide/tests.py` for example usage:
+### Installation options
 
+#### Option 1: Install and compile source distribution from PyPi (Linux, macOS, Windows; Python 3.8–3.14)
+
+```bash
+pip install pygtide
 ```
+
+#### Option 2: Build from source locally (Linux, macOS, Windows; Python 3.8–3.14)
+
+**Requirements for building:**
+- A Fortran compiler (e.g., `gfortran` via MinGW on Windows; included in Linux/macOS gcc toolchains) `conda install gfortran`
+- Meson build system with ninja: automatically installed via `pip`
+
+**Clone repo from git:**
+```bash
+git clone https://github.com/hydrogeoscience/pygtide.git
+```
+
+**Install from local repository:**
+```bash
+cd /path/to/pygtide
+
+pip install .
+```
+
+If Meson or Ninja are missing, pip will attempt to install them automatically. For faster builds, pre-install them:
+```bash
+pip install meson-python meson ninja
+```
+
+#### Option 3: Pre-built wheels (Windows, Python 3.8–3.11)
+Download the correct wheel for your Python version from the `windows/` subfolder and install:
+```powershell
+pip install [wheel_name_depending_on_python_version]
+```
+
+### After installation
+
+* Run tests to verify installation:
+  ```
+  python -c "import pygtide; pygtide.test(msg=True)"
+  ```
+
+* Update internal database files (downloads latest leap seconds and pole data):
+  ```
+  python -c "import pygtide; pygtide.update()"
+  ```
+
+### Example usage
+
+See `pygtide/tests.py` for complete examples. Quick start:
+
+```python
 from pygtide import predict_series
 args = (-20.82071, -70.15288, 830.0, '2020-01-01', 6, 600)
 series = predict_series(*args, statazimut=90, tidalcompo=8)
 ```
-
-* Development version: This can be installed by downloading the Github repository and running:
- `pip install download_path`. <br />
-  Alternatively, in one step as: <br />
-  ```
-  pip install git+https://github.com/hydrogeoscience/pygtide.git
-  ```
 
 ## How to use
 
