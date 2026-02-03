@@ -2,39 +2,39 @@
 from pathlib import Path
 import sys
 
-from setuptools import setup, Extension
+from setuptools import setup, Distribution
 from setuptools.command.build import build as _build
 
 
 class build(_build):
     def run(self):
         # Detect platform-specific ABI extension
-        HERE = Path(__file__).resolve().parent
-
+        here = Path(__file__).resolve().parent
         ext = '.pyd' if sys.platform.startswith('win') else '.so'
-        etpred_path = HERE / 'pygtide' / f'etpred{ext}'
-
+        etpred_path = here / 'pygtide' / f'etpred{ext}'
         if etpred_path.exists():
             print(f"Use ABI module {etpred_path}")
         else:
             print(f"Prebuilt ABI module not found: {etpred_path}\n"
                     "Run build_pygtide_abi.py")
-            sys.path.insert(0, str(HERE))
+            sys.path.insert(0, str(here))
             import build_pygtide_abi
+            # Start Meson build
             build_pygtide_abi.build()
             if not etpred_path.exists():
                 raise FileNotFoundError(f"No ABI module, error in Meson build")
-
-
-        # Define the prebuilt extension
-        etpred_module = Extension(
-            name='pygtide.etpred',
-            sources=[],               # No sources; using prebuilt ABI
-            extra_objects=[str(etpred_path)],
-        )
-
         super().run()
 
 
+# tell setuptools to build platform-dependent wheels
+class BinaryDistribution(Distribution):
+    def has_ext_modules(self):
+        return True
+
+
 # Metadata pulled from pyproject.toml
-setup(cmdclass={'build': build})
+setup(
+    distclass=BinaryDistribution,
+    cmdclass={'build': build}
+)
+
