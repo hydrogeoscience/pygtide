@@ -12,7 +12,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pygtide"
-version = "0.8.0"
+version = "0.8.1"
 description = "A Python module and wrapper for ETERNA PREDICT to compute gravitational tides on Earth"
 readme = "README.md"
 license = "MPL-2.0"
