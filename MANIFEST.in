@@ -1,3 +1,4 @@
 include README.md
-include pygtide/etpred.*
-
+include build_pygtide_abi.py
+include meson.build
+include src/etpred.f90

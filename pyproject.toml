@@ -50,8 +50,7 @@ Issues = "https://github.com/hydrogeoscience/pygtide/issues"
 # Setuptools-specific configuration
 # ----------------------------
 [tool.setuptools]
-packages = ["pygtide"]             # <-- move packages here
-include-package-data = true        # include package data
+packages = ["pygtide"]
 
 [tool.setuptools.package-data]
 pygtide = ["etpred.*", "commdat/*"]
