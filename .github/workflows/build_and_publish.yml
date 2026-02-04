@@ -37,9 +37,9 @@ jobs:
         exclude-flag:
           - ${{ github.event_name != 'release' }}
         exclude:
-          - build: cp12
+          - build: cp312
             exclude-flag: true
-          - build: cp13
+          - build: cp313
             exclude-flag: true
     steps:
       - uses: actions/checkout@v6
