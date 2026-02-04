@@ -24,13 +24,13 @@ There are two options:
 
 ### Installation options
 
-#### Option 1: Install and compile source distribution from PyPi (Linux, macOS, Windows; Python 3.8–3.14)
+#### Option 1: Install and compile source distribution from PyPi (Python 3.8–3.11) or install pre-compiled distribution (Linux, macOS, Windows; Python>=3.12)
 
 ```bash
 pip install pygtide
 ```
 
-#### Option 2: Build from source locally (Linux, macOS, Windows; Python 3.8–3.14)
+#### Option 2: Build from source locally (Linux, macOS, Windows; Python>=3.8)
 
 **Requirements for building:**
 - A Fortran compiler (e.g., `gfortran` via MinGW on Windows; included in Linux/macOS gcc toolchains) `conda install gfortran`
@@ -51,12 +51,6 @@ pip install .
 If Meson or Ninja are missing, pip will attempt to install them automatically. For faster builds, pre-install them:
 ```bash
 pip install meson-python meson ninja
-```
-
-#### Option 3: Pre-built wheels (Windows, Python 3.8–3.11)
-Download the correct wheel for your Python version from the `windows/` subfolder and install:
-```powershell
-pip install [wheel_name_depending_on_python_version]
 ```
 
 ### After installation
