@@ -19,7 +19,7 @@ There are two options:
 * Download and install [*Anaconda*](https://www.anaconda.com/products/distribution) or [*Miniconda*](https://docs.conda.io/en/latest/miniconda.html)
 * Install required packages:
   ```
-  conda install numpy pandas requests
+  conda install numpy pandas
   ```
 
 ### Installation options
@@ -46,11 +46,6 @@ git clone https://github.com/hydrogeoscience/pygtide.git
 cd /path/to/pygtide
 
 pip install .
-```
-
-If Meson or Ninja are missing, pip will attempt to install them automatically. For faster builds, pre-install them:
-```bash
-pip install meson-python meson ninja
 ```
 
 ### After installation
