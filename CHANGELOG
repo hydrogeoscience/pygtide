@@ -1,13 +1,15 @@
-v0.8.0:
+v0.8.2:
+  * Precompiled wheels for Python>=2.12 are now available on PyPI
+v0.8.1:
   * modernisation of update script and test script and build system by Craig Miller, ESNZ.
 v0.7.1:
   * record length was corrected
   * length of day (LOD) tide is now properly interpolated
   * the Fortran based execution timer was removed
-  
+
 v0.7:
   * pygtide now working for years before 1962 back until 1600
-  
+
 v0.6:
   * Fortran code is now platform independent and specific variables are now set from Python (Fortran and Python)
   * updated Python to comply with proper package structure
