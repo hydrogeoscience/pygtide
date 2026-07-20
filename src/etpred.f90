@@ -738,22 +738,32 @@ SUBROUTINE PREDICT(ARGS)
 !-GCR fixed a bug whereby seconds and minutes wouldn't be rounded
 ! correctly in the original code
       ! calculate time
-      ITH=INT(FLOOR(DTH))
-      DTMIN=(DTH-DBLE(ITH))*60.D0
+      ! ITH=INT(FLOOR(DTH))
+      ! DTMIN=(DTH-DBLE(ITH))*60.D0
       ! modified to work with minutes rounding errors
-      ITMIN=FLOOR(DTMIN+0.001388D0)
-      IF(ITMIN.GE.60) THEN
-         ITMIN=0
-         ITH=ITH+1
-      ENDIF
-      DTSEC=DTH*3600.D0-DBLE(ITH)*3600.D0-DBLE(ITMIN)*60.D0
+      ! ITMIN=FLOOR(DTMIN+0.001388D0)
+      ! IF(ITMIN.GE.60) THEN
+         !ITMIN=0
+         !ITH=ITH+1
+      !ENDIF
+      !DTSEC=DTH*3600.D0-DBLE(ITH)*3600.D0-DBLE(ITMIN)*60.D0
       ! modified to work with seconds rounding errors
-      ITSEC=FLOOR(DTSEC+2.3148D-05)
-      IF(ITSEC.GE.60) THEN
-         ITSEC=0
-         ITMIN=ITMIN+1
-      ENDIF
+      !ITSEC=FLOOR(DTSEC+2.3148D-05)
+      !IF(ITSEC.GE.60) THEN
+         !ITSEC=0
+         !ITMIN=ITMIN+1
+      !ENDIF
+      !ITIM=ITH*10000+ITMIN*100+ITSEC
+!     round fractional hour to HHMMSS; one rounding decision,
+!     fields valid by construction, no tuned tolerances
+      ISEC=NINT(DTH*3600.D0)
+      IF(ISEC.LT.0)     ISEC=0
+      IF(ISEC.GE.86400) ISEC=86399
+      ITH=ISEC/3600
+      ITMIN=MOD(ISEC,3600)/60
+      ITSEC=MOD(ISEC,60)
       ITIM=ITH*10000+ITMIN*100+ITSEC
+
 !-GCR end time fix
       WRITE(IUN23,17021) IDAT,ITIM,(DCOUT(JC),JC=1,NC)
       IF (SCROUT.EQ.1) THEN
