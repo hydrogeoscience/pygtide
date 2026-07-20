@@ -2,12 +2,10 @@
 requires = [
     "setuptools>=61",
     "wheel",
-    "numpy>=1.21.0",
+    "numpy>=1.21.0,<2.0",
     "meson",
-#    "meson-python",
     "ninja"
 ]
-#build-backend = 'mesonpy'
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -22,7 +20,7 @@ authors = [
     { name = "Tom Eulenfeld" }
 ]
 dependencies = [
-    "numpy>=1.21.0",
+    "numpy>=1.21.0,<2.0",
     "pandas",
 ]
 classifiers = [
