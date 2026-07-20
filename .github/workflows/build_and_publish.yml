@@ -23,6 +23,11 @@ jobs:
       CIBW_BUILD_VERBOSITY: 1
       CIBW_TEST_COMMAND: python -c "import pygtide; pygtide.test(); pygtide.update(); pygtide.test()"
       MACOSX_DEPLOYMENT_TARGET: 15.0
+      # Statically link the gfortran runtime so delocate doesn't need to bundle
+      # Homebrew's libgfortran/libquadmath (which target a newer macOS minimum).
+      CIBW_ENVIRONMENT_MACOS: >-
+        LDFLAGS="-static-libgfortran -static-libquadmath -static-libgcc"
+        FFLAGS="-static-libgfortran -static-libquadmath -static-libgcc"
       # Package the DLL dependencies in the wheel for windows
       # delvewheel cannot mangle the libraries, stripping does not work.
       CIBW_BEFORE_BUILD_WINDOWS: pip install delvewheel
