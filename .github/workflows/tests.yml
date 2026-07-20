@@ -13,6 +13,10 @@ jobs:
         exclude:
           - os: windows-latest
             python: "3.10"
+          - os: ubuntu-latest
+            python: "3.10"
+          - os: macos-latest
+            python: "3.10"
         include:
           - os: windows-latest
             python: "3.12"
