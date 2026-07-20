@@ -2,5 +2,5 @@ name: test
 channels:
   - conda-forge
 dependencies:
-  - numpy
+  - numpy<2.0
   - pandas
