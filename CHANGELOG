@@ -1,9 +1,11 @@
-v0.9.1:
- * Additional fortran code bug in IC7 shear strain fixed (90 deg phase error)
-
 v0.9.0:
- * Bugs in fortran code fixed using LLM.  Fixes strain calculations for certain latitudes and a time conversion error.
-
+  * Bug fixes in the Fortran code (etpred.f90), verified against analytic limits and finite-difference ground truth:
+  *- Areal strain (tidalcompo=6) returned values about 1e6 times too small (issue #47): the scale factor line DFAK=1.D9/(DGRAV*DR) was unreachable dead code placed before the block's entry label, so a leftover scale factor from a previous component call was used instead. The line was moved into the block. Areal strain now correctly equals 1.5 x volume strain at every epoch (nstr units).
+  *- Horizontal and shear strain (tidalcompo=5, 7): the signs of the (3,2) and (4,4) tesseral shear terms were opposite to all others (affected phases only, not amplitudes); signs corrected.
+  *- Shear strain (tidalcompo=7) no longer depends on the sensor azimuth; azimuth projection factors copied from the horizontal strain block were removed so eps(theta,lambda) is a true tensor component.
+  *- Mathematical errors (NaN/Inf) at certain latitudes fixed: at the poles (0/0 in tilt and displacement coefficients) and at the equator (division by exactly zero in horizontal and shear strain terms). Geocentric latitude is now kept within a 1e-6 degree guard band away from these values (induced error far below model precision).
+  *- Elastic parameters (Wahr-Dehant-Zschau model) no longer diverge near geodetic latitude +-35.45 degrees, where the degree-2 denominator 3*cos(theta)**2-1 vanishes; the denominator is now capped (guard band of about +-0.47 degrees).
+  *- Time stamps (HHMMSS) are now computed by a single rounding to the nearest second, replacing truncation plus tolerance patches that could emit malformed times (e.g. seconds of -1, printing as e.g. 130299) or garbage for epochs within 0.36 s before midnight.
 v0.8.2:
   * Precompiled wheels for Python>=3.12 are now available on PyPI
 

@@ -118,8 +118,13 @@ class pygtide(object):
         if not self.data_dir.endswith(os.sep):
             self.data_dir += os.sep
 
-        # Fortran expects a fixed-length string (256 chars)
-        etpred.params.comdir = self.data_dir + " " * (256 - len(self.data_dir))
+        # Fortran buffer for the commdat path (CHARACTER(1024) :: COMDIR in etpred.f90);
+        # 12 chars headroom for the longest appended filename (e.g. 'etpolut1.dat')
+        COMDIR_LEN = 1024
+        if len(self.data_dir) + 12 > COMDIR_LEN:
+            raise RuntimeError(f"Install path too long for the Fortran interface "
+                f"({len(self.data_dir)} characters): {self.data_dir}")
+        etpred.params.comdir = self.data_dir.ljust(COMDIR_LEN)
 
         # OS-dependent null file
         etpred.params.nullfile = os.devnull + " " * (10 - len(os.devnull))
@@ -438,7 +443,8 @@ class pygtide(object):
             date = np.char.mod("%08.0f ", etpred_data[:, 0])
             time = np.char.mod("%06.0f", etpred_data[:, 1])
             # merge date and time arrays
-            datetime = np.core.defchararray.add(date, time)
+            # OLD: datetime = np.core.defchararray.add(date, time)
+            datetime = np.char.add(date, time)
             etdata["UTC"] = pd.to_datetime(datetime, format="%Y%m%d %H%M%S", utc=True)
             # obtain header strings from routine and convert
             etdata[cols[2:]] = np.around(etpred_data[:, 2:], digits)

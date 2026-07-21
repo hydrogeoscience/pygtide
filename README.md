@@ -3,7 +3,7 @@
 
 ## A Python module and wrapper for ETERNA PREDICT to compute gravitational tides on Earth
 
-PyGTide is a Python module that wraps around ETERNA PREDICT 3.4 which is compiled from Fortran into an executable using [f2py](https://docs.scipy.org/doc/numpy/f2py/). The original ETERNA PREDICT 3.3 was written by the late Prof. H.-G. Wenzel (Wenzel, 1996) in a mix of Fortran 77 and 90. This was updated by Kudryavtsev (2004) to include the latest tidal catalogue. Note that the original Fortran code was comprehensively revised in order to facilitate integration into Python. The original Fortran code for ETERNA PREDICT can be downloaded from the [International Geodynamics and Earth Tide Service (IGETS)](http://igets.u-strasbg.fr/soft_and_tool.php).
+PyGTide is a Python module that wraps around ETERNA PREDICT 3.4 which is compiled from Fortran into an executable using [f2py](https://docs.scipy.org/doc/numpy/f2py/). The original ETERNA PREDICT 3.3 was written by the late Prof. H.-G. Wenzel (Wenzel, 1996) in a mix of Fortran 77 and 90. This was updated by Kudryavtsev (2004) to include the latest tidal catalogue. Note that the original Fortran code was comprehensively revised in order to facilitate integration into Python. Significant bugs were also identified and repaired, please refer to the CHANGELOG for details. The original Fortran code for ETERNA PREDICT can be downloaded from the [International Geodynamics and Earth Tide Service (IGETS)](http://igets.u-strasbg.fr/soft_and_tool.php).
 
 ## How to use
 
@@ -17,34 +17,39 @@ There are two options:
 ### Prerequisites
 
 * Download and install [*Anaconda*](https://www.anaconda.com/products/distribution) or [*Miniconda*](https://docs.conda.io/en/latest/miniconda.html)
-* Install required packages:
-  ```
-  conda install numpy pandas
-  ```
 
 ### Installation options
 
-#### Option 1: Install and compile source distribution from PyPi (Python 3.8–3.11) or install pre-compiled distribution (Linux, macOS, Windows; Python>=3.12)
+#### Option 1: Install from PyPI (recommended)
 
 ```bash
 pip install pygtide
 ```
 
-#### Option 2: Build from source locally (Linux, macOS, Windows; Python>=3.8)
+Pre-compiled wheels are provided for Linux, macOS and Windows on Python 3.12 and newer — no compiler required. On Python 3.10 and 3.11, pip automatically builds from the source distribution instead, which requires a Fortran compiler (see Option 2). NumPy and pandas are installed automatically as dependencies.
+
+To upgrade an existing installation:
+
+```bash
+pip install -U pygtide
+```
+
+#### Option 2: Build from source locally (Linux, macOS, Windows; Python &gt;= 3.10)
 
 **Requirements for building:**
-- A Fortran compiler (e.g., `gfortran` via MinGW on Windows; included in Linux/macOS gcc toolchains) `conda install gfortran`
-- Meson build system with ninja: automatically installed via `pip`
+- A Fortran compiler (e.g., `gfortran`, via `conda install gfortran` or your system package manager)
+- Meson and ninja (installed automatically by pip)
 
-**Clone repo from git:**
+**Clone the repository:**
+
 ```bash
 git clone https://github.com/hydrogeoscience/pygtide.git
 ```
 
-**Install from local repository:**
-```bash
-cd /path/to/pygtide
+**Install from the local repository:**
 
+```bash
+cd pygtide
 pip install .
 ```
 
@@ -91,4 +96,4 @@ This image shows Earth tides calculated for the city Karlsruhe (Germany) in the 
 * McMillan, T. C., and Rau, G. C., and Timms, W. A., and Andersen, M. S. (2019), Utilizing the impact of Earth and atmospheric tides on groundwater systems: A review reveals the future potential, Reviews of Geophysics, https://dx.doi.org/10.1029/2018RG000630.
 
 ## License
-PyGTide is released by [Gabriel C. Rau](https://hydrogeo.science) and [Tom Eulenfeld](https://scholar.google.com/citations?user=SJXF3mwAAAAJ&hl=en) under the [Mozilla Public License 2.0](https://www.mozilla.org/en-US/MPL/2.0/)
+PyGTide is released by [Gabriel C. Rau](https://hydrogeo.science), [Tom Eulenfeld](https://scholar.google.com/citations?user=SJXF3mwAAAAJ&hl=en) and [Craig Miller](https://www.gns.cri.nz/about-us/staff-search/craig-miller/) under the [Mozilla Public License 2.0](https://www.mozilla.org/en-US/MPL/2.0/)
