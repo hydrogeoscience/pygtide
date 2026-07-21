@@ -738,22 +738,32 @@ SUBROUTINE PREDICT(ARGS)
 !-GCR fixed a bug whereby seconds and minutes wouldn't be rounded
 ! correctly in the original code
       ! calculate time
-      ITH=INT(FLOOR(DTH))
-      DTMIN=(DTH-DBLE(ITH))*60.D0
+      ! ITH=INT(FLOOR(DTH))
+      ! DTMIN=(DTH-DBLE(ITH))*60.D0
       ! modified to work with minutes rounding errors
-      ITMIN=FLOOR(DTMIN+0.001388D0)
-      IF(ITMIN.GE.60) THEN
-         ITMIN=0
-         ITH=ITH+1
-      ENDIF
-      DTSEC=DTH*3600.D0-DBLE(ITH)*3600.D0-DBLE(ITMIN)*60.D0
+      ! ITMIN=FLOOR(DTMIN+0.001388D0)
+      ! IF(ITMIN.GE.60) THEN
+         !ITMIN=0
+         !ITH=ITH+1
+      !ENDIF
+      !DTSEC=DTH*3600.D0-DBLE(ITH)*3600.D0-DBLE(ITMIN)*60.D0
       ! modified to work with seconds rounding errors
-      ITSEC=FLOOR(DTSEC+2.3148D-05)
-      IF(ITSEC.GE.60) THEN
-         ITSEC=0
-         ITMIN=ITMIN+1
-      ENDIF
+      !ITSEC=FLOOR(DTSEC+2.3148D-05)
+      !IF(ITSEC.GE.60) THEN
+         !ITSEC=0
+         !ITMIN=ITMIN+1
+      !ENDIF
+      !ITIM=ITH*10000+ITMIN*100+ITSEC
+!     round fractional hour to HHMMSS; one rounding decision,
+!     fields valid by construction, no tuned tolerances
+      ISEC=NINT(DTH*3600.D0)
+      IF(ISEC.LT.0)     ISEC=0
+      IF(ISEC.GE.86400) ISEC=86399
+      ITH=ISEC/3600
+      ITMIN=MOD(ISEC,3600)/60
+      ITSEC=MOD(ISEC,60)
       ITIM=ITH*10000+ITMIN*100+ITSEC
+
 !-GCR end time fix
       WRITE(IUN23,17021) IDAT,ITIM,(DCOUT(JC),JC=1,NC)
       IF (SCROUT.EQ.1) THEN
@@ -1702,7 +1712,18 @@ SUBROUTINE ETGCON(IUN16,IPRINT,DLAT,DLON,DH,DGRAV,DAZ,IC,DGK,DPK)
 !#######################################################################
 !     Compute geocentric latitude DPSI in degree:
 !#######################################################################
+!     DPSI=DRO*ATAN(((DN*(1.D0-DEE)+DH)*DSLAT)/((DN+DH)*DCLAT))
+!     DTHET=90.D0-DPSI
       DPSI=DRO*ATAN(((DN*(1.D0-DEE)+DH)*DSLAT)/((DN+DH)*DCLAT))
+!     BUGFIX (2026): guard against exact singularities at the poles
+!     and at the equator.  Several divisors below are SIN or COS of
+!     the geocentric co-latitude (DGY(J) in loop 10, DCOTT, and the
+!     1/DCT and 1/DST terms in the strain blocks); at DPSI = +-90 DEG
+!     or DPSI = 0 DEG these divisors become exactly zero, producing
+!     NaN/Inf.  Keep DPSI at least 1.D-6 degrees (about 0.1 mm on the
+!     Earth's surface) away from those values.
+      IF(ABS(DPSI).LT.1.D-6)       DPSI=SIGN(1.D-6,DPSI)
+      IF(ABS(DPSI).GT.90.D0-1.D-6) DPSI=SIGN(90.D0-1.D-6,DPSI)
       DTHET=90.D0-DPSI
       DCT=COS(DTHET*DRAD)
       DST=SIN(DTHET*DRAD)
@@ -1884,7 +1905,11 @@ SUBROUTINE ETGCON(IUN16,IPRINT,DLAT,DLON,DH,DGRAV,DAZ,IC,DGK,DPK)
       DGY(5)=-20.D0*DLLAT(5)*DCT*DCSTS/(5.D0*DCT2-1.D0)
       DGX(6)=(DHLAT(6)+DLLAT(6)*(2.D0*DCOTT*DCOTT-7.D0))*DCAZ**2 &
        +(DHLAT(6)+DLLAT(6)*(2.D0*DCOTT*DCOTT-1.D0-4.D0/DST2))*DSAZ**2
-      DGY(6)=-4.D0*DLLAT(6)*(DCOTT-1.D0/DCOTT)*DCSTS/DST
+!     DGY(6)=-4.D0*DLLAT(6)*(DCOTT-1.D0/DCOTT)*DCSTS/DST
+!     BUGFIX (2026): the sign of the (3,2) shear term was opposite to
+!     all other tesseral shear terms (verified against eps(t,l)
+!     derived from the tidal displacement field).
+      DGY(6)= 4.D0*DLLAT(6)*(DCOTT-1.D0/DCOTT)*DCSTS/DST
       DGX(7)=(DHLAT(7)+DLLAT(7)*(6.D0*DCOTT*DCOTT-3.D0))*DCAZ**2 &
        +(DHLAT(7)+DLLAT(7)*(3.D0*DCOTT*DCOTT-9.D0/DST2))*DSAZ**2
       DGY(7)=12.D0*DLLAT(7)*DCOTT*DCSTS/DST
@@ -1908,7 +1933,10 @@ SUBROUTINE ETGCON(IUN16,IPRINT,DLAT,DLON,DH,DGRAV,DAZ,IC,DGK,DPK)
       DGY(11)= DLLAT(11)*3.D0/DCT*(3.D0-2.D0/DST2)*DSAZ2
       DGX(12)=(DHLAT(12)-4.D0*DLLAT(12)*(4.D0-3.D0/DST2))*DCAZ**2 &
              +(DHLAT(12)-4.D0*DLLAT(12)*(1.D0+3.D0/DST2))*DSAZ**2
-      DGY(12)= DLLAT(12)*12.D0*DCT/DST2*DSAZ2
+!     DGY(12)= DLLAT(12)*12.D0*DCT/DST2*DSAZ2
+!     BUGFIX (2026): the sign of the (4,4) shear term was opposite to
+!     all other tesseral shear terms.
+      DGY(12)=-DLLAT(12)*12.D0*DCT/DST2*DSAZ2
       DO 710 I=1,12
       DGK(I)=DGK(I)*SQRT(DGX(I)**2+DGY(I)**2)*DFAK
   710 DPK(I)=DPK(I)+ATAN2(DGY(I),DGX(I))*DRO
@@ -1920,8 +1948,8 @@ SUBROUTINE ETGCON(IUN16,IPRINT,DLAT,DLON,DH,DGRAV,DAZ,IC,DGK,DPK)
 !           i.e. eps(t,t) + eps(l,l), (see ZUERN and WILHELM 1984,
 !           p. 282).
 !#######################################################################
-      DFAK=1.D9/(DGRAV*DR)
   800 CONTINUE
+      DFAK=1.D9/(DGRAV*DR)
       DO 810 I=1,3
   810 DGK(I)=DGK(I)*(2.D0*DHLAT(I)-2.D0*3.D0*DLLAT(I))*DFAK
       DO 820 I=4,7
@@ -1943,7 +1971,14 @@ SUBROUTINE ETGCON(IUN16,IPRINT,DLAT,DLON,DH,DGRAV,DAZ,IC,DGK,DPK)
       DCAZ =COS(DAZR)
       DSAZ =SIN(DAZR)
       DSAZ2=SIN(2.D0*DAZR)
+!     DCSTS=-0.5D0*SIN(2.D0*DAZR)
+!     DCT=DSPSI
       DCSTS=-0.5D0*SIN(2.D0*DAZR)
+!     BUGFIX (2026): eps(t,l) is a tensor component and must not
+!     depend on the sensor azimuth.  Remove the azimuthal projection
+!     factors copied from the horizontal strain block.
+      DSAZ2=1.D0
+      DCSTS=-0.5D0
       DCT=DSPSI
       DST=DCPSI
       DCT2=DCT*DCT
@@ -1958,13 +1993,17 @@ SUBROUTINE ETGCON(IUN16,IPRINT,DLAT,DLON,DH,DGRAV,DAZ,IC,DGK,DPK)
       DGY(3)=4.D0*DLLAT(3)*DCOTT*DCSTS/DST
       DGY(4)=0.D0
       DGY(5)=-20.D0*DLLAT(5)*DCT*DCSTS/(5.D0*DCT2-1.D0)
-      DGY(6)=-4.D0*DLLAT(6)*(DCOTT-1.D0/DCOTT)*DCSTS/DST
+!     DGY(6)=-4.D0*DLLAT(6)*(DCOTT-1.D0/DCOTT)*DCSTS/DST
+!     BUGFIX (2026): sign of the (3,2) shear term (see IC=5 block).
+      DGY(6)= 4.D0*DLLAT(6)*(DCOTT-1.D0/DCOTT)*DCSTS/DST
       DGY(7)=12.D0*DLLAT(7)*DCOTT*DCSTS/DST
       DGY(8)=0.D0
       DGY(9)=DLLAT(9)*3.D0/DCT*(1.D0+2.D0/(7.D0*DCT2-3.D0))*DSAZ2
       DGY(10)=-DLLAT(10)*6.D0*DCT/DST**2*(1.D0-4.D0/(7.D0*DCT2-1.D0))*DSAZ2
       DGY(11)=DLLAT(11)*3.D0/DCT*(3.D0-2.D0/DST2)*DSAZ2
-      DGY(12)=DLLAT(12)*12.D0*DCT/DST2*DSAZ2
+!     DGY(12)=DLLAT(12)*12.D0*DCT/DST2*DSAZ2
+!     BUGFIX (2026): sign of the (4,4) shear term (see IC=5 block).
+      DGY(12)=-DLLAT(12)*12.D0*DCT/DST2*DSAZ2
       DO 910 I=1,12
       DGK(I)=DGK(I)*DGY(I)*DFAK
   910 DPK(I)=0.D0
@@ -1973,7 +2012,7 @@ SUBROUTINE ETGCON(IUN16,IPRINT,DLAT,DLON,DH,DGRAV,DAZ,IC,DGK,DPK)
 !#######################################################################
 !     IC=8, compute geodetic coefficients for volume strain
 !           at the Earth's deformed surface in 10**-9 units = nstr.
-!           We use a spherical approximation, i.e. eps(t,t)+eps(l,l).
+!           Spherical approximation, i.e. eps(r,r)+eps(t,t)+eps(l,l).
 !#######################################################################
  1000 CONTINUE
       DPOISS=0.25D0
@@ -2557,8 +2596,17 @@ SUBROUTINE ETLOVE(IUN16,IPRINT,DLAT,DELV)
       DTHET=90.D0-DPSI
       DCT=COS(DTHET*DRAD)
       DCT2=DCT*DCT
-      DLATP(1)=0.335410D0*(35.D0*DCT2*DCT2-30.D0*DCT2+3.D0)/(3.D0*DCT2-1.D0)
-      DLATM(1) =0.894427D0/(3.D0*DCT2-1.D0)
+!      DLATP(1)=0.335410D0*(35.D0*DCT2*DCT2-30.D0*DCT2+3.D0)/(3.D0*DCT2-1.D0)
+!      DLATM(1) =0.894427D0/(3.D0*DCT2-1.D0)
+!     BUGFIX (2026): the Wahr-Dehant-Zschau latitude functions for
+!     degree 2 are singular where 3*COS(THETA)**2 = 1 (geocentric
+!     latitude +-35.26 DEG, i.e. ellipsoidal latitude +-35.45 DEG).
+!     Cap the denominator at 0.1 so the corrections stay within their
+!     perturbative range instead of diverging.
+      DDENOM=3.D0*DCT2-1.D0
+      IF(ABS(DDENOM).LT.0.1D0) DDENOM=SIGN(0.1D0,DDENOM)
+      DLATP(1)=0.335410D0*(35.D0*DCT2*DCT2-30.D0*DCT2+3.D0)/DDENOM
+      DLATM(1) =0.894427D0/DDENOM
       DLATP(2) =0.612372D0*(7.D0*DCT2-3.D0)
       DLATP(3) =0.866025D0*(7.D0*DCT2-1.D0)
       DLATP(7) =0.829156D0*(9.D0*DCT2-1.D0)
