@@ -1948,8 +1948,8 @@ SUBROUTINE ETGCON(IUN16,IPRINT,DLAT,DLON,DH,DGRAV,DAZ,IC,DGK,DPK)
 !           i.e. eps(t,t) + eps(l,l), (see ZUERN and WILHELM 1984,
 !           p. 282).
 !#######################################################################
-      DFAK=1.D9/(DGRAV*DR)
   800 CONTINUE
+      DFAK=1.D9/(DGRAV*DR)
       DO 810 I=1,3
   810 DGK(I)=DGK(I)*(2.D0*DHLAT(I)-2.D0*3.D0*DLLAT(I))*DFAK
       DO 820 I=4,7
