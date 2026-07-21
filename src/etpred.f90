@@ -208,7 +208,7 @@ module PARAMS
     ! OS dependent pointer to muted output, will be set from inside python
     CHARACTER(10) :: NULLFILE
     ! commdat directory, will be set from inside python
-    CHARACTER(256) :: COMDIR
+    CHARACTER(1024) :: COMDIR
     ! file i/o streams
     INTEGER, PARAMETER :: STDIN=5,STDOUT=6,STDERR=0,VOID=11
     INTEGER IC2
