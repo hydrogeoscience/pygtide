@@ -1,9 +1,15 @@
-v0.8.3:
+v0.9.1:
+ * Additional fortran code bug in IC7 shear strain fixed (90 deg phase error)
+
+v0.9.0:
  * Bugs in fortran code fixed using LLM.  Fixes strain calculations for certain latitudes and a time conversion error.
+
 v0.8.2:
   * Precompiled wheels for Python>=3.12 are now available on PyPI
+
 v0.8.1:
   * modernisation of update script and test script and build system by Craig Miller, ESNZ.
+
 v0.7.1:
   * record length was corrected
   * length of day (LOD) tide is now properly interpolated

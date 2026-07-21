@@ -1811,7 +1811,7 @@ SUBROUTINE ETGCON(IUN16,IPRINT,DLAT,DLON,DH,DGRAV,DAZ,IC,DGK,DPK)
 !#######################################################################
 !     IC=2, compute geodetic coefficients for vertical displacement
 !           in mm.
-!     Attention: this component has never been tested
+!     Attention: this component has never been tested but in 2026 was verified by LLM.
 !#######################################################################
   400 CONTINUE
 !GCR original:     DFAK=1.D3/DGRAV
@@ -1824,7 +1824,7 @@ SUBROUTINE ETGCON(IUN16,IPRINT,DLAT,DLON,DH,DGRAV,DAZ,IC,DGK,DPK)
 !#######################################################################
 !     IC=3, compute geodetic coefficients for horizontal displacement
 !           in azimuth DAZ in mm.
-!     Attention: this component has never been tested
+!     Attention: this component has never been tested but in 2026 was verified by LLM.
 !#######################################################################
   500 CONTINUE
 !GCR original code: DFAK=1.D3*DR/DGRAV
@@ -2006,8 +2006,10 @@ SUBROUTINE ETGCON(IUN16,IPRINT,DLAT,DLON,DH,DGRAV,DAZ,IC,DGK,DPK)
       DGY(12)=-DLLAT(12)*12.D0*DCT/DST2*DSAZ2
       DO 910 I=1,12
       DGK(I)=DGK(I)*DGY(I)*DFAK
-  910 DPK(I)=0.D0
-      WRITE(IUN16,*) ' ***** The shear strain has never been tested !'
+!  910 DPK(I)=0.D0
+!  BUGFIX 2026
+  910 DPK(I)=-90.D0
+      WRITE(IUN16,*) ' ***** The shear strain has never been tested ! but in 2026 verified by LLM.'
       GOTO 2000
 !#######################################################################
 !     IC=8, compute geodetic coefficients for volume strain
