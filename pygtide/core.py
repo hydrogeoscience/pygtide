@@ -438,7 +438,8 @@ class pygtide(object):
             date = np.char.mod("%08.0f ", etpred_data[:, 0])
             time = np.char.mod("%06.0f", etpred_data[:, 1])
             # merge date and time arrays
-            datetime = np.core.defchararray.add(date, time)
+            # OLD: datetime = np.core.defchararray.add(date, time)
+            datetime = np.char.add(date, time)
             etdata["UTC"] = pd.to_datetime(datetime, format="%Y%m%d %H%M%S", utc=True)
             # obtain header strings from routine and convert
             etdata[cols[2:]] = np.around(etpred_data[:, 2:], digits)
