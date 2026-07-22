@@ -43,6 +43,11 @@ series = predict_series(*args)
 > [!IMPORTANT]
 > By default, gravity, potential and tilt outputs are **rigid-Earth (geometric) tides**, while displacement and strain outputs are **body tides** (Love numbers applied). Read [Background — Absolute scale of the output](docs/background.md#absolute-scale-of-the-output) before interpreting amplitudes.
 
+## Example
+
+<img src="https://raw.githubusercontent.com/hydrogeoscience/pygtide/master/earth_tide_example.png" width="500">
+This image shows Earth tides calculated for the city Karlsruhe (Germany) in the year 2018.
+
 ## How to cite
 
 If you use PyGTide, please cite the work as:
