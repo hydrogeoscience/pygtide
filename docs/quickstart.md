@@ -59,7 +59,7 @@ The columns are:
 | `Pole tide [unit]` | Contribution from polar motion (zero if disabled) |
 | `LOD tide [unit]` | Contribution from length-of-day variations (zero if disabled) |
 
-![Illustrative Earth tide time series](../assets/earth_tide_example.png)
+![Illustrative Earth tide time series](../assets/karlsruhe_example.png)
 
 *Illustrative gravimetric Earth tide built from the main tidal constituents — your `predict_series` result for the same location will look similar.*
 
@@ -72,8 +72,6 @@ args = (49.00937, 8.40444, 120, '2018-01-01', 24 * 30, 600)
 plot_series(*args)    # time series
 plot_spectrum(*args)  # amplitude spectrum
 ```
-
-![Illustrative amplitude spectrum](../assets/earth_tide_spectrum.png)
 
 ## 4. Useful things to know right away
 
