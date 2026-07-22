@@ -1,6 +1,8 @@
 # PyGTide
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1346260.svg)](https://doi.org/10.5281/zenodo.1346260)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21483314.svg)](https://doi.org/10.5281/zenodo.21483314)
+
+
 
 PyGTide is a Python module that computes gravitational tides on Earth. It wraps ETERNA PREDICT 3.4 — the classic Fortran 77/90 code by the late Prof. H.-G. Wenzel (Wenzel, 1996), updated with the KSM03 tidal catalogue by Kudryavtsev (2004) — compiled into a Python extension using [f2py](https://docs.scipy.org/doc/numpy/f2py/). The original Fortran code was comprehensively revised for the Python integration, and significant bugs were identified and repaired (see the CHANGELOG).
 
@@ -50,7 +52,7 @@ This image shows Earth tides calculated for the city Karlsruhe (Germany) in the 
 
 If you use PyGTide, please cite the work as:
 
-*Rau, Gabriel C. (2018) hydrogeoscience/pygtide: PyGTide. Zenodo. [https://doi.org/10.5281/zenodo.1346260](https://doi.org/10.5281/zenodo.1346260)*
+*Gabriel C Rau, Eulenfeld, T., Miller, C. (2026). hydrogeoscience/pygtide: PyGTide v0.9.1 (Version v0.9.1) [Computer software]. Zenodo. https://doi.org/10.5281/zenodo.21483314*
 
 ## References
 
