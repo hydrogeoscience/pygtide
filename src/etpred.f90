@@ -1724,6 +1724,19 @@ SUBROUTINE ETGCON(IUN16,IPRINT,DLAT,DLON,DH,DGRAV,DAZ,IC,DGK,DPK)
 !     Earth's surface) away from those values.
       IF(ABS(DPSI).LT.1.D-6)       DPSI=SIGN(1.D-6,DPSI)
       IF(ABS(DPSI).GT.90.D0-1.D-6) DPSI=SIGN(90.D0-1.D-6,DPSI)
+!     BUGFIX (2026): the strain formulas (IC=5, IC=7) contain the
+!     denominators 3DCT2-1, 5DCT2-3, 5DCT2-1, 7DCT2-3, 7DCT2-1 and
+!     35DCT2**2-30DCT2+3, which vanish at the geocentric latitudes
+!     below.  These are removable singularities (finite limits exist),
+!     but at exactly these latitudes the code produces NaN.  Nudge DPSI
+!     by 1.D-6 degrees (about 0.1 mm) as done above for pole/equator.
+      IF(ABS(ABS(DPSI)-35.26439D0).LT.1.D-6) DPSI=SIGN(35.26440D0,DPSI)
+      IF(ABS(ABS(DPSI)-50.76848D0).LT.1.D-6) DPSI=SIGN(50.76849D0,DPSI)
+      IF(ABS(ABS(DPSI)-26.56505D0).LT.1.D-6) DPSI=SIGN(26.56506D0,DPSI)
+      IF(ABS(ABS(DPSI)-40.89339D0).LT.1.D-6) DPSI=SIGN(40.89340D0,DPSI)
+      IF(ABS(ABS(DPSI)-22.20765D0).LT.1.D-6) DPSI=SIGN(22.20766D0,DPSI)
+      IF(ABS(ABS(DPSI)-19.87572D0).LT.1.D-6) DPSI=SIGN(19.87573D0,DPSI)
+      IF(ABS(ABS(DPSI)-59.44441D0).LT.1.D-6) DPSI=SIGN(59.44442D0,DPSI)
       DTHET=90.D0-DPSI
       DCT=COS(DTHET*DRAD)
       DST=SIN(DTHET*DRAD)
@@ -1811,7 +1824,6 @@ SUBROUTINE ETGCON(IUN16,IPRINT,DLAT,DLON,DH,DGRAV,DAZ,IC,DGK,DPK)
 !#######################################################################
 !     IC=2, compute geodetic coefficients for vertical displacement
 !           in mm.
-!     Attention: this component has never been tested but in 2026 was verified by LLM.
 !#######################################################################
   400 CONTINUE
 !GCR original:     DFAK=1.D3/DGRAV
@@ -1819,12 +1831,10 @@ SUBROUTINE ETGCON(IUN16,IPRINT,DLAT,DLON,DH,DGRAV,DAZ,IC,DGK,DPK)
       DO 410 I=1,12
       DGK(I)=DGK(I)*DHLAT(I)*DFAK
   410 DPK(I)=0.0D0
-      WRITE(IUN16,*) '*****The component',IC,' has never been tested !'
       GOTO 2000
 !#######################################################################
 !     IC=3, compute geodetic coefficients for horizontal displacement
 !           in azimuth DAZ in mm.
-!     Attention: this component has never been tested but in 2026 was verified by LLM.
 !#######################################################################
   500 CONTINUE
 !GCR original code: DFAK=1.D3*DR/DGRAV
@@ -1837,7 +1847,6 @@ SUBROUTINE ETGCON(IUN16,IPRINT,DLAT,DLON,DH,DGRAV,DAZ,IC,DGK,DPK)
       IF(DGX(I)*DCAZ.EQ.0.D0.AND.DGY(I)*DSAZ.EQ.0.D0) GOTO 510
       DPK(I)=DRO*ATAN2(DGY(I)*DSAZ,DGX(I)*DCAZ)
   510 CONTINUE
-      WRITE(IUN16,*) '*****The component',IC,' has never been tested !'
       GOTO 2000
 !#######################################################################
 !     IC=4, compute geodetic coefficients for vertical strain at the
@@ -1963,7 +1972,6 @@ SUBROUTINE ETGCON(IUN16,IPRINT,DLAT,DLON,DH,DGRAV,DAZ,IC,DGK,DPK)
 !     IC=7, compute geodetic coefficients for shear tidal strain
 !           at the Earth's deformed surface in 10**-9 units = nstr.
 !           We use a spherical approximation, i.e. eps(t,l)
-!     Attention: this component has never been tested
 !#######################################################################
   900 CONTINUE
       DTHETA=(90.D0-DPSI)*DRAD
@@ -2004,12 +2012,13 @@ SUBROUTINE ETGCON(IUN16,IPRINT,DLAT,DLON,DH,DGRAV,DAZ,IC,DGK,DPK)
 !     DGY(12)=DLLAT(12)*12.D0*DCT/DST2*DSAZ2
 !     BUGFIX (2026): sign of the (4,4) shear term (see IC=5 block).
       DGY(12)=-DLLAT(12)*12.D0*DCT/DST2*DSAZ2
+!     BUGFIX (2026): eps(t,l) is in quadrature with the tidal potential
+!     (proportional to SIN of the wave argument), while DPK=0 output it
+!     in phase.  Shift by -90 degrees; the DGY factors then have exactly
+!     the meaning they have as the imaginary part in the IC=5 block.
       DO 910 I=1,12
       DGK(I)=DGK(I)*DGY(I)*DFAK
-!  910 DPK(I)=0.D0
-!  BUGFIX 2026
   910 DPK(I)=-90.D0
-      WRITE(IUN16,*) ' ***** The shear strain has never been tested ! but in 2026 verified by LLM.'
       GOTO 2000
 !#######################################################################
 !     IC=8, compute geodetic coefficients for volume strain
@@ -3468,6 +3477,9 @@ SUBROUTINE ETPOTS(IUN14,IUN16,IUN24,IPRINT,IMODEL,DLAT,DLON,DH, &
       ENDIF
       IF(NRI.GT.MAXNW) GOTO 2000
       NWFILE=NWFILE+1
+!     Skip waves of degree > 4 for components IC >= 1: their geodetic
+!     coefficients are only defined for degrees 2...4.
+      IF(IC.GE.1.AND.LI.GT.4) GOTO 1110
 !#######################################################################
 !     Truncation of the tidal potential catalogue:
 !#######################################################################

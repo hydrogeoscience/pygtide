@@ -79,6 +79,44 @@ series = predict_series(*args, statazimut=90, tidalcompo=8)
 
 An updated user guide is currently in progress ...
 
+### Note on the absolute scale of the output
+
+PyGTide follows the ETERNA PREDICT convention: tidal potential, gravity and
+tilt (`tidalcompo=-1, 0, 1`) are rigid-Earth (geometric) tides. The body-tide
+amplitude factors of the Wahr–Dehant–Zschau model (gravimetric factor δ≈1.16,
+1+k≈1.30 for the potential, tilt factor γ=1+k−h≈0.69) are divided out for the
+main wave of each wave group and only modulate the relative amplitudes of the
+satellite waves within a group (including the NDFW resonance in the diurnal
+band). To obtain body-tide gravity or tilt, set the wave-group amplitude
+factor accordingly, e.g. for gravity:
+
+```python
+pt.set_wavegroup(np.asarray([[0, 10, 1.16, 0]]))
+```
+
+to set multiple wave group parameters
+
+```python
+DC = np.array([0.000000, 0.000001, 1.000000, 0.0000])
+Long = np.array([0.000002, 0.249951, 1.160000, 0.0000])
+Q1 = np.array([0.721500, 0.906315, 1.154250, 0.0000])
+O1 = np.array([0.921941, 0.974188, 1.154240, 0.0000])
+P1 = np.array([0.989049, 0.998028, 1.149150, 0.0000])
+K1 = np.array([0.999853, 1.216397, 1.134890, 0.0000])
+N2 = np.array([1.719381, 1.906462, 1.161720, 0.0000])
+M2 = np.array([1.923766, 1.976926, 1.161720, 0.0000])
+S2 = np.array([1.991787, 2.002885, 1.161720, 0.0000])
+K2 = np.array([2.003032, 2.182843, 1.161720, 0.0000])
+M3 = np.array([2.753244, 3.081254, 1.07338, 0.0000])
+other = np.array([3.791964, 3.937897, 1.03900, 0.0000])
+
+pt.set_wavegroup(wavedata=np.vstack((DC, Long, Q1, O1, P1, K1, N2, M2, S2, K2, M3, other)))
+```
+
+
+In contrast, displacement and strain outputs (`tidalcompo=2...8`) already
+include the Love numbers h and l, i.e. they are body tides. Keep this in mind
+when combining components (e.g. gravity with displacement or strain).
 
 ## How to cite
 If you use PyGTide, please cite the work as:

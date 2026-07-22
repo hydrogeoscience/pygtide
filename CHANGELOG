@@ -1,3 +1,19 @@
+v0.9.1:
+  * fixed a 90 degree phase error in the shear strain (tidalcompo=7): eps(t,l)
+    is proportional to sin of the wave argument but was output in phase;
+    DPK is now set to -90 degrees
+  * extended the geocentric-latitude singularity guard to the seven removable
+    0/0 singularities of the strain formulas (+-19.88, +-22.21, +-26.57,
+    +-35.26, +-40.89, +-50.77, +-59.44 degrees)
+  * fixed NumPy 2.2+ incompatibility: np.core.defchararray.add() -> np.char.add()
+  * enlarged COMDIR to 1024 characters; path lengths beyond the limit now raise
+    a clear error instead of being silently truncated
+  *- the derivative components (tilt, displacement, strains) are now verified:
+    IC=2/3/4/5/6/8 confirmed correct, IC=7 magnitude and azimuth fixed in v0.9,
+    phase fixed in this release; "never been tested" warnings removed
+  *- documented that potential, gravity and tilt are rigid-Earth tides by ETERNA
+    design (body-tide factors can be set via wave group amplitude factors),
+    while displacement and strain include the Love numbers h and l
 v0.9.0:
   * Bug fixes in the Fortran code (etpred.f90), verified against analytic limits and finite-difference ground truth:
   *- Areal strain (tidalcompo=6) returned values about 1e6 times too small (issue #47): the scale factor line DFAK=1.D9/(DGRAV*DR) was unreachable dead code placed before the block's entry label, so a leftover scale factor from a previous component call was used instead. The line was moved into the block. Areal strain now correctly equals 1.5 x volume strain at every epoch (nstr units).
