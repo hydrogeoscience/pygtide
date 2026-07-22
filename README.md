@@ -4,8 +4,6 @@
 
 PyGTide is a Python module that computes gravitational tides on Earth. It wraps ETERNA PREDICT 3.4 — the classic Fortran 77/90 code by the late Prof. H.-G. Wenzel (Wenzel, 1996), updated with the KSM03 tidal catalogue by Kudryavtsev (2004) — compiled into a Python extension using [f2py](https://docs.scipy.org/doc/numpy/f2py/). The original Fortran code was comprehensively revised for the Python integration, and significant bugs were identified and repaired (see the CHANGELOG).
 
-![Illustrative Earth tide time series](assets/earth_tide_example.png)
-
 ## Key features
 
 - Computes 11 tidal components: tidal potential, gravity, tilt, vertical/horizontal displacement, and vertical/horizontal/areal/shear/volume strain
