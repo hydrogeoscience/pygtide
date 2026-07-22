@@ -92,7 +92,7 @@ The original user guide compared PyGTide with the peer-reviewed package [TSoft](
 - With the **same** catalogue (T87), PyGTide and TSoft agree to rounding level.
 - With **KSM03**, residuals against TSoft reflect the catalogue improvement (KSM03 is ~7× more accurate than HW95, ~50× more accurate than T87) and TSoft's lack of pole/LOD corrections.
 
-- ![PyGTide vs TSoft](assets/comp_tsoft_pygtide.png)
+<img src="../assets/comp_tsoft_pygtide.png" width="500">
 
 PyGTide's own test suite additionally regression-checks an hourly strain series and the M2 frequency — run it any time with `python -c "import pygtide; pygtide.test(msg=True)"`.
 
