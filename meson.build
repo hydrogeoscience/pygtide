@@ -1,74 +1,44 @@
-project('pygtide', 'fortran',
-  version : '0.9.1',
+project('pygtide', ['c', 'fortran'],
+  version : '0.9.2',
   meson_version : '>=1.1.0',
+  default_options : ['optimization=3'],
 )
 
 py = import('python').find_installation()
 
-host_os = host_machine.system()
-fc = meson.get_compiler('fortran')
+numpy_include = run_command(
+  py, '-c', 'import numpy; print(numpy.get_include())',
+  check : true,
+).stdout().strip()
+f2py_include = run_command(
+  py, '-c', 'import numpy.f2py; print(numpy.f2py.get_include())',
+  check : true,
+).stdout().strip()
 
-if host_os == 'windows'
-  ext = 'pyd'
-  if fc.get_id() == 'msvc'
-    f90flags = ['/O2']
-  else
-    f90flags = ['-O3']
-  endif
-else
-  ext = 'so'
-  f90flags = ['-fPIC', '-O3']
-endif
-
-src = 'src/etpred.f90'
-f90_flag_args = ['--f90flags=' + ' '.join(f90flags)]
-
-# --------------------------------------------------
-# 1. Build f2py (ABI-tagged output)
-# --------------------------------------------------
-etpred_build = custom_target(
-  'etpred_build',
-  input : src,
-  output : 'etpred.build.stamp',
+f2py_sources = custom_target(
+  'etpred_f2py_sources',
+  input : 'src/etpred.f90',
+  output : [
+    'etpredmodule.c',
+    'etpred-f2pywrappers.f',
+    'etpred-f2pywrappers2.f90',
+  ],
   command : [
     py,
     '-m', 'numpy.f2py',
-    '-c',
-  ] + f90_flag_args + [
-    '-m', 'etpred',
     '@INPUT@',
+    '-m', 'etpred',
+    '--lower',
   ],
-  build_by_default : true,
 )
 
-# --------------------------------------------------
-# 2. Copy ABI module → pygtide/etpred.pyd
-# --------------------------------------------------
-copy_code = '''
-import glob, os, shutil, sys
-
-build_dir = os.getcwd()
-src_root = r"@0@"
-
-pattern = os.path.join(build_dir, '**', 'etpred*.@1@')
-matches = glob.glob(pattern, recursive=True)
-
-if not matches:
-    print("ERROR: etpred ABI module not found")
-    sys.exit(1)
-
-dst = os.path.join(src_root, 'pygtide', 'etpred.@1@')
-shutil.copy(matches[0], dst)
-print(f"Copied {matches[0]} -> {dst}")
-'''.format(
-  meson.project_source_root(),
-  ext
-)
-
-custom_target(
-  'copy_etpred',
-  input : etpred_build,
-  output : 'etpred.copy.stamp',
-  command : [py, '-c', copy_code],
-  build_by_default : true,
+py.extension_module(
+  'etpred',
+  [
+    'src/etpred.f90',
+    f2py_sources,
+    join_paths(f2py_include, 'fortranobject.c'),
+  ],
+  include_directories : include_directories(numpy_include, f2py_include),
+  install : false,
 )
