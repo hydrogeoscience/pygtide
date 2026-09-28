@@ -16,7 +16,11 @@ def build():
         print(f"Build directory '{build_dir}' already exists, skipping setup.")
     else:
         print(f"Setting up Meson build directory '{build_dir}'...")
-        subprocess.check_call(['meson', 'setup', build_dir])
+    #    subprocess.check_call(['meson', 'setup', build_dir])
+         setup_args = ['meson', 'setup', build_dir]
++        if os.name == 'nt':
++            setup_args.append('-Db_vscrt=none')
++        subprocess.check_call(setup_args)
     # --- Step 2: Compile Meson targets ---
     print("Compiling Meson targets...")
     subprocess.check_call(['meson', 'compile', '-C', build_dir])
