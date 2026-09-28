@@ -22,7 +22,7 @@ jobs:
       CIBW_SKIP: '*i686 *win32 *s390x *ppc64le *musllinux* *aarch64'
       CIBW_BUILD_VERBOSITY: 1
       CIBW_TEST_COMMAND: python -c "import pygtide; pygtide.test(); pygtide.update(); pygtide.test()"
-      MACOSX_DEPLOYMENT_TARGET: 15.0
+      MACOSX_DEPLOYMENT_TARGET: 26.0
       # Statically link the gfortran runtime so delocate doesn't need to bundle
       # Homebrew's libgfortran/libquadmath (which target a newer macOS minimum).
       #CIBW_ENVIRONMENT_MACOS: >-
