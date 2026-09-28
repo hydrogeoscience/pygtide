@@ -1,5 +1,5 @@
 project('pygtide', ['c', 'fortran'],
-  version : '0.9.1',
+  version : '0.9.2',
   meson_version : '>=1.1.0',
   default_options : ['optimization=3'],
 )

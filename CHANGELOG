@@ -1,3 +1,6 @@
+v0.9.2:
+  * Modify meson build system to work under conda-forge.
+
 v0.9.1:
   * added and updated the user guide within GitHub
   * fixed a 90 degree phase error in the shear strain (tidalcompo=7): eps(t,l) is proportional to sin of the wave argument but was output in phase; DPK is now set to -90 degrees
