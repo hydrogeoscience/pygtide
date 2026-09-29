@@ -434,7 +434,9 @@ SUBROUTINE PREDICT(ARGS)
       INTEGER NDAT, ROWI
       LOGICAL OPENSTAT
       ! open a void stream to redirect output (if required)
-      OPEN(UNIT=VOID,FILE=TRIM(NULLFILE),STATUS='OLD')
+      ! STATUS='UNKNOWN' is required for portability: STATUS='OLD' fails on
+      ! some Fortran runtimes (e.g. flang) that don't treat null devices as pre-existing
+      OPEN(UNIT=VOID,FILE=TRIM(NULLFILE),STATUS='UNKNOWN')
 !-GCR calculate row number and allocate new array
       HEADER(1)='Date [UTC]'
       HEADER(2)='Time [UTC]'
