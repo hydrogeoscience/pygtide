@@ -1,3 +1,6 @@
+v0.9.5:
+  * More conda forge updates for the feed-stock
+
 v0.9.4:
   * Update so the test script runs under conda forge with different compilers.
   * pygtide available on conda-forge.
