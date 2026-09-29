@@ -349,7 +349,7 @@ subroutine INIT
     use PARAMS
     use DDT_MOD
     use INOUT
-    INTEGER :: MYPOS,IOS
+    INTEGER :: IOS,IDATE
     CHARACTER(100) TXT
     INTEGER :: IUN16 = 16, IUN30 = 30, IUN27 = 27, IPRINT = 0
     ! find out the date limitations from the files for f2py to prevent calculation
@@ -363,15 +363,19 @@ subroutine INIT
             if (TXT == CENDT) then ! found search string at beginning of line
                   READ(IUN30, '(I8,A)') ETPOL_START, TXT
                   !WRITE(*,*) "etpolut1.dat:",ETPOL_START
+                  ! scan forward to the sentinel/EOF to find the last valid date,
+                  ! rather than seeking to a hard-coded byte offset from file size
+                  ! (offset is not portable across Fortran runtimes/line endings)
+                  ETPOL_END = ETPOL_START
+                  do
+                      READ(IUN30, '(I8,A)', IOSTAT=IOS) IDATE, TXT
+                      if (IOS /= 0) exit
+                      if (IDATE == 99999999) exit
+                      ETPOL_END = IDATE
+                  end do
+                  exit
             end if
         end do
-        ! get file size to estimate where to read dates from
-        INQUIRE(UNIT=IUN30, SIZE=MYPOS)
-        !INQUIRE(IUN30, POS=MYPOS)
-        !WRITE(*,*) MYPOS
-        ! go back by a specific number to the beginning of the previous line
-        READ(IUN30, '(I8,A)', POS=MYPOS-74) ETPOL_END, TXT
-        !WRITE(STDOUT,*) "Last line:" // TXT
         !WRITE(*,*) "etpolut1.dat:",ETPOL_END
         CLOSE(IUN30)
     ENDIF
