@@ -10,7 +10,7 @@ This guide walks you through installing PyGTide, verifying the installation, and
 | Package manager | [Anaconda](https://www.anaconda.com/products/distribution) or [Miniconda](https://docs.conda.io/en/latest/miniconda.html) recommended, but any `pip` works |
 | Fortran compiler | Only needed for source builds (Python 3.10/3.11), e.g. `gfortran` |
 
-## Option 1: Install from PyPI (recommended)
+## Option 1: Install from PyPI
 
 ```bash
 pip install pygtide
@@ -24,10 +24,19 @@ To upgrade an existing installation:
 pip install -U pygtide
 ```
 
+## Option 2: Install from Conda Forge
+
+```bash
+conda install pygtide -c conda-forge
+```
+
+As of version 0.9.4 pygtide is available on conda-forge on windows, linux, mac-os.
+
+
 > [!NOTE]
 > Always use the latest release. Several numerical bug fixes in the Fortran core (geodetic coefficients, shear strain, leap-second handling) were shipped in v0.9 and v0.9.1 — see [Troubleshooting — Known issues by version](troubleshooting.md#known-issues-by-version).
 
-## Option 2: Build from source (Linux, macOS, Windows; Python >= 3.10)
+## Option 3: Build from source (Linux, macOS, Windows; Python >= 3.10)
 
 **Requirements for building:**
 
