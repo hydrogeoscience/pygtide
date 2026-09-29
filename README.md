@@ -32,6 +32,13 @@ PyGTide is a Python module that computes gravitational tides on Earth. It wraps 
 pip install pygtide
 ```
 
+or
+
+```bash
+conda install pygtide -c conda-forge
+```
+
+
 ```python
 from pygtide import predict_series
 
