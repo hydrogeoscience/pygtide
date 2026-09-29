@@ -1,3 +1,7 @@
+v0.9.4:
+  * Update so the test script runs under conda forge with different compilers.
+  * pygtide available on conda-forge.
+
 v0.9.3:
   * Further updates to the build system for windows under conda-forge.
   
