@@ -110,7 +110,6 @@ class pygtide(object):
         pygtide.init() initialises the etpred (Fortran) module and sets global variables
         """
         self.msg = msg
-        self.fortran_version = etpred.inout.vers.astype(str)
         # Resolve package data directory directly from filesystem.
         # Avoid importlib.resources.as_file() which creates temp dirs that get cleaned up.
         pkg_dir = os.path.dirname(__file__)
@@ -122,8 +121,10 @@ class pygtide(object):
         # 12 chars headroom for the longest appended filename (e.g. 'etpolut1.dat')
         COMDIR_LEN = 1024
         if len(self.data_dir) + 12 > COMDIR_LEN:
-            raise RuntimeError(f"Install path too long for the Fortran interface "
-                f"({len(self.data_dir)} characters): {self.data_dir}")
+            raise RuntimeError(
+                f"Install path too long for the Fortran interface "
+                f"({len(self.data_dir)} characters): {self.data_dir}"
+            )
         etpred.params.comdir = self.data_dir.ljust(COMDIR_LEN)
 
         # OS-dependent null file
@@ -133,6 +134,9 @@ class pygtide(object):
 
         # Initialise Fortran module
         etpred.init()
+
+        # VERS is assigned at runtime inside INIT, so read it only after init()
+        self.fortran_version = bytes(etpred.inout.vers).decode("ascii").strip()
 
         # capture end date of file "etddt.dat" from module
         year = int(etpred.inout.etd_start)
@@ -371,26 +375,27 @@ class pygtide(object):
                 raise ValueError("Startdate has incorrect format (YYYY-MM-DD)!")
         enddate = startdate + timedelta(hours=duration)
         # check if requested prediction series exceeds permissible time
+        # NOTE: 'etddt.dat' is hardcoded here rather than read from
+        # etpred.params.etddtdat - f2py/flang mis-marshals CHARACTER(17)
+        # module strings back to Python (see VERS/CFPRN fix history); the
+        # filename is a fixed constant used only for this message text.
         if startdate < self.etddt_start:
-            fname = str(etpred.params.etddtdat)
             warn(
                 "Prediction timeframe is earlier than the available time database (%s). "
-                "For details refer to the file '%s'." % (self.etddt_start, fname)
+                "For details refer to the file '%s'." % (self.etddt_start, "etddt.dat")
             )
         if enddate > (self.etddt_end + timedelta(days=365)):
-            fname = str(etpred.params.etddtdat)
             warn(
                 "Please consider updating the leap second database '%s' (last value is from %s)."
-                % (fname, self.etddt_end)
+                % ("etddt.dat", self.etddt_end)
             )
         # if not (-50*365 < (startdate - dt.datetime.now()).days < 365):
         if ((argsin[13] > 0) or (argsin[14] > 0)) and (
             (startdate < self.etpolut1_start) or (enddate > self.etpolut1_end)
         ):
-            fname = str(etpred.params.etddtdat)
             warn(
                 "Dates exceed permissible range for pole/LOD tide correction (interval %s to %s). Consider update file '%s'."
-                % (self.etpolut1_start, self.etpolut1_end, fname)
+                % (self.etpolut1_start, self.etpolut1_end, "etddt.dat")
             )
         if ((argsin[13] > 0) or (argsin[14] > 0)) and (
             startdate < datetime.strptime("1600-01-01", "%Y-%m-%d")

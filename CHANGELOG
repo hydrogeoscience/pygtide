@@ -1,3 +1,6 @@
+v0.9.7:
+  * fortran run time fixes and core.py updates for modern compilers
+
 v0.9.6:
   * More conda forge updates for the feed-stock
 
@@ -11,7 +14,7 @@ v0.9.4:
 v0.9.3:
   * Further updates to the build system for windows under conda-forge.
   
-v0.9.2:
+v0.9.2
   * Modify meson build system to work under conda-forge.
 
 v0.9.1:

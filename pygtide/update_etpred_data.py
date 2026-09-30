@@ -49,9 +49,12 @@ class update_etpred_db(object):
 
         # set OS dependent module output
         etpred.params.nullfile = os.devnull + " " * (10 - len(os.devnull))
-        self.etddt_file = str(etpred.params.etddtdat, "UTF-8").strip()
-        self.etpolut1_dat_file = str(etpred.params.etpolutdat, "UTF-8").strip()
-        self.etpolut1_bin_file = str(etpred.params.etpolutbin, "UTF-8").strip()
+        # NOTE: hardcoded rather than read from etpred.params - these are only
+        # assigned inside subroutine INIT (see core.py fix history), which
+        # this class never calls; the filenames are fixed by convention.
+        self.etddt_file = "etddt.dat"
+        self.etpolut1_dat_file = "etpolut1.dat"
+        self.etpolut1_bin_file = "etpolut1.bin"
 
         # %% remote data files
         # IERS leap seconds history file
@@ -288,7 +291,9 @@ Leap sec.: $5$
 Date     Time   MJD         x         y       UT1-UTC   TAI-UT1
                            ["]       ["]      [sec]     [sec]
 C****************************************************************\n"""
-            header = header.replace("$1$", dt.datetime.now(dt.timezone.utc).strftime("%d/%m/%Y"))
+            header = header.replace(
+                "$1$", dt.datetime.now(dt.timezone.utc).strftime("%d/%m/%Y")
+            )
             header = header.replace(
                 "$2$",
                 etpolut["date"].iloc[0].strftime("%d/%m/%Y")
@@ -420,7 +425,8 @@ C****************************************************************\n"""
             regex = re.compile(r"^\s*updated\s*\:.*$", re.IGNORECASE)
             for num, line in enumerate(f, 1):
                 line = regex.sub(
-                    "Updated    : %s" % dt.datetime.now(dt.timezone.utc).strftime("%d/%m/%Y"),
+                    "Updated    : %s"
+                    % dt.datetime.now(dt.timezone.utc).strftime("%d/%m/%Y"),
                     line,
                 )
                 header.append(line)

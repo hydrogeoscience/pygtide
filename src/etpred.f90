@@ -213,8 +213,9 @@ module PARAMS
     INTEGER, PARAMETER :: STDIN=5,STDOUT=6,STDERR=0,VOID=11
     INTEGER IC2
     ! names of the i/o files
-    CHARACTER(17), PARAMETER :: CFPRN='pygtide.out.prn',CFOUT='pygtide.out.prd',&
-    ETDDTDAT='etddt.dat',ETPOLUTDAT='etpolut1.dat',ETPOLUTBIN='etpolut1.bin'
+    ! NOTE: not declared PARAMETER - see INOUT module note on f2py exposure of
+    ! CHARACTER PARAMETER constants; assigned instead at runtime in INIT below.
+    CHARACTER(17) :: CFPRN,CFOUT,ETDDTDAT,ETPOLUTDAT,ETPOLUTBIN
     ! numerical parameters
     REAL(8), PARAMETER :: DPI=3.141592653589793D0
     REAL(8), PARAMETER :: DPI2=2*DPI,DRAD=DPI/180,DRO=180/DPI
@@ -234,7 +235,8 @@ module PARAMS
     'Vertical displacement   ','Horizontal displacement ','Vertical strain         ','Horizontal strain       ',&
     'Aereal strain           ','Shear  strain           ','Volume strain           ','Ocean tide              '/)
     INTEGER, PARAMETER :: C88=88888888,C99=99999999
-    CHARACTER(10), PARAMETER :: CENDT='C*********'
+    ! NOTE: not declared PARAMETER, see note above; assigned in INIT below.
+    CHARACTER(10) :: CENDT
     save
 end module PARAMS
 
@@ -335,10 +337,12 @@ module INOUT
     ! CHARACTER(255) :: MESSAGE
     CHARACTER(25), DIMENSION(6) :: HEADER
     CHARACTER(8) :: ETPUNIT
-    !CHARACTER(6), PARAMETER :: CREST='PyGTide'
-    CHARACTER(7), PARAMETER :: CPROJ='PyGTide'
-    CHARACTER(32), PARAMETER :: VERS='ETERNA PREDICT v3.4 (10/02/2013)'
-    CHARACTER(10), PARAMETER :: FORTVERS='3.4 130210'
+    ! NOTE: not declared PARAMETER - f2py's exposure of module-scope CHARACTER
+    ! PARAMETER constants is unreliable on some builds (returns uninitialised
+    ! bytes to Python); assigned instead at runtime in subroutine INIT below.
+    CHARACTER(7) :: CPROJ
+    CHARACTER(32) :: VERS
+    CHARACTER(10) :: FORTVERS
     SAVE
 end module INOUT
 ! ##################################################################
@@ -352,6 +356,16 @@ subroutine INIT
     INTEGER :: IOS,IDATE
     CHARACTER(100) TXT
     INTEGER :: IUN16 = 16, IUN30 = 30, IUN27 = 27, IPRINT = 0
+    ! assign at runtime rather than declaring PARAMETER (see INOUT module note)
+    CPROJ = 'PyGTide'
+    VERS = 'ETERNA PREDICT v3.4 (10/02/2013)'
+    FORTVERS = '3.4 130210'
+    CFPRN = 'pygtide.out.prn'
+    CFOUT = 'pygtide.out.prd'
+    ETDDTDAT = 'etddt.dat'
+    ETPOLUTDAT = 'etpolut1.dat'
+    ETPOLUTBIN = 'etpolut1.bin'
+    CENDT = 'C*********'
     ! find out the date limitations from the files for f2py to prevent calculation
     ! SUCCESS IN READING THE LAST LINE FROM ETPOLUT1.DAT FORMATTED
     OPEN(UNIT=IUN30,FILE=TRIM(COMDIR)//TRIM(ETPOLUTDAT),FORM='FORMATTED',&
