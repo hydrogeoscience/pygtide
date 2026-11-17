@@ -57,19 +57,19 @@ For the Hartmann & Wenzel (1995) catalogue, the gravity-tide accuracy depends on
 
 ## Earth tide components (`tidalcompo`)
 
-| Value | Component | Unit | Absolute scale | Uses `statazimut` |
+| Value | Component | Unit | Absolute scale | Uses `statazimut` | Positive means |
 |---|---|---|---|---|
-| −1 | Tidal potential | m²/s² | rigid (geometric) | no |
-| 0 | Gravity (vertical acceleration, **positive down**) | nm/s² | rigid (geometric) | no |
-| 1 | Tilt | mas | rigid (geometric) | yes |
-| 2 | Vertical displacement (**positive up**) | mm | body tide (h applied) | no |
-| 3 | Horizontal displacement | mm | body tide (l applied) | yes |
-| 4 | Vertical strain ε_rr | nstr (1e-9) | body tide | no |
-| 5 | Horizontal strain | nstr | body tide | yes |
-| 6 | Areal strain (ε_θθ + ε_λλ) | nstr | body tide | no |
-| 7 | Shear strain (ε_θλ) | nstr | body tide | no (tensor component) |
-| 8 | Volume strain | nstr | body tide | no |
-| 9 | Ocean tide | mm | — | no |
+| −1 | Tidal potential | m²/s² | rigid (geometric) | no | increase of tide-generating potential (bulge) |
+| 0 | Gravity (vertical acceleration, **positive down**) | nm/s² | rigid (geometric) | no | downward gravity increase (DPK = 180°) |
+| 1 | Tilt | mas | rigid (geometric) | yes | ground tilts down towards DAZ (plumb line deflects towards DAZ) |
+| 2 | Vertical displacement (**positive up**) | mm | body tide (h applied) | no | up |
+| 3 | Horizontal displacement | mm | body tide (l applied) | yes | towards DAZ |
+| 4 | Vertical strain ε_rr | nstr (1e-9) | body tide | no | extension (normally negative under a bulge) |
+| 5 | Horizontal strain | nstr | body tide | yes | extension along DAZ |
+| 6 | Areal strain (ε_θθ + ε_λλ) | nstr | body tide | no | extension (surface dilatation) |
+| 7 | Shear strain (ε_θλ) | nstr | body tide | no (tensor component) | tensor shear in the (θ = south, λ = east) basis; ε_NE = −ε_θλ |
+| 8 | Volume strain | nstr | body tide | no | dilatation |
+| 9 | Ocean tide | mm | — | no | sea surface up |
 
 > [!IMPORTANT]
 > "Rigid (geometric)" means the Wahr–Dehant–Zschau body-tide factors are divided out at the main wave of each wave group; they only modulate satellite waves within a group. Apply amplitude factors via `set_wavegroup()` to get body-tide gravity/tilt. Full explanation: [Background — Absolute scale](background.md#absolute-scale-of-the-output).
