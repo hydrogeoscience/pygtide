@@ -58,7 +58,7 @@ For the Hartmann & Wenzel (1995) catalogue, the gravity-tide accuracy depends on
 ## Earth tide components (`tidalcompo`)
 
 | Value | Component | Unit | Absolute scale | Uses `statazimut` | Positive means |
-|---|---|---|---|---|
+|---|---|---|---|---|---|
 | −1 | Tidal potential | m²/s² | rigid (geometric) | no | increase of tide-generating potential (bulge) |
 | 0 | Gravity (vertical acceleration, **positive down**) | nm/s² | rigid (geometric) | no | downward gravity increase (DPK = 180°) |
 | 1 | Tilt | mas | rigid (geometric) | yes | ground tilts down towards DAZ (plumb line deflects towards DAZ) |
