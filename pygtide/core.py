@@ -384,11 +384,11 @@ class pygtide(object):
                 "Prediction timeframe is earlier than the available time database (%s). "
                 "For details refer to the file '%s'." % (self.etddt_start, "etddt.dat")
             )
-        if enddate > (self.etddt_end + timedelta(days=365)):
-            warn(
-                "Please consider updating the leap second database '%s' (last value is from %s)."
-                % ("etddt.dat", self.etddt_end)
-            )
+        # if enddate > (self.etddt_end + timedelta(days=365)):
+        #     warn(
+        #         "Please consider updating the leap second database '%s' (last value is from %s)."
+        #         % ("etddt.dat", self.etddt_end)
+        #     )
         # if not (-50*365 < (startdate - dt.datetime.now()).days < 365):
         if ((argsin[13] > 0) or (argsin[14] > 0)) and (
             (startdate < self.etpolut1_start) or (enddate > self.etpolut1_end)
