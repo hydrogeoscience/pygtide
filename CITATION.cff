@@ -1,0 +1,23 @@
+cff-version: 1.2.0
+message: "If you use PyGTide, please cite it as below."
+title: "PyGTide"
+abstract: "A Python module and wrapper for ETERNA PREDICT to compute gravitational tides on Earth. It wraps ETERNA PREDICT 3.4, updated with the KSM03 tidal catalogue, and is compiled into a Python extension using f2py."
+authors:
+  - family-names: "Rau"
+    given-names: "Gabriel C."
+  - family-names: "Eulenfeld"
+    given-names: "Tom"
+  - family-names: "Miller"
+    given-names: "Craig"
+version: "0.9.7"
+doi: "10.5281/zenodo.21483314"
+date-released: "2026-10-01"  # Approximate; replace with the actual release date if known.
+license: "MPL-2.0"
+repository-code: "https://github.com/hydrogeoscience/pygtide"
+url: "https://github.com/hydrogeoscience/pygtide"
+keywords:
+  - "Earth tides"
+  - "gravitational tides"
+  - "ETERNA PREDICT"
+  - "geophysics"
+  - "Python"
